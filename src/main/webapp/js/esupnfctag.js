@@ -67,7 +67,7 @@ $(document).ready(function() {
 					<div class="modal-content"> \
 						<!-- dialog body --> \
 						<div class="modal-body" style="text-align: center"> \
-							<h1>{{e.message}}</h1> \
+							<h1>{{exception.message}}</h1> \
 							<button id="cancelButton" type="button" data-dismiss="modal" class="btn btn-danger btn-lg">Fermer</button> \
 						</div> \
 					</div> \
