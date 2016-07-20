@@ -17,7 +17,14 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.domain.TagLog;
+import org.esupportail.nfctag.domain.TagLog.Status;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
 import org.esupportail.nfctag.service.api.TagIdCheckApi;
@@ -38,10 +45,19 @@ public class TagIdCheckDummyWs implements TagIdCheckApi {
 		this.description = description;
 	}
 	
+	List<List<String>> daltons = new ArrayList<List<String>>();
+	
 	@Override
 	public TagLog getTagLogFromTagId(TagType tagType, String tagId) throws EsupNfcTagException {
 		
-		String desfireId = null;		
+		String desfireId = null;
+		
+		int numDalton = 0;
+		
+		daltons.add(Arrays.asList("Joe", "Dalton"));
+		daltons.add(Arrays.asList("Jack", "Dalton"));
+		daltons.add(Arrays.asList("William", "Dalton"));
+		daltons.add(Arrays.asList("Averell", "Dalton"));
 		
 		switch (tagType) {
 			case CSN :
@@ -51,6 +67,7 @@ public class TagIdCheckDummyWs implements TagIdCheckApi {
 					csnRetourne = csnRetourne + csn.charAt(csn.length() - i - 1) + csn.charAt(csn.length() - i);
 				}
 				tagId = csnRetourne;
+				numDalton = Integer.parseInt(tagId.substring(0, 4), 16) % 4;
 				log.info("Check CSN : " + csnRetourne);
 				break;
 			case DESFIRE :
@@ -61,11 +78,15 @@ public class TagIdCheckDummyWs implements TagIdCheckApi {
 				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_typenotsupported, tagType.toString());
 		}		
 		
+		
 		TagLog tagLog = new TagLog();
 		tagLog.setCsn(tagId);
-		tagLog.setDesfireId(desfireId);
-		tagLog.setLastname("Joe");
-		tagLog.setFirstname("Dalton");
+		tagLog.setFirstname(daltons.get(numDalton).get(0));
+		tagLog.setLastname(daltons.get(numDalton).get(1));
+		tagLog.setStatus(Status.valid);
+		tagLog.setAuthDate(new Date());
+		tagLog.setEppn(daltons.get(numDalton).get(1)+"@univ-ville.fr");
+		tagLog.setLocation("Dummy Location");
 
 		return tagLog;	
 	}
