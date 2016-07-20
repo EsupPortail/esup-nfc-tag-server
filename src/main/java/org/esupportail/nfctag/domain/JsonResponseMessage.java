@@ -3,6 +3,7 @@ package org.esupportail.nfctag.domain;
 public class JsonResponseMessage {
 	
 	private String code;
+	
 	private String message;
 	
 	public String getCode() {

@@ -66,7 +66,9 @@ public class CsnWsController {
 		String resp4arduino = "<";
 		resp4arduino += jsonResponseMessage.getCode();
 		resp4arduino += "\n";
+		resp4arduino += "ERROR".equals(jsonResponseMessage.getCode()) ? "Erreur\n" : "";
 		resp4arduino += jsonResponseMessage.getMessage();
+		resp4arduino += "OK".equals(jsonResponseMessage.getCode()) ? "\nReconnu" : "";
 		resp4arduino += ">";
 		return resp4arduino;
 
