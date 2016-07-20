@@ -21,7 +21,7 @@ public class JsonResponseMessage {
 	
 	private String code;
 	
-	private String message;
+	private String msg;
 	
 	public String getCode() {
 		return code;
@@ -29,11 +29,11 @@ public class JsonResponseMessage {
 	public void setCode(String code) {
 		this.code = code;
 	}
-	public String getMessage() {
-		return message;
+	public String getMsg() {
+		return msg;
 	}
-	public void setMessage(String msg) {
-		this.message = msg;
+	public void setMsg(String msg) {
+		this.msg = msg;
 	}
 
 }

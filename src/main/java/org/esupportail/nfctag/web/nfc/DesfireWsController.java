@@ -115,19 +115,19 @@ public class DesfireWsController {
 			TagLog tagLog = tagAuthService.auth(TagType.DESFIRE, desfireId, numeroId);
 			liveController.handleTagLog(tagLog);		
 			jsonResponseMessage.setCode("OK");
-			jsonResponseMessage.setMessage(tagLog.getFirstname() + " " + tagLog.getLastname());
+			jsonResponseMessage.setMsg(tagLog.getFirstname() + " " + tagLog.getLastname());
 		} catch(EsupNfcTagException e) {
 			TagError tagError = new TagError(e);
 			tagError.setNumeroId(numeroId);
 			errorLongPoolController.handleError(tagError);
 			jsonResponseMessage.setCode("ERROR");
-			jsonResponseMessage.setMessage(e.getMessage());
+			jsonResponseMessage.setMsg(e.getMessage());
 			log.error("EsupNfcTagException during desfireRequest with desfireId = " + desfireId + " and numeroId=" + numeroId, e);
 		} catch (Exception e) {
 			TagError tagError = new TagError(e);
 			errorLongPoolController.handleError(tagError);
 			jsonResponseMessage.setCode("ERROR");
-			jsonResponseMessage.setMessage(e.getMessage());
+			jsonResponseMessage.setMsg(e.getMessage());
 			log.error("Desfire tag issue", e);
 		}
 		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();

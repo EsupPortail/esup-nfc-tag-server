@@ -64,13 +64,13 @@ public class CsnWsController {
 			TagLog tagLog = tagAuthService.auth(TagType.CSN, csn, numeroId);
 			liveController.handleTagLog(tagLog);		
 			jsonResponseMessage.setCode("OK");
-			jsonResponseMessage.setMessage(tagLog.getFirstname() + " " + tagLog.getLastname());
+			jsonResponseMessage.setMsg(tagLog.getFirstname() + " " + tagLog.getLastname());
 		} catch(EsupNfcTagException e) {
 			TagError tagError = new TagError(e);
 			tagError.setNumeroId(numeroId);
 			errorLongPoolController.handleError(tagError);
 			jsonResponseMessage.setCode("ERROR");
-			jsonResponseMessage.setMessage(e.getMessage());
+			jsonResponseMessage.setMsg(e.getMessage());
 			log.error("EsupNfcTagException during csnRequest with csn = " + csn + " and numeroId=" + numeroId + " - "+ e.getMessage());
 		}
 		return jsonResponseMessage;
@@ -84,7 +84,7 @@ public class CsnWsController {
 		resp4arduino += jsonResponseMessage.getCode();
 		resp4arduino += "\n";
 		resp4arduino += "ERROR".equals(jsonResponseMessage.getCode()) ? "Erreur\n" : "";
-		resp4arduino += jsonResponseMessage.getMessage();
+		resp4arduino += jsonResponseMessage.getMsg();
 		resp4arduino += "OK".equals(jsonResponseMessage.getCode()) ? "\nReconnu" : "";
 		resp4arduino += ">";
 		return resp4arduino;
