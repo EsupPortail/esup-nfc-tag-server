@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+    <definition extends="user" name="manager/taglogs/list">
+        <put-attribute name="body" value="/WEB-INF/views/manager/taglogs/list.jspx"/>
+    </definition>
+	<definition extends="user" name="manager/taglogs/show">
+        <put-attribute name="body" value="/WEB-INF/views/manager/taglogs/show.jspx"/>
+    </definition>
+	<definition extends="user" name="manager/taglogs/findTagLogsByAuthDateGreaterThan">
+        <put-attribute name="body" value="/WEB-INF/views/manager/taglogs/findTagLogsByAuthDateGreaterThan.jspx"/>
+    </definition>
+	<definition extends="user" name="manager/taglogs/findTagLogsByAuthDateGreaterThanAndNumeroIdEquals">
+        <put-attribute name="body" value="/WEB-INF/views/manager/taglogs/findTagLogsByAuthDateGreaterThanAndNumeroIdEquals.jspx"/>
+    </definition>
+	<definition extends="user" name="manager/taglogs/findTagLogsByLocation">
+        <put-attribute name="body" value="/WEB-INF/views/manager/taglogs/findTagLogsByLocation.jspx"/>
+    </definition>
+	<definition extends="user" name="manager/taglogs/findTagLogsByNumeroIdEquals">
+        <put-attribute name="body" value="/WEB-INF/views/manager/taglogs/findTagLogsByNumeroIdEquals.jspx"/>
+    </definition>
+</tiles-definitions>

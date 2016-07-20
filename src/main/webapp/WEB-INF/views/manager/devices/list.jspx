@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:spring="http://www.springframework.org/tags" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <h1>
+        <spring:message code="label_org_esupportail_nfctag_domain_device_plural"/>
+    </h1>
+    <div class="btn-group">
+        <a class="btn btn-info pull-left" href="/manager/devices?form">
+            <span class="glyphicon glyphicon-plus">
+                <spring:message code="button_add_device"/>
+            </span>
+        </a>
+    </div>
+    <br/>
+    <br/>
+    <page:list id="pl_org_esupportail_nfctag_domain_Device" items="${devices}" z="user-managed"/>
+    <table:table update="false" delete="false" data="${devices}" id="l_org_esupportail_nfctag_domain_Device" path="/manager/devices" z="user-managed">
+        <table:column id="c_org_esupportail_nfctag_domain_Device_numeroId" property="numeroId" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_Device_eppnInit" property="eppnInit" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_Device_imei" property="imei" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_Device_macAddress" property="macAddress" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_Device_userAgent" property="userAgent" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_Device_application" sort="true" property="applicationName" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_Device_location" property="location" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_Device_validateAuthWoConfirmation" property="validateAuthWoConfirmation" z="cTst4CWgTJIO74pDMvMbzsNGyhs="/>
+    </table:table>
+</div>

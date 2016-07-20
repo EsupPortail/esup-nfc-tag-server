@@ -1,0 +1,350 @@
+body {
+	background-color: rgba(0,0,0,1);
+	padding-top: 10px;
+	padding-bottom: 30px;
+}
+
+table{
+	background-color: rgb(240, 241, 241);
+}
+
+.newLog h2 {
+font-size: 50px;
+color: red;
+}
+.newLog img {
+width: 50px;
+}
+.oldLog h2 {
+opacity: 0.5;
+}
+.oldLog img {
+width: 30px;
+}
+
+.icon-tag{
+	font-size:2em;
+}
+
+.td-live-img {
+	text-align:center;
+	vertical-align:middle !important;
+}
+
+.td-live-text {
+	width: 90%;
+}
+
+.modal-backdrop {
+  
+}
+
+.modal {
+  text-align: center;
+  padding: 0!important; 
+}
+
+.modal-dialog {
+  display: inline-block;
+  text-align: left;
+  vertical-align: middle;
+}
+
+#menu{
+	background-color: rgba(255,255,255,0.8);
+}
+
+.navbar-collapse {
+	font-weight: bold;
+}
+
+@media ( min-width : 768px) {
+	.navbar-default .navbar-nav> li >a {
+		color: white;
+		font-weight: bold;
+	}
+}
+.navbar-btn {
+	margin-bottom: 0;
+	margin-right: 8px;
+}
+
+.navbar-text {
+	color: white !important;
+	font-size: 1.3em;
+}
+
+.nav-tabs {
+	margin-bottom: 20px;
+}
+
+.page-header {
+	background: url("../images/logo-xl.png") no-repeat 10px 5px;
+	background-size: 74px;
+	margin: 0 0 5px;
+	border-bottom: 0px;
+	padding-bottom: 0px;
+	position: relative;
+	z-index: 11;
+	width: 100px;
+}
+
+.navbar-default {
+	z-index: 10;
+	background-color: #555;
+}
+
+.navbar-default div {
+	margin-left: 85px;
+}
+
+.header-btn {
+	min-height: 80px;
+    width : 100px;
+	/* background: #222 url("../images/leodrid-icon.svg") no-repeat 10px 5px; */
+}
+
+
+	.individu {
+		position: absolute;
+		bottom: 0px;
+		left: 250px;
+		padding: 15px 5px 5px 5px;
+		margin: 5px;
+	}
+@media ( max-width : 768px) {
+	header {
+		min-height: 80px;
+		margin: 0 0 15px 10px;
+		border-bottom: 1px solid #EEE;
+		padding-bottom: 10px;
+		position: relative;
+	}
+}
+
+.containerfull {
+	margin-left: 20px;
+	margin-right: 20px;
+	padding: 5px;
+	background: #ddd;
+	border : 1px solid #aaa;
+	opacity: 0.95;
+}
+
+@media ( max-width : 1200px) {
+	.containerfull {
+		margin-left: 5px;
+		margin-right: 5px;
+	}
+	.addMailFonct {
+		width: 95%;
+	}
+}
+
+.supervisor-nav {
+	margin-top: -48px;
+	margin-right: 25px !important;
+}
+
+#footer {
+	text-align: center;
+	background-color: #000;
+	color: #FFF;
+	padding: 10px;
+
+	position: fixed;
+	bottom: 0px;
+	width: 100%;
+
+}
+
+.panel-body h4 {
+	border-bottom: 1px solid #EEE;
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
+.panel-heading h3 {
+	font-weight: bold;
+}
+
+#contrat dd {
+	margin-bottom: 0 !important;
+}
+
+#updateTag .btn-group, #createTag .btn-group, #listTag .btn-group {
+	margin-right:20px;
+	float:right;
+}
+
+@media (max-width: 768px){
+	#listTag .btn-group{
+		top: 5px;
+	}
+}
+.text-grey {
+opacity: 0.15;
+cursor: pointer;
+}
+.text-green {
+color: #0cba00;
+cursor: pointer;
+}
+
+.btn-group-vertical{
+	margin-right: 10px;
+}
+
+.dropdown .btn {
+    margin: 10px;
+}
+
+thead, tfoot {
+	background-color: #ccc;
+}
+
+.removeclass {
+	position: relative;
+	top: -26px;
+	left: 100%;
+}
+
+input[type=radio] {
+	margin-right: 5px;
+	margin-left: 5px;
+}
+
+h4.panel-title {
+	border: none;
+	margin: 0;
+}
+
+h4 .btn {
+	color: white;
+}
+
+.dl-horizontal dt {
+	text-align: left;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.dl-horizontal dd {
+	margin-left: 0;
+	border-bottom: 1px solid rgb(230, 230, 230);
+}
+
+.btn-group .pull-left {
+	margin-left: 10px;
+}
+
+.marginTop {
+	margin-top: 10px;
+}
+
+.marginLeft {
+	margin-left: 0 !important;
+}
+
+input[type="checkbox"] {
+	margin-right: 10px;
+	vertical-align: sub;
+}
+
+span.error {
+	color: red;
+	font-weight: bold;
+}
+
+.customSelect .btn-group {
+	position: static!important;
+}
+
+.btn{
+	font-weight: bold;
+}
+.glyphicon {
+    font-family: inherit;
+    font-weight: bold
+}
+.glyphicon:before{
+    font-family:'Glyphicons Halflings';
+}
+
+@media(max-width: 1200px){
+	.btn-group, .btn-group-vertical{
+		margin-right: 10px;
+	}
+}
+@media (max-width: 1280px){
+	.nav-tabs {
+    margin-left: 10px;
+	}
+}
+
+@media(max-width: 768px){
+	.row{
+		margin-left: 0;
+		margin-right: 0;
+	}
+	.jumbotron h2{
+		margin-left: 10px;
+	}
+}
+/* Portrait tablet to landscape and desktop */
+@media (max-width: 659px){
+	header{
+		background: url("../images/logo-xs.png") no-repeat 10px;
+	}
+}
+
+
+.btn-danger{
+background-color: #c9302c;	
+}
+
+
+.background {
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+    height: 100%;
+    left: 0;
+    top: 0;
+    overflow: auto;
+}
+
+.background-filter {
+    background-color:rgb(153, 178, 178);
+    -webkit-background-size: cover;
+    -moz-background-size: cover;
+    background-size: cover;
+    -o-background-size: cover;
+    height: 100%;
+    left: 0;
+    top: 0;
+    overflow: auto;
+    z-index:-10;
+}
+
+.panel{
+	background-color:rgba(20,0,0,0.95);
+	color: #FFF;
+}
+
+.panel > .panel-heading {
+    background-image: none;
+    background-color: #d9534f;
+    color: white;
+}
+
+.input-group-addon.primary { color: rgb(255, 255, 255); background-color: rgb(50, 118, 177); border-color: rgb(40, 94, 142); } .input-group-addon.success { color: rgb(255, 255, 255); background-color: rgb(92, 184, 92); border-color: rgb(76, 174, 76); } .input-group-addon.info { color: rgb(255, 255, 255); background-color: rgb(57, 179, 215); border-color: rgb(38, 154, 188); } .input-group-addon.warning { color: rgb(255, 255, 255); background-color: rgb(240, 173, 78); border-color: rgb(238, 162, 54); } .input-group-addon.danger { color: rgb(255, 255, 255); background-color: rgb(217, 83, 79); border-color: rgb(212, 63, 58); }
+
+.nav-tabs>li>a{
+        background-color: rgba(255, 255, 255, 0.6);
+}
+
+.with-nav-tabs.panel-danger .nav-tabs > li > a{
+        font-weight: bold;
+}

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder name="enc" class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+	        <layout class="org.esupportail.nfctag.logs.PatternLayoutWithUserContext">
+	            <param name="Pattern" value="[%-5level] %date{dd/MM/yyyy HH:mm:ss} [%-20thread] [%user %remote %session] %logger{36} - %msg - %n" />
+    	    </layout>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>TRACE</level>
+		</filter>
+	</appender>
+	
+    <appender name="FILE" class="ch.qos.logback.core.FileAppender">
+       <file>/opt/tomcat-esup-nfc-tag-server/logs/esupnfctagserver.log</file>
+		<encoder name="enc" class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+	        <layout class="org.esupportail.nfctag.logs.PatternLayoutWithUserContext">
+	            <param name="Pattern" value="[%-5level] %date{dd/MM/yyyy HH:mm:ss} [%-20thread] [%user %remote %session] %logger{36} - %msg - %n" />
+    	    </layout>
+		</encoder>
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>TRACE</level>
+		</filter>
+    </appender>
+    
+    <appender name="EMAIL" class="ch.qos.logback.classic.net.SMTPAppender">
+        <smtpHost>smtp.univ-ville.fr</smtpHost>
+        <smtpPort>25</smtpPort>
+        <to>leodrid-logs@univ-ville.fr</to>
+        <from>leodrid-logs@univ-ville.fr</from>
+        <subject>%-5level - Leodrid %date{dd/MM/yyyy HH:mm:ss}</subject>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>[%-5level] %date{dd/MM/yyyy HH:mm:ss} [%-20thread] %logger{36} - %msg%n</pattern>
+        </layout>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+			<level>ERROR</level>
+		</filter>
+    </appender>
+
+	<root>
+		<level value="WARN" />
+		<appender-ref ref="STDOUT" />
+	</root>
+	    
+	<logger name="org.esupportail.nfctag" additivity="false">
+	    <level value="DEBUG" />
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+		<!-- 
+		<appender-ref ref="EMAIL" />
+		 -->
+	</logger>
+
+</configuration>

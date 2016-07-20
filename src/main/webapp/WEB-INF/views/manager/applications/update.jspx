@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <h1>
+        <spring:message code="label_org_esupportail_nfctag_domain_application"/> : ${application.name}</h1>
+    <form:update cssClass="form-horizontal" id="fu_org_esupportail_nfctag_domain_Application" modelAttribute="application" path="/manager/applications" versionField="Version" z="user-managed">
+        <field:input cssClass="form-control" field="name" id="c_org_esupportail_nfctag_domain_Application_name" z="user-managed"/>
+        <field:select checkboxes="true" field="nfcConfig" id="c_org_esupportail_nfctag_domain_Application_nfcConfig" itemLabel="description" itemValue="id" items="${nfcAuthConfigs}" multiple="false" path="/" z="user-managed"/>
+        <field:select checkboxes="true" field="appliExt" id="c_org_esupportail_nfctag_domain_Application_appliExt" itemLabel="appliExtDescription" itemValue="appliExtKey" items="${extApis}" multiple="false" path="/" z="user-managed"/>
+        <field:select checkboxes="true" field="tagIdCheck" id="c_org_esupportail_nfctag_domain_Application_tagIdCheck" itemLabel="tagIdCheckDescription" itemValue="tagIdCheckKey" items="${tagIdChecks}" multiple="false" path="/" z="user-managed"/>
+		<field:checkbox field="active" id="c_org_esupportail_nfctag_domain_Application_active" z="user-managed"/>
+        <field:textarea cssClass="form-control" field="description" id="c_org_esupportail_nfctag_domain_Application_description" z="user-managed"/>
+        <field:input field="applisExtService" id="c_org_esupportail_nfctag_domain_Application_applisExtService" render="false" z="user-managed"/>
+        <field:input field="nfcAuthConfigService" id="c_org_esupportail_nfctag_domain_Application_nfcAuthConfigService" render="false" z="user-managed"/>
+        <field:input field="tagIdCheckService" id="c_org_esupportail_nfctag_domain_Application_tagIdCheckService" render="false" z="user-managed"/>
+    </form:update>
+</div>

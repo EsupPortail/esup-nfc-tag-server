@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <h1>
+        <spring:message code="label_org_esupportail_nfctag_domain_device"/> : ${device.imei}</h1>
+    <form:update cssClass="form-horizontal" id="fu_org_esupportail_nfctag_domain_Device" modelAttribute="device" path="/manager/devices" versionField="Version" z="user-managed">
+        <field:input cssClass="form-control" field="numeroId" id="c_org_esupportail_nfctag_domain_Device_numeroId" z="user-managed"/>
+        <field:input cssClass="form-control" field="eppnInit" id="c_org_esupportail_nfctag_domain_Device_eppnInit" z="user-managed"/>
+        <field:input cssClass="form-control" field="macAddress" id="c_org_esupportail_nfctag_domain_Device_macAddress" z="user-managed"/>
+        <field:input cssClass="form-control" field="imei" id="c_org_esupportail_nfctag_domain_Device_imei" z="user-managed"/>
+        <field:input cssClass="form-control" field="userAgent" id="c_org_esupportail_nfctag_domain_Device_userAgent" z="user-managed"/>
+        <field:select checkboxes="true" field="application" id="c_org_esupportail_nfctag_domain_Device_application" itemLabel="name" itemValue="id" items="${applications}" path="/manager/applications" z="user-managed"/>
+        <field:input cssClass="form-control" field="location" id="c_org_esupportail_nfctag_domain_Device_location" z="user-managed"/>
+        <field:checkbox field="validateAuthWoConfirmation" id="c_org_esupportail_nfctag_domain_Device_validateAuthWoConfirmation" z="user-managed"/>
+    </form:update>
+</div>

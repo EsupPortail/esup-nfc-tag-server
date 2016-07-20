@@ -1,0 +1,22 @@
+<Context>
+  
+  <Resource name="jdbc/esupNfcTagDb"
+  		auth="Container" 
+  		factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+  		driverClassName="org.postgresql.Driver"
+        username="esupnfctag"
+        password="esup" 
+        type="javax.sql.DataSource"
+        url="jdbc:postgresql://localhost:5432/esupnfctag"
+        maxActive="20" 
+        minIdle="5"     
+        maxIdle="10" 
+        initialSize="5"
+        maxWait="60000" 
+        validationQuery="SELECT 1"
+        testOnBorrow="true"
+        maxAge="3600000" 
+         />
+       
+</Context>
+

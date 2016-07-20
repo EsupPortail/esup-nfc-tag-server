@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:spring="http://www.springframework.org/tags" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <h1>
+        <spring:message code="label_org_esupportail_nfctag_domain_taglog_plural"/>
+    </h1>
+    <page:list id="pl_org_esupportail_nfctag_domain_TagLog" items="${taglogs}" z="user-managed"/>
+    <table:table data="${taglogs}" delete="false" id="l_org_esupportail_nfctag_domain_TagLog" path="/manager/taglogs" update="false" z="user-managed">
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_authDate" property="authDate" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_applicationName" property="applicationName" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_location" property="location" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_eppnInit" property="eppnInit" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_numeroId" property="numeroId" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_status" property="status" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_csn" property="csn" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_desfireId" property="desfireId" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_eppn" property="eppn" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_firstname" property="firstname" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_lastname" property="lastname" z="user-managed"/>
+    </table:table>
+</div>

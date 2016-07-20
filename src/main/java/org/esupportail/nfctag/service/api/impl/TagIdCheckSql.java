@@ -1,0 +1,89 @@
+package org.esupportail.nfctag.service.api.impl;
+
+import javax.sql.DataSource;
+
+import org.esupportail.nfctag.domain.TagLog;
+import org.esupportail.nfctag.service.api.TagIdCheckApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
+
+public class TagIdCheckSql implements TagIdCheckApi {
+	
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
+	protected JdbcTemplate jdbcTemplate;
+
+	protected String csnAuthSql;
+
+	protected String desfireAuthSql;
+	
+	protected String description;
+	
+	
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setDataSource(DataSource datesource) {
+		this.jdbcTemplate = new JdbcTemplate(datesource);
+	}
+
+	public void setCsnAuthSql(String csnAuthSql) {
+		this.csnAuthSql = csnAuthSql;
+	}
+
+	public void setDesfireAuthSql(String desfireAuthSql) {
+		this.desfireAuthSql = desfireAuthSql;
+	}
+	
+	@Override
+	public TagLog getTagLogFromTagId(TagType tagType, String tagId){
+		
+		String authSql = "";
+		switch (tagType) {
+			case CSN :
+				String csn = tagId;
+				String csnRetourne = new String();
+				for (int i = 1; i < csn.length(); i = i + 2) {
+					csnRetourne = csnRetourne + csn.charAt(csn.length() - i - 1) + csn.charAt(csn.length() - i);
+				}
+				tagId = csnRetourne;
+				authSql = csnAuthSql;
+				break;
+			case DESFIRE :
+				authSql = desfireAuthSql;
+				break;	
+			default:
+				throw new RuntimeException(tagType + " is not supported");
+		}
+		
+		TagLog tagLog = null;
+		try {
+			tagLog = (TagLog) jdbcTemplate.queryForObject(authSql, new Object[] { tagId }, new TagLogRowMapper());
+			log.info("tagId " + tagId + " identifié !");
+		} catch (EmptyResultDataAccessException ex) {
+			log.info("Pas de résultat pour le tagId : " + tagId);
+		}
+		return tagLog;	
+	}
+
+	@Override
+	public Boolean supportTagType(TagType tagType) {
+		switch (tagType) {
+			case CSN :
+				return csnAuthSql != null && !csnAuthSql.isEmpty();
+			case DESFIRE :
+				return desfireAuthSql != null && !desfireAuthSql.isEmpty();
+			default:
+				return false;
+		}
+	}
+	
+	
+}

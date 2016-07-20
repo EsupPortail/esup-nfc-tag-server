@@ -1,0 +1,53 @@
+<div xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:sec="http://www.springframework.org/security/tags" xmlns:form="http://www.springframework.org/tags/form">
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	<c:if test="${not empty backgroundColor}">
+	<style>
+	.background-filter {
+		background-color: ${backgroundColor};
+		}
+	</style>
+	</c:if>
+	<c:if test="${not empty pageHeader}">
+	<style>
+		.page-header {
+			background: url('/live-ws/headerImage?numeroId=${numeroId}') no-repeat 10px;
+			background-size: 90px;
+		}
+
+	</style>
+	</c:if>
+	<c:choose>
+	<c:when test="${isActiv}">
+	<h2>${location}</h2>
+		<button id="showLogs" style="width:100%;" type="button" class="btn btn-success btn-lg" onclick="document.getElementById('lastleoauth').style.display='block';this.style.display='none';document.getElementById('hideLogs').style.display='block';">
+			<spring:message code="message_tag_view"/>
+		</button>
+		<button id="hideLogs"  type="button" class="btn btn-success btn-lg" style="width:100%;display:none;" onclick="document.getElementById('lastleoauth').style.display='none';this.style.display='none';document.getElementById('showLogs').style.display='block';">
+			<spring:message code="message_tag_hide" />
+		</button>
+		<div id="newLog" class="oldLog"> 
+			<div id="status" class="danger" style="display:none;"><!--  --></div>
+			<table class="table table-bordered"> 
+				<tbody id="lastleoauth" style="display:none;"><!--  --></tbody>
+			</table> 
+		</div>
+	&amp;nbsp;
+	<div id="validate"><!--  --></div>
+	<div id="error" class="text-danger"><!--  --></div>
+	<div id="debug" class="text-warning"><!--  --></div>
+	<script type="text/javascript">
+		var numeroId = '${numeroId}';
+		var serviceUrl = '${serviceUrl}';
+		var authType = '${authType}';
+		var validateAuthWoConfirmation = '${validateAuthWoConfirmation}';
+	</script>
+	</c:when>
+	<c:otherwise>
+	<h2>${location}</h2>
+			<button id="error" style="width:100%;" type="button" class="btn btn-danger btn-lg" onclick="location.reload();"	>
+			<spring:message code="message_tag_unavailable" />
+		</button>
+	</c:otherwise>
+	</c:choose>
+</div>

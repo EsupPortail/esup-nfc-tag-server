@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
+    <jsp:output omit-xml-declaration="yes"/>
+    <h1>
+        <spring:message code="label_org_esupportail_nfctag_domain_device"/> : ${device.imei}</h1>
+    <page:show id="ps_org_esupportail_nfctag_domain_Device" object="${device}" path="/manager/devices" z="user-managed">
+        <dl class="dl-horizontal">
+            <field:display field="numeroId" id="s_org_esupportail_nfctag_domain_Device_numeroId" object="${device}" z="user-managed"/>
+            <field:display field="eppnInit" id="s_org_esupportail_nfctag_domain_Device_eppnInit" object="${device}" z="user-managed"/>
+            <field:display field="macAddress" id="s_org_esupportail_nfctag_domain_Device_macAddress" object="${device}" z="user-managed"/>
+            <field:display field="imei" id="s_org_esupportail_nfctag_domain_Device_imei" object="${device}" z="user-managed"/>
+            <field:display field="userAgent" id="s_org_esupportail_nfctag_domain_Device_userAgent" object="${device}" z="user-managed"/>
+            <field:display field="location" id="s_org_esupportail_nfctag_domain_Device_location" object="${device}" z="user-managed"/>
+            <field:display field="application" id="s_org_esupportail_nfctag_domain_Device_application" object="${device}" z="user-managed"/>
+	        <field:display field="validateAuthWoConfirmation" id="s_org_esupportail_nfctag_domain_Device_validateAuthWoConfirmation" object="${device}" z="user-managed"/>
+        </dl>
+    </page:show>
+</div>

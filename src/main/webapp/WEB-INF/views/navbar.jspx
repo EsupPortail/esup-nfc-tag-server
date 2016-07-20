@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:menu="urn:jsptagdir:/WEB-INF/tags/menu" 
+    xmlns:sec="http://www.springframework.org/security/tags"
+    xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+	xmlns:spring="http://www.springframework.org/tags" class="navbar-default navbar-inverse navbar-fixed-top">
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	<spring:message code="application_name" htmlEscape="false" var="app_name" />
+	<spring:url value="/j_spring_security_logout" var="logout_url" />
+	<script type="text/javascript">
+		var msg_location="<spring:message code="message_location_disconnect_location" />";
+		var msg="<spring:message code="message_location_disconnect" />";
+	</script>
+	<div class="container-fluid">
+	<c:choose>
+		<c:when test="${empty param.numeroId and empty numeroId}">
+		<menu:menu appName="${app_name}" id="_navbar">
+
+		    <sec:authorize access="hasRole('ROLE_ADMIN')">          
+  				<menu:item id="adminview" label="Sessions" url="/admin/currentsessions" activeMenu="${active=='sessions'}"/>
+          </sec:authorize>
+          	
+		</menu:menu>
+		<sec:authorize access="isAuthenticated()">
+			<ul class="list-inline navbar-right supervisor-nav visible-xs-block visible-lg-block visible-md-block visible-sm-block"> 
+				<li><h4 style="color:white;"><sec:authentication property="principal.username" /></h4></li>
+	      		<li><a href="${logout_url}" class="btn btn-default navbar-btn"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a></li>
+	      	</ul>
+	    </sec:authorize>
+	    <sec:authorize access="not isAuthenticated()">
+			<ul class="list-inline navbar-right supervisor-nav visible-xs-block visible-lg-block visible-xs-block visible-md-block visible-sm-block"> 
+	      		<li><a href="/manager" class="btn btn-success"><spring:message code="button_authentication" /></a></li>
+	      	</ul>
+	    </sec:authorize>
+		</c:when>
+			<c:otherwise>
+				<spring:url value="/nfc/unregister?numeroId=${numeroId}&amp;imei=${imei}&amp;macAddress=${macAddress}" var="nfc_unregister_url" htmlEscape="false" />
+				<c:choose>
+					<c:when test="${not empty location}">
+						<ul class="list-inline navbar-right visible-xs-block visible-lg-block visible-md-block visible-sm-block text-right"> 
+				      		<li><a href="${nfc_unregister_url}" onclick="return confirm(msg_location)" class="btn btn-default navbar-btn btn-success"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a></li>
+				      	</ul>
+					</c:when>
+					<c:otherwise>
+						<ul class="list-inline navbar-right visible-xs-block visible-lg-block visible-md-block visible-sm-block text-right"> 
+				      		<li><a href="${nfc_unregister_url}" onclick="return androidLogout()" class="btn btn-default navbar-btn btn-danger"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a></li>
+				      	</ul>
+					</c:otherwise>
+				</c:choose>
+			</c:otherwise>
+		</c:choose>
+	</div>
+</div>

@@ -1,0 +1,29 @@
+<div xmlns:page="urn:jsptagdir:/WEB-INF/tags/form"
+     xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields"
+      xmlns:fn="http://java.sun.com/jsp/jstl/functions"
+     xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:sec="http://www.springframework.org/security/tags" xmlns:form="http://www.springframework.org/tags/form">
+	<jsp:directive.page contentType="text/html;charset=UTF-8" />
+	<jsp:output omit-xml-declaration="yes" />
+	<div class="row">
+	<div class="col-lg-12 text-center">
+		<h1><spring:message code="message_location_choice" /></h1>
+		<c:forEach items="${appLocations}" var = "appLocation">
+			<c:choose>
+				<c:when test="${appLocation.available}">
+					<c:forEach items="${appLocation.locations}" var = "location">
+						<hr/>
+						<spring:url value="/nfc/register/?location=${location}&amp;applicationId=${appLocation.application.id}&amp;imei=${imei}&amp;macAddress=${macAddress}&amp;apkVersion=${apkVersion}" var="register_url" htmlEscape="false"/>
+						<a href="${register_url}" class="btn btn-lg btn-success">${location}</a>
+					</c:forEach>  	
+				</c:when>
+				<c:otherwise>
+					<hr/>
+					<a class="btn btn-lg btn-danger">${appLocation.application.name} <spring:message code="message_unavailable"/> </a>
+				</c:otherwise>
+			</c:choose>
+		</c:forEach>
+		<hr/>
+		<div id="debug"><!--  --></div>
+	</div>
+	</div>
+</div>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security" 
+             xmlns:beans="http://www.springframework.org/schema/beans" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+                                 http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
+    
+    
+    <!-- HTTP security configurations -->
+    <http disable-url-rewriting="true" use-expressions="true" entry-point-ref="http403EntryPoint">
+	<intercept-url pattern="/nfc-ws" access="permitAll" />
+	<intercept-url pattern="/logs" access="permitAll" />
+	<intercept-url pattern="/live**" access="permitAll" />
+        <intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />
+        <intercept-url pattern="/manager" access="isAuthenticated()" />
+        <intercept-url pattern="/manager/**" access="hasRole('ROLE_ADMIN')" />
+        <intercept-url pattern="/nfc/**" access="isAuthenticated()" />
+        <intercept-url pattern="/**" access="permitAll" />
+	<access-denied-handler error-page="/denied" />
+	<session-management session-authentication-strategy-ref="sas" />
+	<custom-filter position="PRE_AUTH_FILTER" ref="shibFilter"/>
+	<custom-filter ref="concurrencyFilter" position="CONCURRENT_SESSION_FILTER" />
+	<logout logout-success-url="/" />
+    </http>
+
+    <beans:bean id="http403EntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
+    
+    <beans:bean id="authEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
+	<beans:constructor-arg value="/"/>
+    </beans:bean>
+    
+    <beans:bean id="shibFilter" class="org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter">
+	<beans:property name="principalRequestHeader" value="REMOTE_USER"/>
+	<beans:property name="credentialsRequestHeader" value="MEMBER"/>
+	<beans:property name="exceptionIfHeaderMissing" value="false"/>
+	<beans:property name="authenticationManager" ref="authenticationManager" />
+    </beans:bean>
+
+    <authentication-manager alias="authenticationManager">
+	<authentication-provider ref="preauthAuthProvider" />	
+	<!--  <authentication-provider ref="casAuthenticationProvider" />-->
+    </authentication-manager>
+    
+    <beans:bean id="preauthAuthProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
+	<beans:property name="preAuthenticatedUserDetailsService" ref="authUserDetailsService"/>
+    </beans:bean>
+
+    <beans:bean id="concurrencyFilter"
+		class="org.springframework.security.web.session.ConcurrentSessionFilter">
+	<beans:constructor-arg ref="sessionRegistry"/>
+	<beans:constructor-arg value="/"/>
+    </beans:bean>
+
+    <beans:bean id="sas"
+		class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
+	<beans:constructor-arg name="sessionRegistry" ref="sessionRegistry" />
+    </beans:bean>
+
+    <beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
+
+
+    <beans:bean id="authUserDetailsService"
+		class="org.esupportail.nfctag.security.ShibAuthenticatedUserDetailsService">
+	<beans:property name="mappingGroupesRoles">
+	    <beans:map>
+		<beans:entry key="EsupNfcTag_Admin" value="ROLE_ADMIN" />
+	    </beans:map>
+	</beans:property>
+    </beans:bean>
+	
+</beans:beans>
