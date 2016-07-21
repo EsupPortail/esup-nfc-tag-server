@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:form="urn:jsptagdir:/WEB-INF/tags/form" xmlns:jsp="http://java.sun.com/JSP/Page" version="2.0">
-    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
-    <jsp:output omit-xml-declaration="yes"/>
-    <form:find finderName="ByAuthDateGreaterThanAndNumeroIdEquals" id="ff_org_esupportail_nfctag_domain_TagLog" path="/manager/taglogs" z="O0lsCqkCjk9W8X3rIrXMMauVzx0=">
-        <field:datetime dateTimePattern="${tagLog_authdate_date_format}" disableFormBinding="true" field="authDate" id="f_org_esupportail_nfctag_domain_TagLog_authDate" required="true" z="BrEiFtmMsyWCxdFyqSnf3E/5MxM="/>
-        <field:input disableFormBinding="true" field="numeroId" id="f_org_esupportail_nfctag_domain_TagLog_numeroId" required="true" z="ImxnLFyxPJ4VVnThtoF8LsRZJqM="/>
-    </form:find>
-</div>
