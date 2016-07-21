@@ -77,7 +77,6 @@
 
     <beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
 
-
     <beans:bean id="authUserDetailsService"
 		class="org.esupportail.nfctag.security.ShibAuthenticatedUserDetailsService">
 	<beans:property name="mappingGroupesRoles">
