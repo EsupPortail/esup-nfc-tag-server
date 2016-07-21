@@ -25,7 +25,15 @@ import org.springframework.roo.addon.tostring.RooToString;
 
 @RooJavaBean
 @RooToString
-@RooJpaActiveRecord(finders = { "findDevicesByNumeroIdEquals" , "findDevicesByEppnInitEquals", "findDevicesByLocationAndEppnInitAndImeiEquals", "findDevicesByLocationAndEppnInitAndMacAddressEquals" })
+@RooJpaActiveRecord(finders = { "findDevicesByApplicationEquals",
+								"findDevicesByNumeroIdEquals", 
+								"findDevicesByEppnInitEquals", 
+								"findDevicesByImeiEquals",
+								"findDevicesByMacAddressEquals",
+								"findDevicesByLocationEquals",
+								"findDevicesByEppnInitLike",
+								"findDevicesByLocationAndEppnInitAndImeiEquals", 
+								"findDevicesByLocationAndEppnInitAndMacAddressEquals" })
 public class Device {
 
     private String numeroId;

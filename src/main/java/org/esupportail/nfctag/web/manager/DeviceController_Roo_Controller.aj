@@ -51,20 +51,6 @@ privileged aspect DeviceController_Roo_Controller {
         return "manager/devices/show";
     }
     
-    @RequestMapping(produces = "text/html")
-    public String DeviceController.list(@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "size", required = false) Integer size, @RequestParam(value = "sortFieldName", required = false) String sortFieldName, @RequestParam(value = "sortOrder", required = false) String sortOrder, Model uiModel) {
-        if (page != null || size != null) {
-            int sizeNo = size == null ? 10 : size.intValue();
-            final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
-            uiModel.addAttribute("devices", Device.findDeviceEntries(firstResult, sizeNo, sortFieldName, sortOrder));
-            float nrOfPages = (float) Device.countDevices() / sizeNo;
-            uiModel.addAttribute("maxPages", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));
-        } else {
-            uiModel.addAttribute("devices", Device.findAllDevices(sortFieldName, sortOrder));
-        }
-        return "manager/devices/list";
-    }
-    
     @RequestMapping(value = "/{id}", params = "form", produces = "text/html")
     public String DeviceController.updateForm(@PathVariable("id") Long id, Model uiModel) {
         populateEditForm(uiModel, Device.findDevice(id));

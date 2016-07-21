@@ -1,28 +1,85 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<div xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:spring="http://www.springframework.org/tags" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
+<div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:spring="http://www.springframework.org/tags" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <h1>
         <spring:message code="label_org_esupportail_nfctag_domain_device_plural"/>
-    </h1>
-    <div class="btn-group">
+            &amp;nbsp;
+            <div class="btn-group">
         <a class="btn btn-info pull-left" href="/manager/devices?form">
             <span class="glyphicon glyphicon-plus">
                 <spring:message code="button_add_device"/>
             </span>
         </a>
     </div>
-    <br/>
-    <br/>
+    </h1>
+    <form action="devices" class="form-inline">
+        <div class="input-group">
+            <div class="input-group-addon"><spring:message code="label_org_esupportail_nfctag_domain_device_application"/></div>
+            <div class="input-group-btn">
+                <button aria-expanded="true" aria-haspopup="true" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="dropdownMenu1" type="button">
+                    <c:choose>
+                        <c:when test="${not empty application}">
+          					${application.name}
+       					</c:when>
+                        <c:otherwise>
+          				-- Choisir --
+       					</c:otherwise>
+                    </c:choose>
+                    <span class="caret"/>
+                </button>
+                <ul aria-labelledby="dropdownMenu1" class="dropdown-menu">
+                    <c:forEach items="${applications}" var="application">
+                        <li>
+                            <a href="devices?applicationFilter=${application.id}">${application.name}</a>
+                        </li>
+                    </c:forEach>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="input-group">
+            <div class="input-group-addon"><spring:message code="title_search_by"/></div>
+            <div class="input-group-btn">
+                <select class="selectpicker" id="searchAttribut" name="searchBySelected">
+                	<option value="">&amp;nbsp;</option>
+                    <c:forEach items="${listSearchBy}" var="searchBy">
+                    <c:choose>
+                    <c:when test="${searchBySelected eq searchBy }">
+                    	<option value="${searchBy}" selected="selected">${searchBy}</option>
+                    </c:when>
+                    <c:otherwise>
+                    	<option value="${searchBy}">${searchBy}</option>
+                    </c:otherwise>
+                    </c:choose>
+                    </c:forEach>
+                </select>
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-group-btn">
+                <input class="form-control" data-provide="typeahead" id="multiSearch" name="searchString" type="text" value="${searchString}"/>
+            </div>
+            <div class="input-group-btn">
+            	<spring:message code="button_search" var="search"/>
+                <input class="btn btn-success" id="proceed" title="Search" type="submit" value="${search}"/>
+            </div>
+        </div>
+        <div class="input-group">
+        	<spring:message code="button_cancel" var="cancel"/>
+            <input class="btn btn-danger" onclick="window.location.href='devices';" id="deviceCancelFilters" title="Cancel filters" type="button" value="${cancel}"/>
+        </div>
+    </form>
+            
     <page:list id="pl_org_esupportail_nfctag_domain_Device" items="${devices}" z="user-managed"/>
     <table:table update="false" delete="false" data="${devices}" id="l_org_esupportail_nfctag_domain_Device" path="/manager/devices" z="user-managed">
         <table:column id="c_org_esupportail_nfctag_domain_Device_numeroId" property="numeroId" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_Device_eppnInit" property="eppnInit" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_Device_imei" property="imei" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_Device_macAddress" property="macAddress" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_Device_userAgent" property="userAgent" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_Device_userAgent" render="false" property="userAgent" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_Device_application" sort="true" property="applicationName" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_Device_location" property="location" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_Device_validateAuthWoConfirmation" property="validateAuthWoConfirmation" z="cTst4CWgTJIO74pDMvMbzsNGyhs="/>
+        <table:column id="c_org_esupportail_nfctag_domain_Device_validateAuthWoConfirmation" sort="true" property="validateAuthWoConfirmation" z="user-managed"/>
     </table:table>
 </div>
