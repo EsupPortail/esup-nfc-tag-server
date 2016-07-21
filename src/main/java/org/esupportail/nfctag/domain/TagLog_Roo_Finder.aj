@@ -18,11 +18,13 @@ privileged aspect TagLog_Roo_Finder {
         return ((Long) q.getSingleResult());
     }
     
-    public static Long TagLog.countFindTagLogsByAuthDateEquals(Date authDate) {
-        if (authDate == null) throw new IllegalArgumentException("The authDate argument is required");
+    public static Long TagLog.countFindTagLogsByAuthDateBetween(Date minAuthDate, Date maxAuthDate) {
+        if (minAuthDate == null) throw new IllegalArgumentException("The minAuthDate argument is required");
+        if (maxAuthDate == null) throw new IllegalArgumentException("The maxAuthDate argument is required");
         EntityManager em = TagLog.entityManager();
-        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.authDate = :authDate", Long.class);
-        q.setParameter("authDate", authDate);
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.authDate BETWEEN :minAuthDate AND :maxAuthDate", Long.class);
+        q.setParameter("minAuthDate", minAuthDate);
+        q.setParameter("maxAuthDate", maxAuthDate);
         return ((Long) q.getSingleResult());
     }
     
@@ -68,10 +70,17 @@ privileged aspect TagLog_Roo_Finder {
         return ((Long) q.getSingleResult());
     }
     
-    public static Long TagLog.countFindTagLogsByEppnInitEquals(String eppnInit) {
+    public static Long TagLog.countFindTagLogsByEppnInitLike(String eppnInit) {
         if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
+        eppnInit = eppnInit.replace('*', '%');
+        if (eppnInit.charAt(0) != '%') {
+            eppnInit = "%" + eppnInit;
+        }
+        if (eppnInit.charAt(eppnInit.length() - 1) != '%') {
+            eppnInit = eppnInit + "%";
+        }
         EntityManager em = TagLog.entityManager();
-        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.eppnInit = :eppnInit", Long.class);
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE LOWER(o.eppnInit) LIKE LOWER(:eppnInit)", Long.class);
         q.setParameter("eppnInit", eppnInit);
         return ((Long) q.getSingleResult());
     }
@@ -115,18 +124,21 @@ privileged aspect TagLog_Roo_Finder {
         return q;
     }
     
-    public static TypedQuery<TagLog> TagLog.findTagLogsByAuthDateEquals(Date authDate) {
-        if (authDate == null) throw new IllegalArgumentException("The authDate argument is required");
+    public static TypedQuery<TagLog> TagLog.findTagLogsByAuthDateBetween(Date minAuthDate, Date maxAuthDate) {
+        if (minAuthDate == null) throw new IllegalArgumentException("The minAuthDate argument is required");
+        if (maxAuthDate == null) throw new IllegalArgumentException("The maxAuthDate argument is required");
         EntityManager em = TagLog.entityManager();
-        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.authDate = :authDate", TagLog.class);
-        q.setParameter("authDate", authDate);
+        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.authDate BETWEEN :minAuthDate AND :maxAuthDate", TagLog.class);
+        q.setParameter("minAuthDate", minAuthDate);
+        q.setParameter("maxAuthDate", maxAuthDate);
         return q;
     }
     
-    public static TypedQuery<TagLog> TagLog.findTagLogsByAuthDateEquals(Date authDate, String sortFieldName, String sortOrder) {
-        if (authDate == null) throw new IllegalArgumentException("The authDate argument is required");
+    public static TypedQuery<TagLog> TagLog.findTagLogsByAuthDateBetween(Date minAuthDate, Date maxAuthDate, String sortFieldName, String sortOrder) {
+        if (minAuthDate == null) throw new IllegalArgumentException("The minAuthDate argument is required");
+        if (maxAuthDate == null) throw new IllegalArgumentException("The maxAuthDate argument is required");
         EntityManager em = TagLog.entityManager();
-        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.authDate = :authDate");
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.authDate BETWEEN :minAuthDate AND :maxAuthDate");
         if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
             queryBuilder.append(" ORDER BY ").append(sortFieldName);
             if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
@@ -134,7 +146,8 @@ privileged aspect TagLog_Roo_Finder {
             }
         }
         TypedQuery<TagLog> q = em.createQuery(queryBuilder.toString(), TagLog.class);
-        q.setParameter("authDate", authDate);
+        q.setParameter("minAuthDate", minAuthDate);
+        q.setParameter("maxAuthDate", maxAuthDate);
         return q;
     }
     
@@ -257,18 +270,32 @@ privileged aspect TagLog_Roo_Finder {
         return q;
     }
     
-    public static TypedQuery<TagLog> TagLog.findTagLogsByEppnInitEquals(String eppnInit) {
+    public static TypedQuery<TagLog> TagLog.findTagLogsByEppnInitLike(String eppnInit) {
         if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
+        eppnInit = eppnInit.replace('*', '%');
+        if (eppnInit.charAt(0) != '%') {
+            eppnInit = "%" + eppnInit;
+        }
+        if (eppnInit.charAt(eppnInit.length() - 1) != '%') {
+            eppnInit = eppnInit + "%";
+        }
         EntityManager em = TagLog.entityManager();
-        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.eppnInit = :eppnInit", TagLog.class);
+        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE LOWER(o.eppnInit) LIKE LOWER(:eppnInit)", TagLog.class);
         q.setParameter("eppnInit", eppnInit);
         return q;
     }
     
-    public static TypedQuery<TagLog> TagLog.findTagLogsByEppnInitEquals(String eppnInit, String sortFieldName, String sortOrder) {
+    public static TypedQuery<TagLog> TagLog.findTagLogsByEppnInitLike(String eppnInit, String sortFieldName, String sortOrder) {
         if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
+        eppnInit = eppnInit.replace('*', '%');
+        if (eppnInit.charAt(0) != '%') {
+            eppnInit = "%" + eppnInit;
+        }
+        if (eppnInit.charAt(eppnInit.length() - 1) != '%') {
+            eppnInit = eppnInit + "%";
+        }
         EntityManager em = TagLog.entityManager();
-        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.eppnInit = :eppnInit");
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE LOWER(o.eppnInit) LIKE LOWER(:eppnInit)");
         if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
             queryBuilder.append(" ORDER BY ").append(sortFieldName);
             if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {

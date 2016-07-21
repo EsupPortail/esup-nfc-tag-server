@@ -31,15 +31,15 @@ import org.springframework.roo.addon.tostring.RooToString;
 @RooToString
 @RooJpaActiveRecord(finders = { "findTagLogsByCsnEquals",
 								"findTagLogsByDesfireIdEquals",
-								"findTagLogsByEppnInitEquals",
+								"findTagLogsByNumeroIdEquals",
+								"findTagLogsByEppnInitLike",
 								"findTagLogsByCsnEquals",
 								"findTagLogsByLocationEquals",
 								"findTagLogsByEppnEquals",
 								"findTagLogsByApplicationNameEquals",
-								"findTagLogsByAuthDateEquals",
+								"findTagLogsByAuthDateBetween",
 								"findTagLogsByAuthDateGreaterThan", 
-								"findTagLogsByAuthDateGreaterThanAndNumeroIdEquals", 
-								"findTagLogsByNumeroIdEquals" } )
+								"findTagLogsByAuthDateGreaterThanAndNumeroIdEquals"	} )
 public class TagLog {
 	
 	public enum Status{
