@@ -4,15 +4,15 @@
     <jsp:output omit-xml-declaration="yes"/>
     <h1>
         <spring:message code="label_org_esupportail_nfctag_domain_application_plural"/>
-    </h1>
-    <div class="btn-group">
+        &amp;nbsp;
+        <div class="btn-group">
         <a class="btn btn-info pull-left" href="/manager/applications?form">
             <span class="glyphicon glyphicon-plus">
                 <spring:message code="button_add_application"/>
             </span>
         </a>
     </div>
-    <br/>
+    </h1>
     <br/>
     <page:list id="pl_org_esupportail_nfctag_domain_Application" items="${applications}" z="user-managed"/>
     <table:table data="${applications}" delete="false" id="l_org_esupportail_nfctag_domain_Application" path="/manager/applications" update="false" z="user-managed">
