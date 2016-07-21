@@ -22,7 +22,6 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.apache.velocity.runtime.directive.Foreach;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
