@@ -10,6 +10,22 @@ import org.esupportail.nfctag.domain.TagLog;
 
 privileged aspect TagLog_Roo_Finder {
     
+    public static Long TagLog.countFindTagLogsByApplicationNameEquals(String applicationName) {
+        if (applicationName == null || applicationName.length() == 0) throw new IllegalArgumentException("The applicationName argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.applicationName = :applicationName", Long.class);
+        q.setParameter("applicationName", applicationName);
+        return ((Long) q.getSingleResult());
+    }
+    
+    public static Long TagLog.countFindTagLogsByAuthDateEquals(Date authDate) {
+        if (authDate == null) throw new IllegalArgumentException("The authDate argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.authDate = :authDate", Long.class);
+        q.setParameter("authDate", authDate);
+        return ((Long) q.getSingleResult());
+    }
+    
     public static Long TagLog.countFindTagLogsByAuthDateGreaterThan(Date authDate) {
         if (authDate == null) throw new IllegalArgumentException("The authDate argument is required");
         EntityManager em = TagLog.entityManager();
@@ -28,7 +44,39 @@ privileged aspect TagLog_Roo_Finder {
         return ((Long) q.getSingleResult());
     }
     
-    public static Long TagLog.countFindTagLogsByLocation(String location) {
+    public static Long TagLog.countFindTagLogsByCsnEquals(String csn) {
+        if (csn == null || csn.length() == 0) throw new IllegalArgumentException("The csn argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.csn = :csn", Long.class);
+        q.setParameter("csn", csn);
+        return ((Long) q.getSingleResult());
+    }
+    
+    public static Long TagLog.countFindTagLogsByDesfireIdEquals(String desfireId) {
+        if (desfireId == null || desfireId.length() == 0) throw new IllegalArgumentException("The desfireId argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.desfireId = :desfireId", Long.class);
+        q.setParameter("desfireId", desfireId);
+        return ((Long) q.getSingleResult());
+    }
+    
+    public static Long TagLog.countFindTagLogsByEppnEquals(String eppn) {
+        if (eppn == null || eppn.length() == 0) throw new IllegalArgumentException("The eppn argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.eppn = :eppn", Long.class);
+        q.setParameter("eppn", eppn);
+        return ((Long) q.getSingleResult());
+    }
+    
+    public static Long TagLog.countFindTagLogsByEppnInitEquals(String eppnInit) {
+        if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.eppnInit = :eppnInit", Long.class);
+        q.setParameter("eppnInit", eppnInit);
+        return ((Long) q.getSingleResult());
+    }
+    
+    public static Long TagLog.countFindTagLogsByLocationEquals(String location) {
         if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
         EntityManager em = TagLog.entityManager();
         TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.location = :location", Long.class);
@@ -42,6 +90,52 @@ privileged aspect TagLog_Roo_Finder {
         TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.numeroId = :numeroId", Long.class);
         q.setParameter("numeroId", numeroId);
         return ((Long) q.getSingleResult());
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByApplicationNameEquals(String applicationName) {
+        if (applicationName == null || applicationName.length() == 0) throw new IllegalArgumentException("The applicationName argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.applicationName = :applicationName", TagLog.class);
+        q.setParameter("applicationName", applicationName);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByApplicationNameEquals(String applicationName, String sortFieldName, String sortOrder) {
+        if (applicationName == null || applicationName.length() == 0) throw new IllegalArgumentException("The applicationName argument is required");
+        EntityManager em = TagLog.entityManager();
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.applicationName = :applicationName");
+        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
+            queryBuilder.append(" ORDER BY ").append(sortFieldName);
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                queryBuilder.append(" ").append(sortOrder);
+            }
+        }
+        TypedQuery<TagLog> q = em.createQuery(queryBuilder.toString(), TagLog.class);
+        q.setParameter("applicationName", applicationName);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByAuthDateEquals(Date authDate) {
+        if (authDate == null) throw new IllegalArgumentException("The authDate argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.authDate = :authDate", TagLog.class);
+        q.setParameter("authDate", authDate);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByAuthDateEquals(Date authDate, String sortFieldName, String sortOrder) {
+        if (authDate == null) throw new IllegalArgumentException("The authDate argument is required");
+        EntityManager em = TagLog.entityManager();
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.authDate = :authDate");
+        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
+            queryBuilder.append(" ORDER BY ").append(sortFieldName);
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                queryBuilder.append(" ").append(sortOrder);
+            }
+        }
+        TypedQuery<TagLog> q = em.createQuery(queryBuilder.toString(), TagLog.class);
+        q.setParameter("authDate", authDate);
+        return q;
     }
     
     public static TypedQuery<TagLog> TagLog.findTagLogsByAuthDateGreaterThan(Date authDate) {
@@ -94,7 +188,99 @@ privileged aspect TagLog_Roo_Finder {
         return q;
     }
     
-    public static TypedQuery<TagLog> TagLog.findTagLogsByLocation(String location) {
+    public static TypedQuery<TagLog> TagLog.findTagLogsByCsnEquals(String csn) {
+        if (csn == null || csn.length() == 0) throw new IllegalArgumentException("The csn argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.csn = :csn", TagLog.class);
+        q.setParameter("csn", csn);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByCsnEquals(String csn, String sortFieldName, String sortOrder) {
+        if (csn == null || csn.length() == 0) throw new IllegalArgumentException("The csn argument is required");
+        EntityManager em = TagLog.entityManager();
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.csn = :csn");
+        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
+            queryBuilder.append(" ORDER BY ").append(sortFieldName);
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                queryBuilder.append(" ").append(sortOrder);
+            }
+        }
+        TypedQuery<TagLog> q = em.createQuery(queryBuilder.toString(), TagLog.class);
+        q.setParameter("csn", csn);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByDesfireIdEquals(String desfireId) {
+        if (desfireId == null || desfireId.length() == 0) throw new IllegalArgumentException("The desfireId argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.desfireId = :desfireId", TagLog.class);
+        q.setParameter("desfireId", desfireId);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByDesfireIdEquals(String desfireId, String sortFieldName, String sortOrder) {
+        if (desfireId == null || desfireId.length() == 0) throw new IllegalArgumentException("The desfireId argument is required");
+        EntityManager em = TagLog.entityManager();
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.desfireId = :desfireId");
+        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
+            queryBuilder.append(" ORDER BY ").append(sortFieldName);
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                queryBuilder.append(" ").append(sortOrder);
+            }
+        }
+        TypedQuery<TagLog> q = em.createQuery(queryBuilder.toString(), TagLog.class);
+        q.setParameter("desfireId", desfireId);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByEppnEquals(String eppn) {
+        if (eppn == null || eppn.length() == 0) throw new IllegalArgumentException("The eppn argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.eppn = :eppn", TagLog.class);
+        q.setParameter("eppn", eppn);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByEppnEquals(String eppn, String sortFieldName, String sortOrder) {
+        if (eppn == null || eppn.length() == 0) throw new IllegalArgumentException("The eppn argument is required");
+        EntityManager em = TagLog.entityManager();
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.eppn = :eppn");
+        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
+            queryBuilder.append(" ORDER BY ").append(sortFieldName);
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                queryBuilder.append(" ").append(sortOrder);
+            }
+        }
+        TypedQuery<TagLog> q = em.createQuery(queryBuilder.toString(), TagLog.class);
+        q.setParameter("eppn", eppn);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByEppnInitEquals(String eppnInit) {
+        if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.eppnInit = :eppnInit", TagLog.class);
+        q.setParameter("eppnInit", eppnInit);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByEppnInitEquals(String eppnInit, String sortFieldName, String sortOrder) {
+        if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
+        EntityManager em = TagLog.entityManager();
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.eppnInit = :eppnInit");
+        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
+            queryBuilder.append(" ORDER BY ").append(sortFieldName);
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                queryBuilder.append(" ").append(sortOrder);
+            }
+        }
+        TypedQuery<TagLog> q = em.createQuery(queryBuilder.toString(), TagLog.class);
+        q.setParameter("eppnInit", eppnInit);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByLocationEquals(String location) {
         if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
         EntityManager em = TagLog.entityManager();
         TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.location = :location", TagLog.class);
@@ -102,7 +288,7 @@ privileged aspect TagLog_Roo_Finder {
         return q;
     }
     
-    public static TypedQuery<TagLog> TagLog.findTagLogsByLocation(String location, String sortFieldName, String sortOrder) {
+    public static TypedQuery<TagLog> TagLog.findTagLogsByLocationEquals(String location, String sortFieldName, String sortOrder) {
         if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
         EntityManager em = TagLog.entityManager();
         StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.location = :location");

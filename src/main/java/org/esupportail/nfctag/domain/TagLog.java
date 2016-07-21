@@ -29,7 +29,17 @@ import org.springframework.roo.addon.tostring.RooToString;
 
 @RooJavaBean
 @RooToString
-@RooJpaActiveRecord(finders = { "findTagLogsByLocation", "findTagLogsByApplication", "findTagLogsByAuthDateGreaterThan", "findTagLogsByAuthDateGreaterThanAndNumeroIdEquals", "findTagLogsByNumeroIdEquals" } )
+@RooJpaActiveRecord(finders = { "findTagLogsByCsnEquals",
+								"findTagLogsByDesfireIdEquals",
+								"findTagLogsByEppnInitEquals",
+								"findTagLogsByCsnEquals",
+								"findTagLogsByLocationEquals",
+								"findTagLogsByEppnEquals",
+								"findTagLogsByApplicationNameEquals",
+								"findTagLogsByAuthDateEquals",
+								"findTagLogsByAuthDateGreaterThan", 
+								"findTagLogsByAuthDateGreaterThanAndNumeroIdEquals", 
+								"findTagLogsByNumeroIdEquals" } )
 public class TagLog {
 	
 	public enum Status{

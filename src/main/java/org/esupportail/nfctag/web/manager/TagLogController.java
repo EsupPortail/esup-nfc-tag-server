@@ -27,8 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RequestMapping("/manager/taglogs")
 @Controller
-@RooWebScaffold(path = "manager/taglogs", formBackingObject = TagLog.class, create=false, delete=false, update=false, exposeFinders=false)
-@RooWebFinder
+@RooWebScaffold(path = "manager/taglogs", formBackingObject = TagLog.class, create=false, delete=false, update=false)
 public class TagLogController {
 
     @RequestMapping(produces = "text/html")

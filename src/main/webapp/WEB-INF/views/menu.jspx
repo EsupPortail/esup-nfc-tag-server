@@ -18,10 +18,6 @@
                 </menu:category>
                 <menu:category id="c_taglog" render="false" z="user-managed">
                     <menu:item id="i_taglog_list" messageCode="global_menu_list" url="/manager/logleoauth?page=1&amp;size=${empty param.size ? 10 : param.size}" z="XdbBwALxD/XRJ3uDGBkpEj2893s="/>
-                    <menu:item id="fi_taglog_authdategreaterthan" messageCode="global_menu_find" url="/manager/taglogs?find=ByAuthDateGreaterThan&amp;form&amp;page=1&amp;size=${empty param.size ? 10 : param.size}" z="sDcv/4tCh5esdehLhp6hbGaCR/w="/>
-                    <menu:item id="fi_taglog_authdategreaterthanandnumeroidequals" messageCode="global_menu_find" url="/manager/taglogs?find=ByAuthDateGreaterThanAndNumeroIdEquals&amp;form&amp;page=1&amp;size=${empty param.size ? 10 : param.size}" z="PrP4VlUwfQMdcudjDRT6SwC1qs8="/>
-                    <menu:item id="fi_taglog_location" messageCode="global_menu_find" url="/manager/taglogs?find=ByLocation&amp;form&amp;page=1&amp;size=${empty param.size ? 10 : param.size}" z="LF5rEY7AdZu2zeRQKGclSuncMaw="/>
-                    <menu:item id="fi_taglog_numeroidequals" messageCode="global_menu_find" url="/manager/taglogs?find=ByNumeroIdEquals&amp;form&amp;page=1&amp;size=${empty param.size ? 10 : param.size}" z="sNnaCAzVZZCRt0RGU7frsLkkJNM="/>
                 </menu:category>
                 <menu:category id="c_application" render="false" z="user-managed">
                     <menu:item id="i_application_new" messageCode="global_menu_new" url="/manager/locations?form" z="iCIoh/q+sIb48GH6xp1Cg98MQcw="/>
