@@ -22,7 +22,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.domain.TagLog.Status;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
