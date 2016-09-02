@@ -48,14 +48,12 @@ public class Device {
     
     private String userAgent;
     
-    @NotNull
     private String location;
     
     @ManyToOne
-    @NotNull
     private Application application;
     
     public String getApplicationName(){
-    	return this.application.getName();
+    	return this.application!=null ? this.application.getName() : "";
     }
 }

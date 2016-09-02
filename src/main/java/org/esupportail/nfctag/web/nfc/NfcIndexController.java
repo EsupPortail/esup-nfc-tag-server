@@ -18,18 +18,34 @@
 package org.esupportail.nfctag.web.nfc;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 import javax.annotation.Resource;
+import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.apache.commons.io.IOUtils;
+import org.esupportail.nfctag.domain.AppLocation;
+import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
+import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import org.esupportail.nfctag.service.ApplicationsService;
 import org.esupportail.nfctag.service.VersionApkService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -37,9 +53,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 @Transactional
 public class NfcIndexController {
-
+	
+	private final Logger log = LoggerFactory.getLogger(getClass());
+	
 	@Resource
 	private VersionApkService versionApkService;
+	
+	@Autowired
+	private ApplicationsService applicationsService;
 	
 	@RequestMapping
 	public String index(@RequestParam(required=false) String numeroId, 
@@ -71,6 +92,117 @@ public class NfcIndexController {
         response.setContentLength((int)apkFile.contentLength());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + apkFile.getFilename() + "\"");
         IOUtils.copy(apkFile.getInputStream(), response.getOutputStream());
+	}
+	
+	/**
+	 *  get Locations form without need to be authenticated ; but numeroId is needed
+	 */
+	@RequestMapping("/locations")
+	public String selectedLocationForm(
+			@RequestParam(required = true) String numeroId,
+			Model uiModel) {
+		
+		log.info(numeroId + "access to /nfc-index/locations");
+		
+		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
+		if(devices.isEmpty()) {
+			return "redirect:/nfc-index";
+		}
+
+		Device device = devices.get(0);
+		String eppn = device.getEppnInit();
+		
+		log.info("eppn init : " + eppn);
+		
+		try {
+			List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppn);
+			if (appLocations.isEmpty()) {
+				log.info(eppn + " don't have location to manage");
+				throw new AccessDeniedException(eppn + " don't have location to manage");
+			}
+			uiModel.addAttribute("numeroId", numeroId);
+			uiModel.addAttribute("macAddress", device.getMacAddress());
+			uiModel.addAttribute("imei", device.getImei());
+			uiModel.addAttribute("appLocations", appLocations);
+			uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
+		} catch (EmptyResultDataAccessException ex) {
+			log.info(eppn + " is not manager");
+			throw new AccessDeniedException(eppn + " is not manager");
+		} catch (EsupNfcTagException e) {
+			log.error("can't get locations", e);
+		}
+		return "nfc";
+	}
+	
+	
+	/**
+	 *  register without need to be authenticated ; but numeroId is needed
+	 */
+	@RequestMapping(value = "/register")
+	public String nfcRegister(
+			@RequestHeader(value="User-Agent") String userAgent, 
+			@RequestParam(required = true) String numeroId,
+			@RequestParam(required = true) String location, 
+			@RequestParam(required = true) Long applicationId,
+			@RequestParam(required = true) String imei,
+			@RequestParam(required = true) String macAddress,
+			Model uiModel) throws IOException, EsupNfcTagException {
+		
+		log.info(numeroId + "access to /nfc-index/locations");
+		
+		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
+		if(devices.isEmpty()) {
+			return "redirect:/nfc/register/?location=" + location + "&applicationId=" + applicationId + "&imei=" + imei + "&macAddress=" + macAddress;
+		}
+
+		Device device = devices.get(0);
+		String eppnInit = device.getEppnInit();
+		
+		Application application = Application.findApplication(applicationId);
+		
+		// check right access ...
+		List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppnInit);
+		Optional<AppLocation> appLocation = appLocations.stream().filter(appLoc -> appLoc.getApplication().getId().equals(applicationId)).findAny();
+		if(!appLocation.isPresent() || !appLocation.get().getLocations().contains(location)) {
+			log.warn(eppnInit + " can not register in this location " + location);
+			throw new AccessDeniedException(eppnInit + " can not register in this location " + location);
+		}
+
+		device.setLocation(location);
+		device.setApplication(application);
+		device.merge();
+		
+		uiModel.addAttribute("imei", imei);
+		uiModel.addAttribute("macAddress", macAddress);
+		uiModel.addAttribute("numeroId", numeroId);
+		uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
+		return "nfc/register";
+	}
+
+	@RequestMapping(value = "/unregister")
+	public String nfcUnRegister(
+			@RequestParam(required = true) String numeroId, 
+			@RequestParam(required = true) String imei, 
+			@RequestParam(required = true) String macAddress,
+			@RequestParam(required = true) Boolean full,
+			Model uiModel) throws IOException {
+		uiModel.addAttribute("imei", imei);
+		uiModel.addAttribute("macAddress", macAddress);
+		uiModel.addAttribute("numeroId", numeroId);
+		uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
+		
+		if(Device.countFindDevicesByNumeroIdEquals(numeroId)>0) {
+			Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+			if(full) {
+				device.remove();
+			} else {
+				device.setLocation(null);
+				device.setApplication(null);
+				device.merge();
+			}
+		 }
+		 
+		return "nfc/unregister";
 	}
 
 }

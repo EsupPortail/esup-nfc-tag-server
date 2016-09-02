@@ -80,8 +80,8 @@ public class LiveLongPoolController {
 		}
 
 		if(numeroId!=null) {
-			if(Device.countFindDevicesByNumeroIdEquals(numeroId)<0) {
-				return "redirect:/nfc/locations?apkVersion=" + apkVersion;		
+			if(Device.countFindDevicesByNumeroIdEquals(numeroId)<1 || Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult().getApplication() == null) {
+				return "redirect:/nfc-index/locations?apkVersion=" + apkVersion + "&numeroId=" + numeroId;		
 			}else{
 				Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
 				Application app = device.getApplication();

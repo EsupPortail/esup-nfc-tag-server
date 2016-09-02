@@ -133,22 +133,4 @@ public class NfcRegisterController {
 		return "nfc/register";
 	}
 
-	@RequestMapping(value = "/unregister")
-	public String nfcUnRegister(@RequestParam(required = true) String numeroId, 
-			@RequestParam(required = true) String imei, 
-			@RequestParam(required = true) String macAddress,
-			Model uiModel) throws IOException {
-		uiModel.addAttribute("imei", imei);
-		uiModel.addAttribute("macAddress", macAddress);
-		uiModel.addAttribute("numeroId", numeroId);
-		uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
-		/*
-		 * if(Device.countFindTelephoneAuthsByNumeroIdEquals(numeroId)>0)
-		 * { Device telephoneAuth =
-		 * Device.findTelephoneAuthsByNumeroIdEquals(numeroId).
-		 * getSingleResult(); telephoneAuth.remove(); telephoneAuth.clear(); }
-		 */
-		return "nfc/unregister";
-	}
-
 }

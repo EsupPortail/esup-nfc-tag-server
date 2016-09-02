@@ -34,7 +34,8 @@
 	    </sec:authorize>
 		</c:when>
 			<c:otherwise>
-				<spring:url value="/nfc/unregister?numeroId=${numeroId}&amp;imei=${imei}&amp;macAddress=${macAddress}" var="nfc_unregister_url" htmlEscape="false" />
+				<spring:url value="/nfc-index/unregister?numeroId=${numeroId}&amp;imei=${imei}&amp;macAddress=${macAddress}&amp;full=false" var="nfc_unregister_url" htmlEscape="false" />
+				<spring:url value="/nfc-index/unregister?numeroId=${numeroId}&amp;imei=${imei}&amp;macAddress=${macAddress}&amp;full=true" var="nfc_unregister_url_full" htmlEscape="false" />
 				<c:choose>
 					<c:when test="${not empty location}">
 						<ul class="list-inline navbar-right visible-xs-block visible-lg-block visible-md-block visible-sm-block text-right"> 
@@ -43,7 +44,7 @@
 					</c:when>
 					<c:otherwise>
 						<ul class="list-inline navbar-right visible-xs-block visible-lg-block visible-md-block visible-sm-block text-right"> 
-				      		<li><a href="${nfc_unregister_url}" onclick="return androidLogout()" class="btn btn-default navbar-btn btn-danger"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a></li>
+				      		<li><a href="${nfc_unregister_url_full}" onclick="return androidLogout()" class="btn btn-default navbar-btn btn-danger"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a></li>
 				      	</ul>
 					</c:otherwise>
 				</c:choose>
