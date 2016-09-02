@@ -72,7 +72,16 @@ public class NfcRegisterController {
 				log.info(eppn + " don't have location to manage");
 				throw new AccessDeniedException(eppn + " don't have location to manage");
 			}
-			uiModel.addAttribute("numeroId", "?");
+			
+			String numeroId = "?";
+			
+			List<Device> devices = Device.findDevicesByEppnInitAndImeiEquals(eppn, imei).getResultList();
+			if(!devices.isEmpty()) {
+				Device device = devices.get(0);
+				numeroId = device.getNumeroId();
+			} 
+			
+			uiModel.addAttribute("numeroId", numeroId);
 			uiModel.addAttribute("macAddress", macAddress);
 			uiModel.addAttribute("imei", imei);
 			uiModel.addAttribute("appLocations", appLocations);

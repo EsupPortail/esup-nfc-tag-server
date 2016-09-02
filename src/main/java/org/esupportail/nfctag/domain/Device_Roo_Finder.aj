@@ -18,6 +18,16 @@ privileged aspect Device_Roo_Finder {
         return ((Long) q.getSingleResult());
     }
     
+    public static Long Device.countFindDevicesByEppnInitAndImeiEquals(String eppnInit, String imei) {
+        if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
+        if (imei == null || imei.length() == 0) throw new IllegalArgumentException("The imei argument is required");
+        EntityManager em = Device.entityManager();
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM Device AS o WHERE o.eppnInit = :eppnInit AND o.imei = :imei", Long.class);
+        q.setParameter("eppnInit", eppnInit);
+        q.setParameter("imei", imei);
+        return ((Long) q.getSingleResult());
+    }
+    
     public static Long Device.countFindDevicesByEppnInitEquals(String eppnInit) {
         if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
         EntityManager em = Device.entityManager();
@@ -117,6 +127,33 @@ privileged aspect Device_Roo_Finder {
         }
         TypedQuery<Device> q = em.createQuery(queryBuilder.toString(), Device.class);
         q.setParameter("application", application);
+        return q;
+    }
+    
+    public static TypedQuery<Device> Device.findDevicesByEppnInitAndImeiEquals(String eppnInit, String imei) {
+        if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
+        if (imei == null || imei.length() == 0) throw new IllegalArgumentException("The imei argument is required");
+        EntityManager em = Device.entityManager();
+        TypedQuery<Device> q = em.createQuery("SELECT o FROM Device AS o WHERE o.eppnInit = :eppnInit AND o.imei = :imei", Device.class);
+        q.setParameter("eppnInit", eppnInit);
+        q.setParameter("imei", imei);
+        return q;
+    }
+    
+    public static TypedQuery<Device> Device.findDevicesByEppnInitAndImeiEquals(String eppnInit, String imei, String sortFieldName, String sortOrder) {
+        if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
+        if (imei == null || imei.length() == 0) throw new IllegalArgumentException("The imei argument is required");
+        EntityManager em = Device.entityManager();
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM Device AS o WHERE o.eppnInit = :eppnInit AND o.imei = :imei");
+        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
+            queryBuilder.append(" ORDER BY ").append(sortFieldName);
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                queryBuilder.append(" ").append(sortOrder);
+            }
+        }
+        TypedQuery<Device> q = em.createQuery(queryBuilder.toString(), Device.class);
+        q.setParameter("eppnInit", eppnInit);
+        q.setParameter("imei", imei);
         return q;
     }
     

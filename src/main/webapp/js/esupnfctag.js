@@ -31,9 +31,16 @@ $(document).ready(function() {
 		}
 	}
 
-	window.androidLogout = function() {
-		if(confirm(msg)){
-			Android.disconnect();
+	window.androidLogout = function(urldisconnect) {
+		if(confirm(msg)) {
+			$.ajax({
+				url : urldisconnect,
+				context: this,
+				success : function() {
+					Android.disconnect();
+				},
+				cache : false
+				});
 			return true;
 		}
 		return false;
