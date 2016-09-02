@@ -32,6 +32,7 @@ import org.springframework.roo.addon.tostring.RooToString;
 @RooJpaActiveRecord(finders = { "findTagLogsByCsnEquals",
 								"findTagLogsByDesfireIdEquals",
 								"findTagLogsByNumeroIdEquals",
+								"findTagLogsByNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals",
 								"findTagLogsByEppnInitLike",
 								"findTagLogsByCsnEquals",
 								"findTagLogsByLocationEquals",
@@ -39,7 +40,7 @@ import org.springframework.roo.addon.tostring.RooToString;
 								"findTagLogsByApplicationNameEquals",
 								"findTagLogsByAuthDateBetween",
 								"findTagLogsByAuthDateGreaterThan", 
-								"findTagLogsByAuthDateGreaterThanAndNumeroIdEquals"	} )
+								"findTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals"	} )
 public class TagLog {
 	
 	public enum Status{

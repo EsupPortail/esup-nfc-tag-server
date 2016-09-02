@@ -36,13 +36,17 @@ privileged aspect TagLog_Roo_Finder {
         return ((Long) q.getSingleResult());
     }
     
-    public static Long TagLog.countFindTagLogsByAuthDateGreaterThanAndNumeroIdEquals(Date authDate, String numeroId) {
+    public static Long TagLog.countFindTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(Date authDate, String numeroId, String applicationName, String location) {
         if (authDate == null) throw new IllegalArgumentException("The authDate argument is required");
         if (numeroId == null || numeroId.length() == 0) throw new IllegalArgumentException("The numeroId argument is required");
+        if (applicationName == null || applicationName.length() == 0) throw new IllegalArgumentException("The applicationName argument is required");
+        if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
         EntityManager em = TagLog.entityManager();
-        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.authDate > :authDate  AND o.numeroId = :numeroId", Long.class);
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.authDate > :authDate  AND o.numeroId = :numeroId  AND o.applicationName = :applicationName  AND o.location = :location", Long.class);
         q.setParameter("authDate", authDate);
         q.setParameter("numeroId", numeroId);
+        q.setParameter("applicationName", applicationName);
+        q.setParameter("location", location);
         return ((Long) q.getSingleResult());
     }
     
@@ -98,6 +102,18 @@ privileged aspect TagLog_Roo_Finder {
         EntityManager em = TagLog.entityManager();
         TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.numeroId = :numeroId", Long.class);
         q.setParameter("numeroId", numeroId);
+        return ((Long) q.getSingleResult());
+    }
+    
+    public static Long TagLog.countFindTagLogsByNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(String numeroId, String applicationName, String location) {
+        if (numeroId == null || numeroId.length() == 0) throw new IllegalArgumentException("The numeroId argument is required");
+        if (applicationName == null || applicationName.length() == 0) throw new IllegalArgumentException("The applicationName argument is required");
+        if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.numeroId = :numeroId  AND o.applicationName = :applicationName  AND o.location = :location", Long.class);
+        q.setParameter("numeroId", numeroId);
+        q.setParameter("applicationName", applicationName);
+        q.setParameter("location", location);
         return ((Long) q.getSingleResult());
     }
     
@@ -174,21 +190,27 @@ privileged aspect TagLog_Roo_Finder {
         return q;
     }
     
-    public static TypedQuery<TagLog> TagLog.findTagLogsByAuthDateGreaterThanAndNumeroIdEquals(Date authDate, String numeroId) {
+    public static TypedQuery<TagLog> TagLog.findTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(Date authDate, String numeroId, String applicationName, String location) {
         if (authDate == null) throw new IllegalArgumentException("The authDate argument is required");
         if (numeroId == null || numeroId.length() == 0) throw new IllegalArgumentException("The numeroId argument is required");
+        if (applicationName == null || applicationName.length() == 0) throw new IllegalArgumentException("The applicationName argument is required");
+        if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
         EntityManager em = TagLog.entityManager();
-        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.authDate > :authDate  AND o.numeroId = :numeroId", TagLog.class);
+        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.authDate > :authDate  AND o.numeroId = :numeroId  AND o.applicationName = :applicationName  AND o.location = :location", TagLog.class);
         q.setParameter("authDate", authDate);
         q.setParameter("numeroId", numeroId);
+        q.setParameter("applicationName", applicationName);
+        q.setParameter("location", location);
         return q;
     }
     
-    public static TypedQuery<TagLog> TagLog.findTagLogsByAuthDateGreaterThanAndNumeroIdEquals(Date authDate, String numeroId, String sortFieldName, String sortOrder) {
+    public static TypedQuery<TagLog> TagLog.findTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(Date authDate, String numeroId, String applicationName, String location, String sortFieldName, String sortOrder) {
         if (authDate == null) throw new IllegalArgumentException("The authDate argument is required");
         if (numeroId == null || numeroId.length() == 0) throw new IllegalArgumentException("The numeroId argument is required");
+        if (applicationName == null || applicationName.length() == 0) throw new IllegalArgumentException("The applicationName argument is required");
+        if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
         EntityManager em = TagLog.entityManager();
-        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.authDate > :authDate  AND o.numeroId = :numeroId");
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.authDate > :authDate  AND o.numeroId = :numeroId  AND o.applicationName = :applicationName  AND o.location = :location");
         if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
             queryBuilder.append(" ORDER BY ").append(sortFieldName);
             if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
@@ -198,6 +220,8 @@ privileged aspect TagLog_Roo_Finder {
         TypedQuery<TagLog> q = em.createQuery(queryBuilder.toString(), TagLog.class);
         q.setParameter("authDate", authDate);
         q.setParameter("numeroId", numeroId);
+        q.setParameter("applicationName", applicationName);
+        q.setParameter("location", location);
         return q;
     }
     
@@ -350,6 +374,37 @@ privileged aspect TagLog_Roo_Finder {
         }
         TypedQuery<TagLog> q = em.createQuery(queryBuilder.toString(), TagLog.class);
         q.setParameter("numeroId", numeroId);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(String numeroId, String applicationName, String location) {
+        if (numeroId == null || numeroId.length() == 0) throw new IllegalArgumentException("The numeroId argument is required");
+        if (applicationName == null || applicationName.length() == 0) throw new IllegalArgumentException("The applicationName argument is required");
+        if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.numeroId = :numeroId  AND o.applicationName = :applicationName  AND o.location = :location", TagLog.class);
+        q.setParameter("numeroId", numeroId);
+        q.setParameter("applicationName", applicationName);
+        q.setParameter("location", location);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(String numeroId, String applicationName, String location, String sortFieldName, String sortOrder) {
+        if (numeroId == null || numeroId.length() == 0) throw new IllegalArgumentException("The numeroId argument is required");
+        if (applicationName == null || applicationName.length() == 0) throw new IllegalArgumentException("The applicationName argument is required");
+        if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
+        EntityManager em = TagLog.entityManager();
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.numeroId = :numeroId  AND o.applicationName = :applicationName  AND o.location = :location");
+        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
+            queryBuilder.append(" ORDER BY ").append(sortFieldName);
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                queryBuilder.append(" ").append(sortOrder);
+            }
+        }
+        TypedQuery<TagLog> q = em.createQuery(queryBuilder.toString(), TagLog.class);
+        q.setParameter("numeroId", numeroId);
+        q.setParameter("applicationName", applicationName);
+        q.setParameter("location", location);
         return q;
     }
     

@@ -152,7 +152,8 @@ public class LiveLongPoolController {
 		if(authDateTimestamp != 0) {
 			Date authDate = new Date(authDateTimestamp);
 			if(numeroId != null && !numeroId.isEmpty()) {
-				tagLogs = TagLog.findTagLogsByAuthDateGreaterThanAndNumeroIdEquals(authDate, numeroId, sortFieldName, sortOrder).getResultList();
+				Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+				tagLogs = TagLog.findTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(authDate, numeroId, device.getApplicationName(), device.getLocation(), sortFieldName, sortOrder).getResultList();
 			} else {
 				tagLogs = TagLog.findTagLogsByAuthDateGreaterThan(authDate, sortFieldName, sortOrder).getResultList();
 			}
@@ -160,7 +161,8 @@ public class LiveLongPoolController {
 			int firstResult = 0;
 			int size = 10;
 			if(numeroId != null && !numeroId.isEmpty()) {
-				tagLogs = TagLog.findTagLogsByNumeroIdEquals(numeroId, sortFieldName, sortOrder).setFirstResult(firstResult).setMaxResults(size).getResultList();
+				Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+				tagLogs = TagLog.findTagLogsByNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(numeroId, device.getApplicationName(), device.getLocation(), sortFieldName, sortOrder).setFirstResult(firstResult).setMaxResults(size).getResultList();
 			} else {
 				tagLogs = TagLog.findTagLogEntries(firstResult, size, sortFieldName, sortOrder);
 			}
