@@ -153,11 +153,10 @@ public class LiveLongPoolController {
 			Date authDate = new Date(authDateTimestamp);
 			if(numeroId != null && !numeroId.isEmpty()) {
 				List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
-				if(devices.isEmpty()) {
+				if(devices.isEmpty() || devices.get(0).getApplicationName().isEmpty() || devices.get(0).getLocation().isEmpty()) {
 					tagLogs = TagLog.findTagLogsByAuthDateGreaterThanAndNumeroIdEquals(authDate, numeroId, sortFieldName, sortOrder).getResultList();
 				} else {
-					Device device = devices.get(0);
-					tagLogs = TagLog.findTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(authDate, numeroId, device.getApplicationName(), device.getLocation(), sortFieldName, sortOrder).getResultList();
+					tagLogs = TagLog.findTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(authDate, numeroId, devices.get(0).getApplicationName(), devices.get(0).getLocation(), sortFieldName, sortOrder).getResultList();
 				}
 			} else {
 				tagLogs = TagLog.findTagLogsByAuthDateGreaterThan(authDate, sortFieldName, sortOrder).getResultList();
@@ -167,11 +166,10 @@ public class LiveLongPoolController {
 			int size = 10;
 			if(numeroId != null && !numeroId.isEmpty()) {
 				List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
-				if(devices.isEmpty()) {
+				if(devices.isEmpty() || devices.get(0).getApplicationName().isEmpty() || devices.get(0).getLocation().isEmpty()) {
 					tagLogs = TagLog.findTagLogsByNumeroIdEquals(numeroId, sortFieldName, sortOrder).setFirstResult(firstResult).setMaxResults(size).getResultList();
 				} else {
-					Device device = devices.get(0);
-					tagLogs = TagLog.findTagLogsByNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(numeroId, device.getApplicationName(), device.getLocation(), sortFieldName, sortOrder).setFirstResult(firstResult).setMaxResults(size).getResultList();
+					tagLogs = TagLog.findTagLogsByNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(numeroId, devices.get(0).getApplicationName(), devices.get(0).getLocation(), sortFieldName, sortOrder).setFirstResult(firstResult).setMaxResults(size).getResultList();
 				}
 			} else {
 				tagLogs = TagLog.findTagLogEntries(firstResult, size, sortFieldName, sortOrder);
