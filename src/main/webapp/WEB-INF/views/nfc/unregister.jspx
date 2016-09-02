@@ -9,7 +9,7 @@
 	<script type="text/javascript">
 	
 	$(document).ready(function() {
-       	getEsupNfcStorage().setItem("numeroId", "");
+       	// getEsupNfcStorage().setItem("numeroId", "");
         document.location.href="${location_url}";
 	});
      </script>
