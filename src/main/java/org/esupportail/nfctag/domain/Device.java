@@ -55,7 +55,7 @@ public class Device {
     private Application application;
     
     public String getApplicationName(){
-    	return this.application!=null ? this.application.getName() : "";
+    	return this.getApplication()!=null ? this.getApplication().getName() : "";
     }
 
 }
