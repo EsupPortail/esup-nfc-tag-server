@@ -40,6 +40,7 @@ import org.springframework.roo.addon.tostring.RooToString;
 								"findTagLogsByApplicationNameEquals",
 								"findTagLogsByAuthDateBetween",
 								"findTagLogsByAuthDateGreaterThan", 
+								"findTagLogsByAuthDateGreaterThanAndNumeroIdEquals",
 								"findTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals"	} )
 public class TagLog {
 	
