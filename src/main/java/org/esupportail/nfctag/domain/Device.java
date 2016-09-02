@@ -56,4 +56,5 @@ public class Device {
     public String getApplicationName(){
     	return this.application!=null ? this.application.getName() : "";
     }
+
 }

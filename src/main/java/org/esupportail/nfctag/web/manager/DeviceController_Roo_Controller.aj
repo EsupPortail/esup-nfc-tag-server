@@ -4,8 +4,6 @@
 package org.esupportail.nfctag.web.manager;
 
 import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import org.esupportail.nfctag.domain.Application;
@@ -36,11 +34,6 @@ privileged aspect DeviceController_Roo_Controller {
     @RequestMapping(params = "form", produces = "text/html")
     public String DeviceController.createForm(Model uiModel) {
         populateEditForm(uiModel, new Device());
-        List<String[]> dependencies = new ArrayList<String[]>();
-        if (Application.countApplications() == 0) {
-            dependencies.add(new String[] { "application", "manager/applications" });
-        }
-        uiModel.addAttribute("dependencies", dependencies);
         return "manager/devices/create";
     }
     

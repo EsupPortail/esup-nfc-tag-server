@@ -28,6 +28,7 @@ import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -37,8 +38,16 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RooWebScaffold(path = "manager/devices", formBackingObject = Device.class)
 public class DeviceController {
 	
-	List<String> listSearchBy = Arrays.asList("eppnInit", "imei", "macAddress", "location");
+	List<String> listSearchBy = Arrays.asList("numeroId", "eppnInit", "imei", "macAddress", "location");
 	
+    @RequestMapping(value = "/numeroid/{numeroId}", produces = "text/html")
+    public String numeroId(@PathVariable("numeroId") String numeroId, Model uiModel) {
+    	Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+        uiModel.addAttribute("device", device);
+        uiModel.addAttribute("itemId", device.getId());
+        return "manager/devices/show";
+    }
+    
     @RequestMapping(method = RequestMethod.PUT, produces = "text/html")
     public String update(@Valid Device device, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
         if (bindingResult.hasErrors()) {
@@ -65,7 +74,9 @@ public class DeviceController {
         	uiModel.addAttribute("application", application);
     	}else if ("eppnInit".equals(searchBySelected)) {
     		uiModel.addAttribute("devices", Device.findDevicesByEppnInitLike(searchString).getResultList());
-    	} else if ("imei".equals(searchBySelected)) {
+    	}else if ("numeroId".equals(searchBySelected)) {
+    		uiModel.addAttribute("devices", Device.findDevicesByNumeroIdEquals(searchString).getResultList());
+    	}else if ("imei".equals(searchBySelected)) {
     		uiModel.addAttribute("devices", Device.findDevicesByImeiEquals(searchString).getResultList());
     	} else if ("macAddress".equals(searchBySelected)) {
     		uiModel.addAttribute("devices", Device.findDevicesByMacAddressEquals(searchString).getResultList());
