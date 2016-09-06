@@ -105,24 +105,10 @@
     </bean>
 
 	<bean id="localeResolver"
-		class="org.springframework.web.servlet.i18n.SessionLocaleResolver">
-		<property name="defaultLocale" value="en" />
+		class="org.springframework.web.servlet.i18n.FixedLocaleResolver">
+		<property name="defaultLocale" value="fr" />
 	</bean>
 
-	<bean id="localeChangeInterceptor"
-		class="org.springframework.web.servlet.i18n.LocaleChangeInterceptor">
-		<property name="paramName" value="language" />
-	</bean>
-	
-	<bean class="org.springframework.web.servlet.mvc.support.ControllerClassNameHandlerMapping" >
-		<property name="interceptors">
-			<list>
-				<ref bean="localeChangeInterceptor" />
-			</list>
-		</property>
-	</bean>
-
-	<bean id="applicationContextProvder" class="org.esupportail.nfctag.beans.ApplicationContextProvider"/>
                         
 	<bean id="messageSource"
 	    class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
