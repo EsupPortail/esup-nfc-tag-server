@@ -117,4 +117,6 @@
 	    <property name="fallbackToSystemLocale" value="false" />
 	</bean>
 	
+	 <bean id="applicationContextProvder" class="org.esupportail.nfctag.beans.ApplicationContextProvider"/>
+	
 </beans>
