@@ -17,9 +17,13 @@
  */
 package org.esupportail.nfctag.exceptions;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.esupportail.nfctag.beans.ApplicationContextProvider;
-import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.LocaleResolver;
 
 public class EsupNfcTagException extends Exception {
 	
@@ -60,7 +64,9 @@ public class EsupNfcTagException extends Exception {
 	
 	public String getMessage() {
 		ReloadableResourceBundleMessageSource messageSource = ApplicationContextProvider.getApplicationContext().getBean("messageSource", ReloadableResourceBundleMessageSource.class);
-		return messageSource.getMessage(this.message, this.params, LocaleContextHolder.getLocale());
+		LocaleResolver localeResolver = (LocaleResolver)ApplicationContextProvider.getApplicationContext().getBean("localeResolver");
+		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+		return messageSource.getMessage(this.message, this.params, localeResolver.resolveLocale(request));
 	}
 
 }
