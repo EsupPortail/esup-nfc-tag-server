@@ -113,7 +113,6 @@
 	<bean id="messageSource"
 	    class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
 	    <property name="basenames" value="WEB-INF/i18n/messages,WEB-INF/i18n/application" />
-	    <property name="defaultEncoding" value="UTF-8" />
 	    <property name="fallbackToSystemLocale" value="false" />
 	</bean>
 	
