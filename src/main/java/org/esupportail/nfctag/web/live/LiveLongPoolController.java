@@ -101,8 +101,8 @@ public class LiveLongPoolController {
 				return "live/mobil";
 			}
 		} else {		
-			if(!auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN"))) {
-				String msg = " don't have role ROLE_ADMIN";
+			if(!auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN")) && !auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_SUPERVISOR"))) {
+				String msg = " don't have role ROLE_ADMIN / ROLE_SUPERVISOR";
 				log.warn(auth.getName() + msg);
 				throw new AccessDeniedException(auth.getName() + msg);
 			}
@@ -116,7 +116,7 @@ public class LiveLongPoolController {
 	public DeferredResult<List<TagLog>> listLeoAuth(@RequestParam Long authDateTimestamp, @RequestParam(required=false) String numeroId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		// admin ou tel
-		if(numeroId==null && !auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN"))) {
+		if(numeroId==null && !auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN")) && !auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_SUPERVISOR"))) {
 			return null;
 		}
 

@@ -54,7 +54,7 @@ public class ErrorLongPoolController {
 	@ResponseBody
 	public DeferredResult<List<TagError>> tagError(@RequestParam Long errorDateTimestamp, @RequestParam(required=false) String numeroId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if(numeroId==null && !auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN"))) {
+		if(numeroId==null && !auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN")) && !auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_SUPERVISOR"))) {
 			return null;
 		}
 		LiveQuery liveQuery = new LiveQuery(errorDateTimestamp, numeroId);
