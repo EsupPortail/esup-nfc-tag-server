@@ -38,7 +38,6 @@ public class EsupNfcTagException extends Exception {
 		error_esupnfctagexception_tagidchecknotdefine,
 		error_esupnfctagexception_tagvalidationerror,
 		error_esupnfctagexception_httperror
-		
 	}
 	
 	String[] params;

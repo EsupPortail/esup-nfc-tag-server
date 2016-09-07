@@ -29,12 +29,13 @@
     <http disable-url-rewriting="true" use-expressions="true" entry-point-ref="http403EntryPoint">
 	<intercept-url pattern="/nfc-ws" access="permitAll" />
 	<intercept-url pattern="/logs" access="permitAll" />
-	<intercept-url pattern="/live**" access="permitAll" />
-        <intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />
-        <intercept-url pattern="/manager" access="isAuthenticated()" />
-        <intercept-url pattern="/manager/**" access="hasRole('ROLE_ADMIN')" />
-        <intercept-url pattern="/nfc/**" access="isAuthenticated()" />
-        <intercept-url pattern="/**" access="permitAll" />
+	<intercept-url pattern="/live" access="hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_ADMIN')" />
+    <intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />
+    <intercept-url pattern="/manager" access="hasRole('ROLE_ADMIN')" />
+    <intercept-url pattern="/manager/**" access="hasRole('ROLE_ADMIN')" />
+	<intercept-url pattern="/manager/taglogs" access="hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_ADMIN')" />    
+    <intercept-url pattern="/nfc/**" access="isAuthenticated()" />
+    <intercept-url pattern="/**" access="permitAll" />
 	<access-denied-handler error-page="/denied" />
 	<session-management session-authentication-strategy-ref="sas" />
 	<custom-filter position="PRE_AUTH_FILTER" ref="shibFilter"/>
@@ -82,6 +83,7 @@
 	<beans:property name="mappingGroupesRoles">
 	    <beans:map>
 		<beans:entry key="EsupNfcTag_Admin" value="ROLE_ADMIN" />
+		<beans:entry key="EsupNfcTag_Supervisor" value="ROLE_SUPERVISOR" />
 	    </beans:map>
 	</beans:property>
     </beans:bean>
