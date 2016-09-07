@@ -46,34 +46,34 @@
     <beans:bean id="http403EntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
     
     <beans:bean id="authEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
-	<beans:constructor-arg value="/"/>
+		<beans:constructor-arg value="/"/>
     </beans:bean>
     
     <beans:bean id="shibFilter" class="org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter">
-	<beans:property name="principalRequestHeader" value="REMOTE_USER"/>
-	<beans:property name="credentialsRequestHeader" value="MEMBER"/>
-	<beans:property name="exceptionIfHeaderMissing" value="false"/>
-	<beans:property name="authenticationManager" ref="authenticationManager" />
+		<beans:property name="principalRequestHeader" value="REMOTE_USER"/>
+		<beans:property name="credentialsRequestHeader" value="MEMBER"/>
+		<beans:property name="exceptionIfHeaderMissing" value="false"/>
+		<beans:property name="authenticationManager" ref="authenticationManager" />
     </beans:bean>
 
     <authentication-manager alias="authenticationManager">
-	<authentication-provider ref="preauthAuthProvider" />	
-	<!--  <authentication-provider ref="casAuthenticationProvider" />-->
+		<authentication-provider ref="preauthAuthProvider" />	
+		<!--  <authentication-provider ref="casAuthenticationProvider" />-->
     </authentication-manager>
     
     <beans:bean id="preauthAuthProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
-	<beans:property name="preAuthenticatedUserDetailsService" ref="authUserDetailsService"/>
+		<beans:property name="preAuthenticatedUserDetailsService" ref="authUserDetailsService"/>
     </beans:bean>
 
     <beans:bean id="concurrencyFilter"
 		class="org.springframework.security.web.session.ConcurrentSessionFilter">
-	<beans:constructor-arg ref="sessionRegistry"/>
-	<beans:constructor-arg value="/"/>
+		<beans:constructor-arg ref="sessionRegistry"/>
+		<beans:constructor-arg value="/"/>
     </beans:bean>
 
     <beans:bean id="sas"
 		class="org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy">
-	<beans:constructor-arg name="sessionRegistry" ref="sessionRegistry" />
+		<beans:constructor-arg name="sessionRegistry" ref="sessionRegistry" />
     </beans:bean>
 
     <beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
