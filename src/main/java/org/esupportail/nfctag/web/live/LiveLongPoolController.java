@@ -18,6 +18,7 @@
 package org.esupportail.nfctag.web.live;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -41,10 +42,12 @@ import org.esupportail.nfctag.service.api.AppliExtApi;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.GrantedAuthorityImpl;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -71,6 +74,15 @@ public class LiveLongPoolController {
 	private Map<DeferredResult<List<TagLog>>, LiveQuery> suspendedLeoAuthsRequests = new ConcurrentHashMap<DeferredResult<List<TagLog>>, LiveQuery>();
 
 	private Queue<TagLog> tagLogs = new PriorityBlockingQueue<TagLog>(100, new TagLogComparator());
+	
+
+    private List<String> ipsStart4LiveFullAnonymousList;
+
+    @Value("${ipsStart4LiveFullAnonymous}")
+    public void setipsStart4LiveFullAnonymous(String ipsStart4LiveFullAnonymous) {
+    	ipsStart4LiveFullAnonymousList = Arrays.asList(ipsStart4LiveFullAnonymous.split(" "));
+        log.info("Restricted access from this (started) ip for full live without authentication : " + ipsStart4LiveFullAnonymousList);
+    }
 	
 	@RequestMapping
 	public String index(@RequestParam(required=false) String numeroId, @RequestParam(required=false) String apkVersion, Model uiModel){
@@ -101,8 +113,8 @@ public class LiveLongPoolController {
 				return "live/mobil";
 			}
 		} else {		
-			if(!auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN")) && !auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_SUPERVISOR"))) {
-				String msg = " don't have role ROLE_ADMIN / ROLE_SUPERVISOR";
+			if(!isLiveLongPoolAuthorized(auth)) {
+				String msg = " not authorized to see the full live ";
 				log.warn(auth.getName() + msg);
 				throw new AccessDeniedException(auth.getName() + msg);
 			}
@@ -116,7 +128,7 @@ public class LiveLongPoolController {
 	public DeferredResult<List<TagLog>> listLeoAuth(@RequestParam Long authDateTimestamp, @RequestParam(required=false) String numeroId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		// admin ou tel
-		if(numeroId==null && !auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN")) && !auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_SUPERVISOR"))) {
+		if(numeroId==null && !isLiveLongPoolAuthorized(auth)) {
 			return null;
 		}
 
@@ -193,5 +205,23 @@ public class LiveLongPoolController {
 			return o1.getAuthDate().compareTo(o2.getAuthDate());
 		}
 	}
+	
+	private boolean isLiveLongPoolAuthorized(Authentication auth) {
+		return auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN")) || auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_SUPERVISOR")) || isIpCanBeUsed4LiveFullAnonymous(auth);
+	}
+	
+	private Boolean isIpCanBeUsed4LiveFullAnonymous(Authentication auth) {
+		WebAuthenticationDetails wad = (WebAuthenticationDetails) auth.getDetails();
+        String userIPAddress = wad.getRemoteAddress();
+		if (ipsStart4LiveFullAnonymousList != null && !ipsStart4LiveFullAnonymousList.isEmpty()) {
+			for (String ipStart : ipsStart4LiveFullAnonymousList) {
+				if (userIPAddress.startsWith(ipStart)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
+
 
 }
