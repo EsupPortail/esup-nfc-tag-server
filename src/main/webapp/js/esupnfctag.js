@@ -47,13 +47,25 @@ $(document).ready(function() {
 	}
 	
 	/* MUSTACHE TEMPLATES */
+	if(typeof numeroId != 'undefined'){
+		if(numeroId!=""){
+			$.Mustache.add('leoauth-template', '{{#leoauths}} \
+					<tr id="row_{{id}}"> \
+						<td class="td-live-text">{{firstname}} {{lastname}} <br/> {{authDateString}}<br/></td> \
+						<td class="td-live-img"><div id="status_{{id}}">{{status}}</div></td> \
+					</tr>{{/leoauths}}');
 	
-	$.Mustache.add('leoauth-template', '{{#leoauths}} \
-			<tr id="row_{{id}}"> \
-				<td class="td-live-text">{{firstname}} {{lastname}} <br/> {{authDateString}}<br/></td> \
-				<td class="td-live-img"><div id="status_{{id}}">{{status}}</div></td> \
-			</tr>{{/leoauths}}');
-
+	
+	
+		}else{
+			$.Mustache.add('leoauth-template', '{{#leoauths}} \
+					<tr id="row_{{id}}"> \
+						<td class="td-live-text">{{firstname}} {{lastname}} <br/> {{authDateString}}<br/></td> \
+						<td class="td-live-text">{{location}}<br/></td> \
+						<td class="td-live-img"><div id="status_{{id}}">{{status}}</div></td> \
+					</tr>{{/leoauths}}');
+		}
+	}
 	$.Mustache.add('validate-template', '{{#leoauths}} \
 		<div id="validateModal" class="modal fade" role="dialog" style="background-color: rgba(115, 210, 22, 0.5);"> \
 			<div class="modal-dialog" > \
