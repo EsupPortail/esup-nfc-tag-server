@@ -18,12 +18,11 @@
 package org.esupportail.nfctag.web.nfc;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 import javax.annotation.Resource;
-import javax.persistence.TypedQuery;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
@@ -41,13 +40,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.util.UriUtils;
+import org.springframework.web.util.WebUtils;
 
 @RequestMapping("/nfc-index")
 @Controller
@@ -146,13 +145,13 @@ public class NfcIndexController {
 			@RequestParam(required = true) Long applicationId,
 			@RequestParam(required = true) String imei,
 			@RequestParam(required = true) String macAddress,
-			Model uiModel) throws IOException, EsupNfcTagException {
+			Model uiModel, HttpServletRequest httpServletRequest) throws IOException, EsupNfcTagException {
 		
 		log.info(numeroId + "access to /nfc-index/locations");
 		
 		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
 		if(devices.isEmpty()) {
-			return "redirect:/nfc/register/?location=" + location + "&applicationId=" + applicationId + "&imei=" + imei + "&macAddress=" + macAddress;
+			return "redirect:/nfc/register/?location=" + encodeUrlPathSegment(location, httpServletRequest) + "&applicationId=" + applicationId + "&imei=" + imei + "&macAddress=" + macAddress;
 		}
 
 		Device device = devices.get(0);
@@ -204,6 +203,17 @@ public class NfcIndexController {
 		 
 		return "nfc/unregister";
 	}
+	
+    String encodeUrlPathSegment(String pathSegment, HttpServletRequest httpServletRequest) {
+        String enc = httpServletRequest.getCharacterEncoding();
+        if (enc == null) {
+            enc = WebUtils.DEFAULT_CHARACTER_ENCODING;
+        }
+        try {
+            pathSegment = UriUtils.encodePathSegment(pathSegment, enc);
+	} catch (UnsupportedEncodingException uee) {}
+        return pathSegment;
+    }
 
 }
 
