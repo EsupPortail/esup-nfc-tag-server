@@ -12,7 +12,7 @@
 				<c:when test="${appLocation.available}">
 					<c:forEach items="${appLocation.locations}" var = "location">
 						<hr/>
-						<spring:url value="/nfc-index/register/" var="register_url">
+						<spring:url value="/nfc-index/register/" var="register_url" htmlEscape="false">
 							<spring:param name="location" value="${location}"/>
 							<spring:param name="applicationId" value="${appLocation.application.id}"/>
 							<spring:param name="imei" value="${imei}"/>
