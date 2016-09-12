@@ -87,6 +87,7 @@ public class ApplicationController {
         }
         uiModel.asMap().clear();
         Application applicationUpdate = Application.findApplication(application.getId());
+        applicationUpdate.setName(application.getName());
         applicationUpdate.setTagIdCheck(application.getTagIdCheck());
         applicationUpdate.setAppliExt(application.getAppliExt());
         applicationUpdate.setNfcConfig(application.getNfcConfig());
