@@ -199,7 +199,9 @@ $(document).ready(function() {
 				},
 				error : function() {
 					if(this.debug) $('#status').text("Failed to get tagLogs");
-					this.timer = this.poll();
+					setTimeout(function(){
+						liveLongPoll.timer = liveLongPoll.poll();
+					}, 2000);
 				},
 				cache : false
 			})
@@ -252,7 +254,9 @@ $(document).ready(function() {
 				},
 				error : function() {
 					if(this.debug) $('#status').text("Failed to get errors");
-					this.timer = this.poll();
+					setTimeout(function(){
+						errorsLongPool.timer = errorsLongPool.poll();
+					}, 2000);
 				},
 				cache : false
 			});
