@@ -230,14 +230,12 @@ public class LiveLongPoolController {
 			String numeroId = entry.getValue().getNumeroId();
 			if(numeroId != null && !numeroId.isEmpty()) {
 				Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
-				//if(!devices.contains(device)) {
-					Date lastPollDate = entry.getValue().getLastPollDate();
-					device.setLastPollDate(lastPollDate);
-					devices.add(device);
-				//}
+				Date lastPollDate = entry.getValue().getLastPollDate();
+				device.setLastPollDate(lastPollDate);
+				devices.add(device);
 			}
 		}
-		Collections.sort(devices, (Device c1, Device c2) -> c1.getLastPollDate().compareTo(c2.getLastPollDate()));
+		Collections.sort(devices, (Device c1, Device c2) -> c2.getLastPollDate().compareTo(c1.getLastPollDate()));
 		return devices;
 	}
 
