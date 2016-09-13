@@ -231,7 +231,7 @@ public class LiveLongPoolController {
 			String numeroId = entry.getValue().getNumeroId();
 			if(numeroId != null && !numeroId.isEmpty()) {
 				Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
-				if(!devices.contains(device)) {
+				if(!devices.contains(device) && device.getLocation()!=null) {
 					devices.add(device);
 				}
 			}
