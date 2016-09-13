@@ -21,8 +21,9 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Vector;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import javax.annotation.Resource;
+
+import org.esupportail.nfctag.web.live.LiveLongPoolController;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -34,20 +35,20 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class CurrentSessionsController {
 	
+	@Resource
+	private SessionRegistry sessionRegistry;
+	
+	@Resource
+	private LiveLongPoolController liveLongPoolController;
+		
 	@ModelAttribute("active")
 	String getCurrentMenu() {
 		return "sessions";
 	}
-
-	@Autowired
-	@Qualifier("sessionRegistry")
-	private SessionRegistry sessionRegistry;
 	
 	@RequestMapping
 	public String getCurrentSessions(Model uiModel) throws IOException {
 
-		
-		
 		List<String> sessions = new Vector<String>();
 		List<Object> principals = sessionRegistry.getAllPrincipals();
 		
@@ -56,9 +57,12 @@ public class CurrentSessionsController {
 		}
 		
 		uiModel.addAttribute("sessions", sessions);
-		uiModel.addAttribute("active", "sessions");
+		uiModel.addAttribute("active", liveLongPoolController.getDevices());
+		uiModel.addAttribute("active", "sessions");		
 		
 		return "admin/currentsessions";
 	}
+	
+	
 
 }

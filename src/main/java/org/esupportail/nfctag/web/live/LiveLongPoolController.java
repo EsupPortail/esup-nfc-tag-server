@@ -22,6 +22,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -221,6 +223,21 @@ public class LiveLongPoolController {
 			}
 		}
 		return false;
+	}
+
+	public List<Device> getDevices() {
+		List<Device> devices = new ArrayList<Device>();	
+		for (Entry<DeferredResult<List<TagLog>>, LiveQuery> entry : this.suspendedLeoAuthsRequests.entrySet()) {
+			String numeroId = entry.getValue().getNumeroId();
+			if(numeroId != null && !numeroId.isEmpty()) {
+				Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+				if(!devices.contains(device)) {
+					devices.add(device);
+				}
+			}
+		}
+		Collections.sort(devices, (Device c1, Device c2) -> c1.getLocation().compareTo(c2.getLocation()));
+		return devices;
 	}
 
 

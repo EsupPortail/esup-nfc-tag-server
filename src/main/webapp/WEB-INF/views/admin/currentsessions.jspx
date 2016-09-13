@@ -25,15 +25,21 @@
 	<jsp:output omit-xml-declaration="yes" />
 
     <div class="jumbotron well">
-        <p>Utilisateurs connectés.</p>
-        <p>${fn:length(sessions)} session(s) active(s)</p>
-    </div>
-    <div class="jumbotron">
-	<ul>
-	   <c:forEach items="${sessions}" var="session">
-	       <li>${session}</li>
-	   </c:forEach>
-	</ul>
+        <p>${fn:length(sessions)} session(s) shib active(s)</p>
+		<ul>
+		   <c:forEach items="${sessions}" var="session">
+		       <li>${session}</li>
+		   </c:forEach>
+		</ul>
 	</div>
 	
+    <div class="jumbotron well">
+        <p>${fn:length(devices)} périphérique(s) actif(s)</p>
+		<ul>
+		   <c:forEach items="${devices}" var="device">
+		       <li>${device.location} - ${device.eppnInit} - ${device.numeroId} - </li>
+		   </c:forEach>
+		</ul>
+	</div>
+		
 </div>
