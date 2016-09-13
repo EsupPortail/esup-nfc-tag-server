@@ -19,11 +19,10 @@ package org.esupportail.nfctag.web.live;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -231,12 +230,14 @@ public class LiveLongPoolController {
 			String numeroId = entry.getValue().getNumeroId();
 			if(numeroId != null && !numeroId.isEmpty()) {
 				Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
-				if(!devices.contains(device) && device.getLocation()!=null) {
+				//if(!devices.contains(device)) {
+					Date lastPollDate = entry.getValue().getLastPollDate();
+					device.setLastPollDate(lastPollDate);
 					devices.add(device);
-				}
+				//}
 			}
 		}
-		Collections.sort(devices, (Device c1, Device c2) -> c1.getLocation().compareTo(c2.getLocation()));
+		Collections.sort(devices, (Device c1, Device c2) -> c1.getLastPollDate().compareTo(c2.getLastPollDate()));
 		return devices;
 	}
 

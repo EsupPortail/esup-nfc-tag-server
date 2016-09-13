@@ -18,7 +18,7 @@
     limitations under the License.
 
 -->
-<div xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form"
+<div xmlns:fmt="http://java.sun.com/jsp/jstl/fmt" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form"
     xmlns:spring="http://www.springframework.org/tags"
 	>
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
@@ -37,7 +37,7 @@
         <p>${fn:length(devices)} périphérique(s) actif(s)</p>
 		<ul>
 		   <c:forEach items="${devices}" var="device">
-		       <li>${device.location} - ${device.eppnInit} - ${device.numeroId} - </li>
+		       <li>${device.location} - ${device.eppnInit} - ${device.numeroId} - <fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${device.lastPollDate}" /></li>
 		   </c:forEach>
 		</ul>
 	</div>

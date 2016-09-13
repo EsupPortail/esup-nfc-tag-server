@@ -16,8 +16,10 @@
  * limitations under the License.
  */
 package org.esupportail.nfctag.domain;
+import java.util.Date;
+
 import javax.persistence.ManyToOne;
-import javax.validation.constraints.NotNull;
+import javax.persistence.Transient;
 
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
@@ -53,6 +55,9 @@ public class Device {
     
     @ManyToOne
     private Application application;
+    
+    @Transient
+    private Date lastPollDate;
     
     public String getApplicationName(){
     	return this.getApplication()!=null ? this.getApplication().getName() : "";

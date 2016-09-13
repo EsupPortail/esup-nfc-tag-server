@@ -3,6 +3,7 @@
 
 package org.esupportail.nfctag.domain;
 
+import java.util.Date;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 
@@ -70,6 +71,14 @@ privileged aspect Device_Roo_JavaBean {
     
     public void Device.setApplication(Application application) {
         this.application = application;
+    }
+    
+    public Date Device.getLastPollDate() {
+        return this.lastPollDate;
+    }
+    
+    public void Device.setLastPollDate(Date lastPollDate) {
+        this.lastPollDate = lastPollDate;
     }
     
 }

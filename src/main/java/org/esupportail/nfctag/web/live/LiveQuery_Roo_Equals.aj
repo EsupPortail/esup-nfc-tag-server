@@ -17,11 +17,11 @@ privileged aspect LiveQuery_Roo_Equals {
             return true;
         }
         LiveQuery rhs = (LiveQuery) obj;
-        return new EqualsBuilder().append(authDateTimestamp, rhs.authDateTimestamp).append(numeroId, rhs.numeroId).isEquals();
+        return new EqualsBuilder().append(authDateTimestamp, rhs.authDateTimestamp).append(lastPollDate, rhs.lastPollDate).append(numeroId, rhs.numeroId).isEquals();
     }
     
     public int LiveQuery.hashCode() {
-        return new HashCodeBuilder().append(authDateTimestamp).append(numeroId).toHashCode();
+        return new HashCodeBuilder().append(authDateTimestamp).append(lastPollDate).append(numeroId).toHashCode();
     }
     
 }

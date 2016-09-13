@@ -18,6 +18,7 @@
 package org.esupportail.nfctag.web.live;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.springframework.roo.addon.equals.RooEquals;
 import org.springframework.roo.addon.javabean.RooJavaBean;
@@ -33,11 +34,15 @@ public class LiveQuery implements Serializable {
 	String numeroId;
 	
 	Long authDateTimestamp;
+	
+	Date lastPollDate;
 
 	public LiveQuery() {
+		this.lastPollDate = new Date();
 	}
 	
 	public LiveQuery(Long authDateTimestamp, String numeroId) {
+		this.lastPollDate = new Date();
 		this.numeroId = numeroId;
 		this.authDateTimestamp = authDateTimestamp;
 	}

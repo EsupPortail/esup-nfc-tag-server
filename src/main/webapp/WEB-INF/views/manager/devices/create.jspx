@@ -14,6 +14,7 @@
         <field:select checkboxes="true" field="application" id="c_org_esupportail_nfctag_domain_Device_application" itemLabel="name" itemValue="id" items="${applications}" multiple="false" path="/manager/applications" z="user-managed"/>
         <field:input cssClass="form-control" field="location" id="c_org_esupportail_nfctag_domain_Device_location" z="user-managed"/>
         <field:checkbox field="validateAuthWoConfirmation" id="c_org_esupportail_nfctag_domain_Device_validateAuthWoConfirmation" z="user-managed"/>
+        <field:datetime dateTimePattern="${device_lastpolldate_date_format}" field="lastPollDate" id="c_org_esupportail_nfctag_domain_Device_lastPollDate" render="false" z="user-managed"/>
     </form:create>
     <form:dependency dependencies="${dependencies}" id="d_org_esupportail_nfctag_domain_Device" render="${not empty dependencies}" z="user-managed"/>
 </div>

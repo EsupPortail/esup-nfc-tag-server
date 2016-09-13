@@ -3,6 +3,7 @@
 
 package org.esupportail.nfctag.web.live;
 
+import java.util.Date;
 import org.esupportail.nfctag.web.live.LiveQuery;
 
 privileged aspect LiveQuery_Roo_JavaBean {
@@ -21,6 +22,14 @@ privileged aspect LiveQuery_Roo_JavaBean {
     
     public void LiveQuery.setAuthDateTimestamp(Long authDateTimestamp) {
         this.authDateTimestamp = authDateTimestamp;
+    }
+    
+    public Date LiveQuery.getLastPollDate() {
+        return this.lastPollDate;
+    }
+    
+    public void LiveQuery.setLastPollDate(Date lastPollDate) {
+        this.lastPollDate = lastPollDate;
     }
     
 }
