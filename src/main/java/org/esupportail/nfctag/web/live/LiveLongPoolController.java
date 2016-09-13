@@ -197,7 +197,9 @@ public class LiveLongPoolController {
 		this.tagLogs.add(tagLog);
 		for (Entry<DeferredResult<List<TagLog>>, LiveQuery> entry : this.suspendedLeoAuthsRequests.entrySet()) {
 			List<TagLog> newLeoAuths = getLatestLeoAuths(entry.getValue());
-			entry.getKey().setResult(newLeoAuths);
+			if(!newLeoAuths.isEmpty()) {
+				entry.getKey().setResult(newLeoAuths);
+			}
 		}
 	}
 

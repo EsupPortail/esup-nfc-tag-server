@@ -77,7 +77,9 @@ public class ErrorLongPoolController {
 			if(entry.getValue().getNumeroId().equals(tagError.getNumeroId()) && entry.getValue().getAuthDateTimestamp()<= tagError.getErrorDate().getTime()) {
 				log.info("Error match : " + tagError);
 				List<TagError> tagErrors = Arrays.asList(tagError); 
-				entry.getKey().setResult(tagErrors);
+				if(!tagErrors.isEmpty()) {
+					entry.getKey().setResult(tagErrors);
+				}
 			}
 		}
 	}
