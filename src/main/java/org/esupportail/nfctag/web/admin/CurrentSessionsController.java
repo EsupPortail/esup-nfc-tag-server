@@ -57,7 +57,7 @@ public class CurrentSessionsController {
 		}
 		
 		uiModel.addAttribute("sessions", sessions);
-		uiModel.addAttribute("active", liveLongPoolController.getDevices());
+		uiModel.addAttribute("devices", liveLongPoolController.getDevices());
 		uiModel.addAttribute("active", "sessions");		
 		
 		return "admin/currentsessions";
