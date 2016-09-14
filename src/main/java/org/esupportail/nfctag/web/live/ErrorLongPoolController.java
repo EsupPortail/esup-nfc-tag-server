@@ -24,11 +24,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
 import org.esupportail.nfctag.domain.TagError;
-import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;

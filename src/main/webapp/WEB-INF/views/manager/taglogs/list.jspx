@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<div xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:spring="http://www.springframework.org/tags" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
+<div xmlns:sec="http://www.springframework.org/security/tags" xmlns:fn="http://java.sun.com/jsp/jstl/functions" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:spring="http://www.springframework.org/tags" xmlns:table="urn:jsptagdir:/WEB-INF/tags/form/fields" version="2.0">
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <h1>
@@ -38,16 +38,20 @@
             <input class="btn btn-danger" onclick="window.location.href='devices';" id="deviceCancelFilters" title="Cancel filters" type="button" value="${cancel}"/>
         </div>
     </form>
+    <c:set value="false" var="isAdmin"/>
+    <sec:authorize access="hasRole('ROLE_ADMIN')">
+    	<c:set value="true" var="isAdmin"/>
+    </sec:authorize>
     <page:list id="pl_org_esupportail_nfctag_domain_TagLog" items="${taglogs}" z="user-managed"/>
-    <table:table data="${taglogs}" delete="false" id="l_org_esupportail_nfctag_domain_TagLog" path="/manager/taglogs" update="false" z="user-managed">
+    <table:table data="${taglogs}" delete="false" id="l_org_esupportail_nfctag_domain_TagLog" path="/manager/taglogs" update="false" z="user-managed" view="${isAdmin}">
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_authDate" property="authDate" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_applicationName" property="applicationName" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_location" property="location" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_eppnInit" property="eppnInit" z="user-managed"/>
-        <table:column link="true" linkPrefix="/manager/devices/numeroid/" id="c_org_esupportail_nfctag_domain_TagLog_numeroId" property="numeroId" z="user-managed"/>
+        <table:column link="true" linkPrefix="/manager/devices/numeroid/" id="c_org_esupportail_nfctag_domain_TagLog_numeroId" property="numeroId" z="user-managed" render="${isAdmin}"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_status" property="status" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_csn" property="csn" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_desfireId" property="desfireId" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_csn" property="csn" z="user-managed" render="${isAdmin}"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_desfireId" property="desfireId" z="user-managed" render="${isAdmin}"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_eppn" property="eppn" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_firstname" property="firstname" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_lastname" property="lastname" z="user-managed"/>
