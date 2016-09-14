@@ -178,7 +178,7 @@ $(document).ready(function() {
 						setTimeout(function(){
 							newleoauth.attr("class", "oldLog");
 						}, 2000);
-						var oldleoauth = $('.leo-old:gt(10)').slice();
+						var oldleoauth = $('#lastleoauth tr:gt(9)').slice();
 						setTimeout(function(){
 							oldleoauth.hide('slow', function(){ oldleoauth.remove(); });
 						}, 5000);
