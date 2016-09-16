@@ -31,7 +31,7 @@
 <util:load-scripts />
 
 <spring:message code="application_name" var="app_name" htmlEscape="false" />
-<title>ArduinoLeo WebServeur - ${active}</title>
+<title>Esup Nfc Tag Server - ${active}</title>
 </head>
 
 <body data-target=".bs-docs-sidebar" data-spy="scroll" data-twttr-rendered="true">
