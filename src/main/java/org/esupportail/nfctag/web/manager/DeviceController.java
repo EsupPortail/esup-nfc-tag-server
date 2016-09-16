@@ -55,9 +55,7 @@ public class DeviceController {
             return "manager/devices/update";
         }
         uiModel.asMap().clear();
-        Device updateDevice = Device.findDevice(device.getId());
-        updateDevice.setValidateAuthWoConfirmation(device.isValidateAuthWoConfirmation());
-        updateDevice.merge();
+        device.merge();
         return "redirect:/manager/devices/";
     }
  
