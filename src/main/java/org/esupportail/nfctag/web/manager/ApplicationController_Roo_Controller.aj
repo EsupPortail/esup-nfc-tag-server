@@ -5,9 +5,11 @@ package org.esupportail.nfctag.web.manager;
 
 import java.io.UnsupportedEncodingException;
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.web.manager.ApplicationController;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -42,6 +44,17 @@ privileged aspect ApplicationController_Roo_Controller {
             uiModel.addAttribute("applications", Application.findAllApplications(sortFieldName, sortOrder));
         }
         return "manager/applications/list";
+    }
+    
+    @RequestMapping(method = RequestMethod.PUT, produces = "text/html")
+    public String ApplicationController.update(@Valid Application application, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
+        if (bindingResult.hasErrors()) {
+            populateEditForm(uiModel, application);
+            return "manager/applications/update";
+        }
+        uiModel.asMap().clear();
+        application.merge();
+        return "redirect:/manager/applications/" + encodeUrlPathSegment(application.getId().toString(), httpServletRequest);
     }
     
     @RequestMapping(value = "/{id}", params = "form", produces = "text/html")

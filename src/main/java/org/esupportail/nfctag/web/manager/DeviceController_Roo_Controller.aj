@@ -44,6 +44,17 @@ privileged aspect DeviceController_Roo_Controller {
         return "manager/devices/show";
     }
     
+    @RequestMapping(method = RequestMethod.PUT, produces = "text/html")
+    public String DeviceController.update(@Valid Device device, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
+        if (bindingResult.hasErrors()) {
+            populateEditForm(uiModel, device);
+            return "manager/devices/update";
+        }
+        uiModel.asMap().clear();
+        device.merge();
+        return "redirect:/manager/devices/" + encodeUrlPathSegment(device.getId().toString(), httpServletRequest);
+    }
+    
     @RequestMapping(value = "/{id}", params = "form", produces = "text/html")
     public String DeviceController.updateForm(@PathVariable("id") Long id, Model uiModel) {
         populateEditForm(uiModel, Device.findDevice(id));

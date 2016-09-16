@@ -77,22 +77,5 @@ public class ApplicationController {
         application.persist();
         return "redirect:/manager/applications/";
     }
-    
-    
-    @RequestMapping(method = RequestMethod.PUT, produces = "text/html")
-    public String update(@Valid Application application, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
-        if (bindingResult.hasErrors()) {
-            populateEditForm(uiModel, application);
-            return "manager/applications/update";
-        }
-        uiModel.asMap().clear();
-        Application applicationUpdate = Application.findApplication(application.getId());
-        applicationUpdate.setName(application.getName());
-        applicationUpdate.setTagIdCheck(application.getTagIdCheck());
-        applicationUpdate.setAppliExt(application.getAppliExt());
-        applicationUpdate.setNfcConfig(application.getNfcConfig());
-        applicationUpdate.setActive(application.isActive());
-        applicationUpdate.merge();
-        return "redirect:/manager/applications/";
-    }
+
 }
