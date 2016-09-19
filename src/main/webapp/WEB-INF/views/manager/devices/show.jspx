@@ -3,7 +3,9 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <h1>
-        <spring:message code="label_org_esupportail_nfctag_domain_device"/> : ${device.imei}</h1>
+        <spring:message code="label_org_esupportail_nfctag_domain_device"/> : 
+        <a href="/manager/taglogs?searchBySelected=eppn_init&amp;searchString=${device.numeroId}" >${device.numeroId}</a>
+        </h1>
     <page:show id="ps_org_esupportail_nfctag_domain_Device" object="${device}" path="/manager/devices" z="user-managed">
         <dl class="dl-horizontal">
             <field:display field="numeroId" id="s_org_esupportail_nfctag_domain_Device_numeroId" object="${device}" z="user-managed"/>

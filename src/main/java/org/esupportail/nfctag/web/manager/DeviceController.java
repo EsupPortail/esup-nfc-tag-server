@@ -19,18 +19,16 @@ package org.esupportail.nfctag.web.manager;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
-
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @RequestMapping("/manager/devices")
@@ -38,13 +36,19 @@ import org.springframework.web.bind.annotation.RequestParam;
 @RooWebScaffold(path = "manager/devices", formBackingObject = Device.class)
 public class DeviceController {
 	
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+	
 	List<String> listSearchBy = Arrays.asList("numeroId", "eppnInit", "imei", "macAddress", "location");
 	
     @RequestMapping(value = "/numeroid/{numeroId}", produces = "text/html")
     public String numeroId(@PathVariable("numeroId") String numeroId, Model uiModel) {
-    	Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
-        uiModel.addAttribute("device", device);
-        uiModel.addAttribute("itemId", device.getId());
+    	try{
+    		Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+            uiModel.addAttribute("device", device);
+            uiModel.addAttribute("itemId", device.getId());
+    	}catch(EmptyResultDataAccessException e){
+    		log.debug("No device with id " + numeroId);
+    	}
         return "manager/devices/show";
     }
  
