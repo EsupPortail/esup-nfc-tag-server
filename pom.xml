@@ -5,7 +5,7 @@
 	<groupId>org.esupportail.nfctag</groupId>
 	<artifactId>esupNfcTagServer</artifactId>
 	<packaging>war</packaging>
-	<version>0.1.0.BUILD-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>esupNfcTagServer</name>
 	<properties>
 		<aspectj.version>1.8.1</aspectj.version>
