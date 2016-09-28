@@ -23,4 +23,35 @@
 	>
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
 	<jsp:output omit-xml-declaration="yes" />
+<SCRIPT type="text/javascript">
+var annee = '2016';
+var nbTagLastHour = ${nbTagLastHour};
+</SCRIPT>
+   <h1>STATS</h1>
+	<div class="row">
+		<div class="col-lg-12" >
+			<h3>Tags by week</h3>
+			&amp;nbsp;
+			<canvas id="tagsByWeek" height="150">&amp;nbsp;</canvas>
+		</div>
+
+		<div class="col-lg-4">
+			<h3>Tags by location</h3>
+			<canvas id="tagsByLocation">&amp;nbsp;</canvas>
+		</div>
+		<div class="col-lg-4">
+			<h3>Devices by UserAgent</h3>${nbDevice}
+			<canvas id="deviceByUserAgent">&amp;nbsp;</canvas>
+		</div>
+	
+		<div class="col-lg-4">
+			<h3>Tags last hour</h3>
+		<div style="position: absolute;">
+			<canvas id="nbTagLastHour" ></canvas>
+			</div>
+			<div style="position: absolute;margin-top: 20px;margin-left: 145px;">
+			<h2>${nbTagLastHour}</h2>
+			</div>
+		</div>
+   </div>
 </div>

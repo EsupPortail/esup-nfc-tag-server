@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 $(document).ready(function() {
-	
 	// Hack to test with a simple browser (without Android phone)
 	window.getEsupNfcStorage = function() {
 		try {
@@ -306,4 +306,150 @@ $(document).ready(function() {
 		});
 	});
 	
+});
+
+$(document).ready(function(){
+	var string = document.location.href;
+	substring = "stats";
+	if(string.indexOf(substring) > -1){
+	Chart.defaults.global.responsive= true;
+	Chart.defaults.global.maintainAspectRatio=false;
+	Chart.defaults.global.responsiveAnimationDuration=0;
+	Chart.defaults.global.legend.labels.fontFamily = "Arial";
+	Chart.defaults.global.legend.labels.boxWidth = 20;
+	Chart.defaults.global.legend.position= "bottom";
+	Chart.defaults.global.title.fontFamily = "Arial";
+	Chart.defaults.global.title.fontSize = 14;
+	Chart.defaults.global.title.display= false;
+	Chart.defaults.global.elements.point.radius=7;
+	Chart.defaults.global.elements.point.backgroundColor= "#fff";
+	Chart.defaults.global.elements.point.borderColor= "rgba(0,0,0,1)";
+	Chart.defaults.global.elements.line.tension=0.2;
+	Chart.defaults.global.elements.line.backgroundColor= "rgba(220,220,220,0.5)";
+	Chart.defaults.global.elements.line.borderColor= "rgba(100,100,100,0.7)";
+	
+	$.ajax({
+        url: "chartJson?model=numberDeviceByUserAgent&annee="+annee,
+        type: 'GET',
+        dataType : 'json',
+        success : function(data) {
+        	var ctx = document.getElementById("deviceByUserAgent");
+        	var repartionComposantesChart = new Chart(ctx, {
+        		type: 'doughnut',
+        		data: data,
+        		options: {
+        			legend:{
+        				display:false
+        			},
+            		animation:{
+            			animateRotate:true,
+            			animateScale:true
+            		},
+                     title: {
+                    	 text: "deviceByUserAgent",
+                     },
+                     tooltips: {
+                         callbacks: {
+                             label:function(item, data){
+                            	 console.log(data);
+                            	 var sum = 0;
+                            	 data.datasets[0].data.forEach(
+                            	     function addNumber(value) { sum += parseInt(value); }
+                            	 );
+                            	 pourcent = data.datasets[0].data[item.index] / sum * 100;
+                            	 return data.labels[item.index]+" : "+data.datasets[0].data[item.index] + " - "+ Math.round(pourcent*100)/100 +"%";
+                             }
+                         
+                         }
+                     }
+                }
+        	});
+        	
+        }
+	});
+
+	$.ajax({
+        url: "chartJson?model=numberTagByLocation&annee="+annee,
+        type: 'GET',
+        dataType : 'json',
+        success : function(data) {
+        	var ctx = document.getElementById("tagsByLocation");
+        	var repartionComposantesChart = new Chart(ctx, {
+        		type: 'doughnut',
+        		data: data,
+        		animation:{
+        			animateRotate:true,
+        			animateScale:true
+        		},
+        		options: {
+                     title: {
+                    	 text: "tagsByLocation"
+                     },
+        		tooltips: {
+                    callbacks: {
+                        label:function(item, data){
+                       	 console.log(data);
+                       	 var sum = 0;
+                       	 data.datasets[0].data.forEach(
+                       	     function addNumber(value) { sum += parseInt(value); }
+                       	 );
+                       	 pourcent = data.datasets[0].data[item.index] / sum * 100;
+                       	 return data.labels[item.index]+" : "+data.datasets[0].data[item.index] + " - "+ Math.round(pourcent*100)/100 +"%";
+                        }
+                    
+                    }
+                }
+                },
+                
+        	});
+        }
+	
+	});
+
+	
+	
+	$.ajax({
+        url: "chartJson?model=nbTagLastHour&annee="+annee,
+        type: 'GET',
+        dataType : 'json',
+        success : function(data) {
+        	var ctx = document.getElementById("nbTagLastHour").getContext("2d");
+        	var repartionComposantesChart = new Chart(ctx, {
+        		type: 'doughnut',
+        		data: data,
+        		animation:{
+        			animateRotate:true,
+        			animateScale:true
+        		},
+        		options: {
+                     title: {
+                    	 text: "nbTagLastHour"
+                     },
+                },
+                
+        	});
+        }
+	
+	});
+	
+	$.ajax({
+		url: "chartJson?model=numberTagByWeek&annee="+annee,
+        type: 'GET',
+        dataType : 'json',
+        success : function(data) {
+        	var ctx = document.getElementById("tagsByWeek").getContext("2d");
+        	var repartionComposantesChart = new Chart(ctx, {
+        		type: 'line',
+        		data: data,
+        		options: {
+                     title: {
+                    	 text: "tagsByWeek",
+                     },
+                }
+        	});
+        }
+	});
+	
+	
+	}
 });

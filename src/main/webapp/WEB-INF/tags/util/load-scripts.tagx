@@ -25,6 +25,7 @@
 	<spring:url value="/resources/js/additional-methods.min.js" var="addMethodsValidator_js_url" />
 	<spring:url value="/resources/js/jquery.mustache.js" var="jquery_mustache_js_url" />
 	<spring:url value="/resources/js/mustache.js" var="mustache_js_url" />
+	<spring:url value="/resources/js/Chart.js" var="chart_js_url" />
 	<spring:url value="/resources/js/esupnfctag.js" var="esupnfctag_js_url" />
 	
 	<spring:url value="/resources/images/favicon.ico" var="favicon" />
@@ -59,5 +60,6 @@
 	<script src="${addMethodsValidator_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 	<script src="${jquery_mustache_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 	<script src="${mustache_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
+	<script src="${chart_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 	<script src="${esupnfctag_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 </jsp:root>

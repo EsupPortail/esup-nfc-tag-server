@@ -17,10 +17,9 @@
     See the License for the specific language governing permissions and
     limitations under the License.
 
--->
-<div xmlns:sec="http://www.springframework.org/security/tags" xmlns:c="http://java.sun.com/jsp/jstl/core"  xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form"
-    xmlns:spring="http://www.springframework.org/tags"
-	>
-    <jsp:directive.page contentType="text/html;charset=UTF-8"/>
-	<jsp:output omit-xml-declaration="yes" />
-</div>
+--><!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 2.1//EN" "http://tiles.apache.org/dtds/tiles-config_2_1.dtd">
+<tiles-definitions>
+    <definition extends="user" name="manager/stats">
+        <put-attribute name="body" value="/WEB-INF/views/manager/stats.jspx"/>
+    </definition>
+</tiles-definitions>
