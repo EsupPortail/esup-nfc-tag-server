@@ -34,6 +34,7 @@ import org.springframework.roo.addon.tostring.RooToString;
 								"findDevicesByMacAddressEquals",
 								"findDevicesByLocationEquals",
 								"findDevicesByEppnInitLike",
+								"findDevicesByImeiLike",
 								"findDevicesByEppnInitAndImeiEquals",
 								"findDevicesByLocationAndEppnInitAndImeiEquals", 
 								"findDevicesByLocationAndEppnInitAndMacAddressEquals" })

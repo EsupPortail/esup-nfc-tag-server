@@ -31,12 +31,6 @@ privileged aspect DeviceController_Roo_Controller {
         return "redirect:/manager/devices/" + encodeUrlPathSegment(device.getId().toString(), httpServletRequest);
     }
     
-    @RequestMapping(params = "form", produces = "text/html")
-    public String DeviceController.createForm(Model uiModel) {
-        populateEditForm(uiModel, new Device());
-        return "manager/devices/create";
-    }
-    
     @RequestMapping(value = "/{id}", produces = "text/html")
     public String DeviceController.show(@PathVariable("id") Long id, Model uiModel) {
         uiModel.addAttribute("device", Device.findDevice(id));

@@ -59,6 +59,21 @@ privileged aspect Device_Roo_Finder {
         return ((Long) q.getSingleResult());
     }
     
+    public static Long Device.countFindDevicesByImeiLike(String imei) {
+        if (imei == null || imei.length() == 0) throw new IllegalArgumentException("The imei argument is required");
+        imei = imei.replace('*', '%');
+        if (imei.charAt(0) != '%') {
+            imei = "%" + imei;
+        }
+        if (imei.charAt(imei.length() - 1) != '%') {
+            imei = imei + "%";
+        }
+        EntityManager em = Device.entityManager();
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM Device AS o WHERE LOWER(o.imei) LIKE LOWER(:imei)", Long.class);
+        q.setParameter("imei", imei);
+        return ((Long) q.getSingleResult());
+    }
+    
     public static Long Device.countFindDevicesByLocationAndEppnInitAndImeiEquals(String location, String eppnInit, String imei) {
         if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
         if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
@@ -229,6 +244,43 @@ privileged aspect Device_Roo_Finder {
         if (imei == null || imei.length() == 0) throw new IllegalArgumentException("The imei argument is required");
         EntityManager em = Device.entityManager();
         StringBuilder queryBuilder = new StringBuilder("SELECT o FROM Device AS o WHERE o.imei = :imei");
+        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
+            queryBuilder.append(" ORDER BY ").append(sortFieldName);
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                queryBuilder.append(" ").append(sortOrder);
+            }
+        }
+        TypedQuery<Device> q = em.createQuery(queryBuilder.toString(), Device.class);
+        q.setParameter("imei", imei);
+        return q;
+    }
+    
+    public static TypedQuery<Device> Device.findDevicesByImeiLike(String imei) {
+        if (imei == null || imei.length() == 0) throw new IllegalArgumentException("The imei argument is required");
+        imei = imei.replace('*', '%');
+        if (imei.charAt(0) != '%') {
+            imei = "%" + imei;
+        }
+        if (imei.charAt(imei.length() - 1) != '%') {
+            imei = imei + "%";
+        }
+        EntityManager em = Device.entityManager();
+        TypedQuery<Device> q = em.createQuery("SELECT o FROM Device AS o WHERE LOWER(o.imei) LIKE LOWER(:imei)", Device.class);
+        q.setParameter("imei", imei);
+        return q;
+    }
+    
+    public static TypedQuery<Device> Device.findDevicesByImeiLike(String imei, String sortFieldName, String sortOrder) {
+        if (imei == null || imei.length() == 0) throw new IllegalArgumentException("The imei argument is required");
+        imei = imei.replace('*', '%');
+        if (imei.charAt(0) != '%') {
+            imei = "%" + imei;
+        }
+        if (imei.charAt(imei.length() - 1) != '%') {
+            imei = imei + "%";
+        }
+        EntityManager em = Device.entityManager();
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM Device AS o WHERE LOWER(o.imei) LIKE LOWER(:imei)");
         if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
             queryBuilder.append(" ORDER BY ").append(sortFieldName);
             if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {

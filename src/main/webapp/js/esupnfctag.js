@@ -270,42 +270,6 @@ $(document).ready(function() {
 		}
 	});
 	
-	/* USUAL FORM RULES */
-	
-	$(function(){
-		
-		$('#application').validate({
-			rules : {
-				name : {
-					required : true
-				},
-				nfcConfig : {
-					required : true
-				},
-				appliExt : {
-					required : true
-				},
-				tagIdCheck : {
-					required : true
-				}
-			}
-		});
-		
-		$('#device').validate({
-			rules : {
-				numeroId : {
-					required : true
-				},
-				application : {
-					required : true
-				},
-				location : {
-					required : true
-				}
-			}
-		});
-	});
-	
 });
 
 $(document).ready(function(){
@@ -453,3 +417,146 @@ $(document).ready(function(){
 	
 	}
 });
+
+Chart.pluginService.register({
+	  beforeRender: function (chart) {
+	    if (chart.config.options.showAllTooltips) {
+	        // create an array of tooltips
+	        // we can't use the chart tooltip because there is only one tooltip per chart
+	        chart.pluginTooltips = [];
+	        chart.config.data.datasets.forEach(function (dataset, i) {
+	            chart.getDatasetMeta(i).data.forEach(function (sector, j) {
+	                chart.pluginTooltips.push(new Chart.Tooltip({
+	                    _chart: chart.chart,
+	                    _chartInstance: chart,
+	                    _data: chart.data,
+	                    _options: chart.options.tooltips,
+	                    _active: [sector]
+	                }, chart));
+	            });
+	        });
+
+	        // turn off normal tooltips
+	        chart.options.tooltips.enabled = false;
+	    }
+	    
+	},
+	  afterDraw: function (chart, easing) {
+	    if (chart.config.options.showAllTooltips) {
+	        // we don't want the permanent tooltips to animate, so don't do anything till the animation runs atleast once
+	        if (!chart.allTooltipsOnce) {
+	            if (easing !== 1)
+	                return;
+	            chart.allTooltipsOnce = true;
+	        }
+
+	        // turn on tooltips
+	        chart.options.tooltips.enabled = true;
+	        Chart.helpers.each(chart.pluginTooltips, function (tooltip) {
+	            tooltip.initialize();
+	            tooltip.update();
+	            // we don't actually need this since we are not animating tooltips
+	            tooltip.pivot();
+	            tooltip.transition(easing).draw();
+	        });
+	        chart.options.tooltips.enabled = false;
+	    }
+	  }
+	});
+
+$(document).ready(function() {
+	/* USUAL FORM RULES */
+	
+	$(function(){
+		
+		$('#application').validate({
+			rules : {
+				name : {
+					required : true
+				},
+				nfcConfig : {
+					required : true
+				},
+				appliExt : {
+					required : true
+				},
+				tagIdCheck : {
+					required : true
+				}
+			}
+		});
+		
+		$('#device').validate({
+			rules : {
+				numeroId : {
+					required : true
+				},
+				eppnInit : {
+					required : true
+				},
+				imei : {
+					required : true
+				},
+				macAddress : {
+					required : true
+				},
+				userAgent : {
+					required : true
+				},
+				application : {
+					required : true
+				},
+				location : {
+					required : true
+				}
+			}
+		});
+	});
+	
+	$(function(){
+		
+		$('[id^=_application_id]').each(function() {
+			$(this).click(function(){
+				checkLocations();
+			})
+		});
+		$("#eppnInit").focusout(function(){
+			checkLocations();
+		});
+		$("#location").focusin(function(){
+			checkLocations();
+		});	
+
+		
+		function checkLocations(){
+			$('#location').val('');
+			$('#location').find('option').remove().end();
+			var eppn = $('#eppnInit').val();			
+			var idApp;
+			$("input[id^=_application_id]:checked").each(function() {
+		        idApp = $(this).val();
+		    });
+			console.error(idApp);
+			console.error(eppn);
+			
+			if(eppn!=null && idApp!=null){
+				console.error(idApp);
+				var url = '/manager/devices/locationsJson?eppn='+eppn+'&applicationId='+idApp;			
+				console.error(url);
+				$.ajax({
+				    url: url,
+				    type:'GET',
+				    dataType: 'json',
+				    success: function( json ) {
+				        $.each(json, function(i, value) {
+				            $('#location').append($('<option>').text(value).attr('value', value));
+				        });
+				        $("#location").click();
+				    }
+				});
+			}
+		}
+	});
+	
+});
+
