@@ -32,11 +32,19 @@ public class DesfireAuthConfig extends NfcAuthConfig {
 	
 	private String desfireAppId;
 	
-	private String readFileCommand;
+	private String readFilePayload;
 	
 	@Override
 	public AuthType getAuthType() {
 		return AuthType.DESFIRE;
+	}
+
+	public String getReadFilePayload() {
+		return readFilePayload;
+	}
+
+	public void setReadFilePayload(String readFilePayload) {
+		this.readFilePayload = readFilePayload;
 	}
     
 }

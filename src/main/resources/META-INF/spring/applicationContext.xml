@@ -91,15 +91,16 @@
 
     <!-- desfire service ... -->
     <bean id="desfireService" class="org.esupportail.nfctag.service.desfire.DesfireService">
-        <property name="aesService">
-	        <bean class="org.esupportail.nfctag.service.desfire.AesService">
-	        </bean>
-	    </property>
 	    <property name="desfireAuthSession">
 	       <bean class="org.esupportail.nfctag.service.desfire.DesfireAuthSession" scope="session">
 	           <aop:scoped-proxy/>
 	       </bean>
 	    </property>
+ 		<property name="desFireEV1Service">
+	       <bean class="org.esupportail.nfctag.service.desfire.DESFireEV1Service" scope="session">
+	           <aop:scoped-proxy/>
+	       </bean>
+	    </property>	    
 	    <property name="applicationsService" ref="applicationsService"/>
 	    <property name="nfcAuthConfigService" ref="nfcAuthConfigService"/>
     </bean>
@@ -117,6 +118,6 @@
 	    <property name="fallbackToSystemLocale" value="false" />
 	</bean>
 	
-	 <bean id="applicationContextProvder" class="org.esupportail.nfctag.beans.ApplicationContextProvider"/>
+        <bean id="applicationContextProvder" class="org.esupportail.nfctag.beans.ApplicationContextProvider"/>
 	
 </beans>

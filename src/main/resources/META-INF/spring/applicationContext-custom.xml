@@ -44,7 +44,7 @@
     <bean id="desfireAuthConfig" class="org.esupportail.nfctag.service.api.impl.DesfireAuthConfig">
 		<property name="desfireKeyNumber" value="01"/>
 		<property name="desfireAppId" value="XXXXXX"/>
-		<property name="readFileCommand" value="90BD0000070000000016000000"/>
+		<property name="readFilePayload" value="00000000160000"/>
 		<property name="desfireKey" value="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"/>
 		<property name="description" value="Authentification DESFIRE"/>
     </bean>

@@ -39,12 +39,4 @@ privileged aspect DesfireAuthConfig_Roo_JavaBean {
         this.desfireAppId = desfireAppId;
     }
     
-    public String DesfireAuthConfig.getReadFileCommand() {
-        return this.readFileCommand;
-    }
-    
-    public void DesfireAuthConfig.setReadFileCommand(String readFileCommand) {
-        this.readFileCommand = readFileCommand;
-    }
-    
 }
