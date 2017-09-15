@@ -15,19 +15,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.esupportail.nfctag.service.api;
+package org.esupportail.nfctag.service.api.impl;
 
-import org.esupportail.nfctag.domain.TagLog;
-import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import java.util.Date;
 
-public interface TagIdCheckApi {
-	
-	public enum TagType {CSN, DESFIRE};
+import org.esupportail.nfctag.service.api.TagUpdateApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestTemplate;
 
-	TagLog getTagLogFromTagId(TagType tagType, String tagId) throws EsupNfcTagException;
+public class TagUpdateNone implements TagUpdateApi {
+
+	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	Boolean supportTagType(TagType tagType);
+    protected RestTemplate restTemplate;
+    
+    protected String wsUrl;
 	
-	String getDescription();
+	public void setWsUrl(String wsUrl) {
+		this.wsUrl = wsUrl;
+	}
+
+	public TagUpdateNone() {
+		restTemplate = new RestTemplate();
+	}
+
+	@Override
+	public String getIdFromCsn(String csn) {
+		return "00";
+	}
+	
+	@Override
+	public Date getLastUpdateDateFromCsn(String csn) {
+		return new Date();
+	}
 	
 }

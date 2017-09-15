@@ -117,9 +117,19 @@
         <tracking-mode>COOKIE</tracking-mode>
     </session-config>
     
+    <servlet>
+        <servlet-name>ServletExceptionHandler</servlet-name>
+        <servlet-class>org.esupportail.nfctag.web.ServletExceptionHandler</servlet-class>
+    </servlet>
+
+     <servlet-mapping>
+        <servlet-name>ServletExceptionHandler</servlet-name>
+        <url-pattern>/ServletExceptionHandler</url-pattern>
+	</servlet-mapping>
+
     <error-page>
         <exception-type>java.lang.Exception</exception-type>
-        <location>/uncaughtException</location>
+        <location>/ServletExceptionHandler</location>
     </error-page>
     
     <error-page>
@@ -136,5 +146,10 @@
 	<listener>
 	    <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
 	</listener>
+
+	<mime-mapping>
+	    <extension>jnlp</extension>
+	    <mime-type>application/x-java-jnlp-file</mime-type>
+	</mime-mapping>
 
 </web-app>

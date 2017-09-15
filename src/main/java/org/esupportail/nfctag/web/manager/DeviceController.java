@@ -128,7 +128,7 @@ public class DeviceController {
 				throw new AccessDeniedException(eppn + " don't have location to manage");
 			}
 			for (AppLocation appLocation : appLocations) {
-				if(appLocation.getApplication().getId()==applicationId){
+				if(appLocation.getApplication().getId().equals(applicationId)){
 					for (String locationName : appLocation.getLocations()) {
 						json.add(locationName);						
 					}

@@ -111,6 +111,7 @@ public class LiveLongPoolController {
 				uiModel.addAttribute("authType", nfcAuthConfig.getAuthType());
 				uiModel.addAttribute("validateAuthWoConfirmation", device.isValidateAuthWoConfirmation());
 				uiModel.addAttribute("numeroId", numeroId);
+				uiModel.addAttribute("eppnInit", device.getEppnInit());
 				return "live/mobil";
 			}
 		} else {		

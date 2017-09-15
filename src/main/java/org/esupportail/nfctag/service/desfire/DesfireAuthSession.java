@@ -19,13 +19,17 @@ package org.esupportail.nfctag.service.desfire;
 
 import java.io.Serializable;
 
-import org.esupportail.nfctag.service.api.impl.DesfireAuthConfig;
+import org.esupportail.nfctag.service.api.NfcAuthConfig;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Service;
 
+@Service
+@Scope(value="session")
 public class DesfireAuthSession implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
-	DesfireAuthConfig desfireAuthConfig;
+	NfcAuthConfig desfireAuthConfig;
 
 	private String rndBPrimEnc;
 	
@@ -59,10 +63,10 @@ public class DesfireAuthSession implements Serializable {
 	public void setSessionKey(String sessionKey) {
 		this.sessionKey = sessionKey;
 	}
-	public DesfireAuthConfig getDesfireAuthConfig() {
+	public NfcAuthConfig getDesfireAuthConfig() {
 		return desfireAuthConfig;
 	}
-	public void setDesfireAuthConfig(DesfireAuthConfig desfireAuthConfig) {
+	public void setDesfireAuthConfig(NfcAuthConfig desfireAuthConfig) {
 		this.desfireAuthConfig = desfireAuthConfig;
 	}
 }

@@ -21,6 +21,7 @@ import javax.sql.DataSource;
 
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.service.api.TagIdCheckApi;
+import org.esupportail.nfctag.service.api.TagIdCheckApi.TagType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -65,12 +66,6 @@ public class TagIdCheckSql implements TagIdCheckApi {
 		String authSql = "";
 		switch (tagType) {
 			case CSN :
-				String csn = tagId;
-				String csnRetourne = new String();
-				for (int i = 1; i < csn.length(); i = i + 2) {
-					csnRetourne = csnRetourne + csn.charAt(csn.length() - i - 1) + csn.charAt(csn.length() - i);
-				}
-				tagId = csnRetourne;
 				authSql = csnAuthSql;
 				break;
 			case DESFIRE :
@@ -101,6 +96,5 @@ public class TagIdCheckSql implements TagIdCheckApi {
 				return false;
 		}
 	}
-	
-	
+
 }

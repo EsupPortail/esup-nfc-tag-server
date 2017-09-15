@@ -25,7 +25,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.LocaleResolver;
 
-public class EsupNfcTagException extends Exception {
+public class EsupNfcTagException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
 	

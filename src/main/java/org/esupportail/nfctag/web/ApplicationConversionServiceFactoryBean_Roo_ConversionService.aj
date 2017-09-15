@@ -18,7 +18,7 @@ privileged aspect ApplicationConversionServiceFactoryBean_Roo_ConversionService 
     public Converter<Application, String> ApplicationConversionServiceFactoryBean.getApplicationToStringConverter() {
         return new org.springframework.core.convert.converter.Converter<org.esupportail.nfctag.domain.Application, java.lang.String>() {
             public String convert(Application application) {
-                return new StringBuilder().append(application.getName()).append(' ').append(application.getNfcConfig()).append(' ').append(application.getAppliExt()).append(' ').append(application.getTagIdCheck()).toString();
+                return new StringBuilder().append(application.getApplisExtService()).append(' ').append(application.getNfcAuthConfigService()).append(' ').append(application.getTagIdCheckService()).append(' ').append(application.getName()).toString();
             }
         };
     }

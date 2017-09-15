@@ -57,13 +57,7 @@ public class TagIdCheckLdap implements TagIdCheckApi {
 		String cardUidType = null;
 		switch (tagType) {
 			case CSN :
-				cardUidType = CSN_SUFFIX_SWISS;
-				String csn = tagId;
-				String csnRetourne = new String();
-				for (int i = 1; i < csn.length(); i = i + 2) {
-					csnRetourne = csnRetourne + csn.charAt(csn.length() - i - 1) + csn.charAt(csn.length() - i);
-				}
-				tagId = csnRetourne;				
+				cardUidType = CSN_SUFFIX_SWISS;		
 				break;
 			case DESFIRE :
 				cardUidType = desfireSuffix;
@@ -90,6 +84,5 @@ public class TagIdCheckLdap implements TagIdCheckApi {
 				return false;
 		}
 	}
-	
-	
+
 }

@@ -56,6 +56,8 @@ public class DESFireEV1Service extends SimpleSCR {
 	private byte[] fileSett;  // file settings of the last used file (caching)
 
 	private int code;         // response status code of previous command
+	
+	private int payloadSent = 0;
 
 	public DESFireEV1Service() {
 		reset();
@@ -368,7 +370,7 @@ public class DESFireEV1Service extends SimpleSCR {
 				crc = CRC16.get(newKey);
 				System.arraycopy(crc, 0, plaintext, nklen + addAesKeyVersionByte + 2, 2);
 			}
-
+			System.err.println("plaintext : " +Dump.hex(plaintext));
 			ciphertext = send(skey, plaintext, ktype, null);
 			break;
 		case TKTDES:
@@ -395,7 +397,6 @@ public class DESFireEV1Service extends SimpleSCR {
 		}
 
 		byte[] apdu = new byte[5 + 1 + ciphertext.length + 1];
-		
 		apdu[0] = (byte) 0x90;
 		apdu[1] = (byte) Command.CHANGE_KEY.getCode();
 		apdu[4] = (byte) (1 + plaintext.length);
@@ -405,13 +406,10 @@ public class DESFireEV1Service extends SimpleSCR {
 		
 	}
 
-	public String switchToAES(byte keyNo, byte keyversion, byte[] newKey) {
+	public String switchToAES(byte[] newKey) {
 		
-		// tweak for when changing PICC master key
-		if (Arrays.equals(aid, new byte[3])) {
-			System.err.println("PICC");
-			keyNo = (byte) 0x80;
-		}
+		byte keyversion = (byte) 0x00;
+		byte keyNo = (byte) 0x80;
 		
 		System.err.println("sessionKey : "+Dump.hex(skey));
 		
@@ -1010,6 +1008,16 @@ public class DESFireEV1Service extends SimpleSCR {
 	
 	public String writeData2(byte[] payload) {
 		return write2(payload, (byte) Command.WRITE_DATA.getCode());
+	}
+	
+	public String writeData(byte fileNo, String value) {
+		byte[] valueHex = hexStringToByteArray(value);
+		byte[] payload = new byte[7 + valueHex.length];
+		payload[0] = fileNo;
+		payload[4] = Byte.parseByte(Integer.toHexString(valueHex.length),16);
+		System.arraycopy(valueHex, 0, payload, 7, valueHex.length);
+		
+		return write(payload, (byte) Command.WRITE_DATA.getCode());
 	}
 	
 	/**
@@ -1800,6 +1808,36 @@ public class DESFireEV1Service extends SimpleSCR {
 
 		return Dump.hex(apdu).replace(" ", "").toUpperCase();
 	}
+	
+	private String write(byte[] payload, byte cmd) {
+
+		byte[] apdu;
+		byte[] fullApdu = new byte[6 + payload.length];
+		fullApdu[0] = (byte) 0x90;
+		fullApdu[1] = cmd;
+		fullApdu[4] = -1;
+		System.arraycopy(payload, 0, fullApdu, 5, payload.length);
+		int totalPayload = fullApdu.length - 6 - payloadSent;
+
+			int sendThisFrame = totalPayload - payloadSent > 52 ? 52
+					: totalPayload - payloadSent;
+
+			//System.out.println(String.format("totalPaylod=%d, payloadSent=%d, sendThisFrame=%d",
+			//		totalPayload, payloadSent, sendThisFrame));
+
+			apdu = new byte[6 + sendThisFrame];
+			apdu[0] = fullApdu[0];
+			apdu[1] = payloadSent == 0 ? fullApdu[1] : (byte) Command.MORE.getCode();
+			apdu[4] = (byte) sendThisFrame;
+			System.arraycopy(fullApdu, 5 + payloadSent, apdu, 5, sendThisFrame);
+			payloadSent += sendThisFrame;
+		
+		if(!(totalPayload - payloadSent > 0)) {
+			payloadSent = 0;
+		}
+
+		return Dump.hex(apdu).replace(" ", "").toUpperCase();
+	}
 
 	// IV sent is the global one but it is better to be explicit about it: can be null for DES/3DES
 	// if IV is null, then it is set to zeros
@@ -2533,7 +2571,6 @@ public class DESFireEV1Service extends SimpleSCR {
 	
 	public static byte[] swapPairsByte(byte[] tagId) {
 		String aidString = swapPairs(tagId);
-		System.err.println(aidString);
 		return hexStringToByteArray(aidString);
 	}
 

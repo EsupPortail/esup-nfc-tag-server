@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -62,7 +63,7 @@ public class StatsService {
 		result.add(now);
 		
 		Object[] total = new Object[2];
-		total[0] = "Totale";
+		total[0] = "Max";
 		total[1] = q.getResultList().get(0);
 		result.add(total);
 		
@@ -99,7 +100,6 @@ public class StatsService {
 		int nbWeek = Integer.valueOf(nbWeekQuery.getSingleResult().toString());
 		
 		List<Object[]> qResult = q.getResultList();
-		System.err.println(qResult);
 		int count = 0;
 		for (Object object[] : qResult) {
 			result.add(object);
@@ -119,7 +119,7 @@ public class StatsService {
 	
 	public String getnbTagLastHour(String annee) throws JsonProcessingException {
 
-		String[] backgroundColor = { "#FF0000", "#FFFFFF" };
+		String[] backgroundColor = { "#FF0000", "#AAAAAA" };
 		
 		return toChartJson(nbTagLastHour(annee), TypeChart.pie, backgroundColor, null);
 	}
@@ -201,6 +201,7 @@ public class StatsService {
 					if(next) {
 						chartData = new ChartDataLine();
 						chartData.backgroundColor=backgroundColor;
+						if(type==TypeChart.line) backgroundColor = Arrays.copyOfRange(backgroundColor, 1, backgroundColor.length);
 						chartData.label.add(object[1].toString());
 						next=false;
 					}

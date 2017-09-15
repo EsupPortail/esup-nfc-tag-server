@@ -74,6 +74,16 @@ privileged aspect Device_Roo_Finder {
         return ((Long) q.getSingleResult());
     }
     
+    public static Long Device.countFindDevicesByLocationAndEppnInit(String location, String eppnInit) {
+        if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
+        if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
+        EntityManager em = Device.entityManager();
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM Device AS o WHERE o.location = :location AND o.eppnInit = :eppnInit", Long.class);
+        q.setParameter("location", location);
+        q.setParameter("eppnInit", eppnInit);
+        return ((Long) q.getSingleResult());
+    }
+    
     public static Long Device.countFindDevicesByLocationAndEppnInitAndImeiEquals(String location, String eppnInit, String imei) {
         if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
         if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
@@ -289,6 +299,33 @@ privileged aspect Device_Roo_Finder {
         }
         TypedQuery<Device> q = em.createQuery(queryBuilder.toString(), Device.class);
         q.setParameter("imei", imei);
+        return q;
+    }
+    
+    public static TypedQuery<Device> Device.findDevicesByLocationAndEppnInit(String location, String eppnInit) {
+        if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
+        if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
+        EntityManager em = Device.entityManager();
+        TypedQuery<Device> q = em.createQuery("SELECT o FROM Device AS o WHERE o.location = :location AND o.eppnInit = :eppnInit", Device.class);
+        q.setParameter("location", location);
+        q.setParameter("eppnInit", eppnInit);
+        return q;
+    }
+    
+    public static TypedQuery<Device> Device.findDevicesByLocationAndEppnInit(String location, String eppnInit, String sortFieldName, String sortOrder) {
+        if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
+        if (eppnInit == null || eppnInit.length() == 0) throw new IllegalArgumentException("The eppnInit argument is required");
+        EntityManager em = Device.entityManager();
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM Device AS o WHERE o.location = :location AND o.eppnInit = :eppnInit");
+        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
+            queryBuilder.append(" ORDER BY ").append(sortFieldName);
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                queryBuilder.append(" ").append(sortOrder);
+            }
+        }
+        TypedQuery<Device> q = em.createQuery(queryBuilder.toString(), Device.class);
+        q.setParameter("location", location);
+        q.setParameter("eppnInit", eppnInit);
         return q;
     }
     

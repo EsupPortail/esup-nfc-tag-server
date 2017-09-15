@@ -40,6 +40,7 @@
 		var numeroId = '${numeroId}';
 		var serviceUrl = '${serviceUrl}';
 		var authType = '${authType}';
+		var eppnInit = '${eppnInit}';
 		var validateAuthWoConfirmation = '${validateAuthWoConfirmation}';
 	</script>
 	</c:when>

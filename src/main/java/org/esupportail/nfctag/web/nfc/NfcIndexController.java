@@ -169,6 +169,7 @@ public class NfcIndexController {
 
 		device.setLocation(location);
 		device.setApplication(application);
+		device.setMacAddress(macAddress);
 		device.merge();
 		
 		uiModel.addAttribute("imei", imei);

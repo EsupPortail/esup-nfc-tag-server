@@ -22,7 +22,8 @@ import java.io.IOException;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
-import org.esupportail.nfctag.domain.JsonResponseMessage;
+import org.esupportail.nfctag.beans.AuthResultBeanV1.CODE;
+import org.esupportail.nfctag.beans.AuthResultBeanV1;
 import org.esupportail.nfctag.domain.NfcMessage;
 import org.esupportail.nfctag.domain.TagError;
 import org.esupportail.nfctag.domain.TagLog;
@@ -58,18 +59,18 @@ public class CsnWsController {
 	@Resource 
 	ErrorLongPoolController errorLongPoolController;
 
-	private JsonResponseMessage authCsn(String numeroId, String csn) {
-		JsonResponseMessage jsonResponseMessage = new JsonResponseMessage();
+	private AuthResultBeanV1 authCsn(String numeroId, String csn) {
+		AuthResultBeanV1 jsonResponseMessage = new AuthResultBeanV1();
 		try {
-			TagLog tagLog = tagAuthService.auth(TagType.CSN, csn, numeroId);
-			liveController.handleTagLog(tagLog);		
-			jsonResponseMessage.setCode("OK");
+			TagLog tagLog = tagAuthService.auth(TagType.CSN, csn, numeroId, csn);
+			liveController.handleTagLog(tagLog);
+			jsonResponseMessage.setCode(CODE.OK);
 			jsonResponseMessage.setMsg(tagLog.getFirstname() + " " + tagLog.getLastname());
 		} catch(EsupNfcTagException e) {
 			TagError tagError = new TagError(e);
 			tagError.setNumeroId(numeroId);
 			errorLongPoolController.handleError(tagError);
-			jsonResponseMessage.setCode("ERROR");
+			jsonResponseMessage.setCode(CODE.ERROR);
 			jsonResponseMessage.setMsg(e.getMessage());
 			log.error("EsupNfcTagException during csnRequest with csn = " + csn + " and numeroId=" + numeroId + " - "+ e.getMessage());
 		}
@@ -79,7 +80,7 @@ public class CsnWsController {
 	@RequestMapping(params = {"csn", "arduinoId"})
 	@ResponseBody
 	public String arduinoCsnRequest(String csn, String arduinoId) throws IOException {
-		JsonResponseMessage jsonResponseMessage = authCsn(arduinoId, csn);
+		AuthResultBeanV1 jsonResponseMessage = authCsn(arduinoId, csn);
 		String resp4arduino = "<";
 		resp4arduino += jsonResponseMessage.getCode();
 		resp4arduino += "\n";
@@ -88,19 +89,16 @@ public class CsnWsController {
 		resp4arduino += "OK".equals(jsonResponseMessage.getCode()) ? "\nReconnu" : "";
 		resp4arduino += ">";
 		return resp4arduino;
-
 	}
 
 
 	@RequestMapping(method = RequestMethod.POST, headers = {"Content-type=application/json"}, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public String csnRequest(@RequestBody NfcMessage nfcMessage) throws IOException {
-		JsonResponseMessage jsonResponseMessage = authCsn(nfcMessage.getNumeroId(), nfcMessage.getCsn());
+		AuthResultBeanV1 jsonResponseMessage = authCsn(nfcMessage.getNumeroId(), nfcMessage.getCsn());
 		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 		String json = ow.writeValueAsString(jsonResponseMessage);
 		return json;
 	}
 	
 }
-
-

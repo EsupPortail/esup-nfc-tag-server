@@ -65,17 +65,29 @@ public class Application {
     
     public String getNfcConfigDesc(){
     	NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(this.nfcConfig);
-    	return nfcAuthConfig.getDescription();
+    	if(nfcAuthConfig != null) {
+    		return nfcAuthConfig.getDescription();
+    	} else { 
+    		return null;
+    	}
     }
     
     public String getAppliExtDesc(){
     	AppliExtApi extApi = applisExtService.get(this.appliExt);
-    	return extApi.getDescription();
+    	if(extApi != null) {
+    		return extApi.getDescription();
+    	} else { 
+    		return null;
+    	}
     }
     
     public String getTagIdCheckDesc(){
     	TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(this.tagIdCheck);
-    	return tagIdCheckApi.getDescription();
+    	if(tagIdCheckApi != null) {
+    		return tagIdCheckApi.getDescription();
+    	} else { 
+    		return null;
+    	}		
     }
     
 }

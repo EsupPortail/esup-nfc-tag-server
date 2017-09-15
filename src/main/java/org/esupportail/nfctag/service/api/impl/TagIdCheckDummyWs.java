@@ -44,7 +44,14 @@ public class TagIdCheckDummyWs implements TagIdCheckApi {
 		this.description = description;
 	}
 	
-	List<List<String>> daltons = new ArrayList<List<String>>();
+	static List<List<String>> daltons = new ArrayList<List<String>>();
+	
+	static {
+		daltons.add(Arrays.asList("Joe", "Dalton"));
+		daltons.add(Arrays.asList("Jack", "Dalton"));
+		daltons.add(Arrays.asList("William", "Dalton"));
+		daltons.add(Arrays.asList("Averell", "Dalton"));
+	}
 	
 	@Override
 	public TagLog getTagLogFromTagId(TagType tagType, String tagId) throws EsupNfcTagException {
@@ -53,21 +60,10 @@ public class TagIdCheckDummyWs implements TagIdCheckApi {
 		
 		int numDalton = 0;
 		
-		daltons.add(Arrays.asList("Joe", "Dalton"));
-		daltons.add(Arrays.asList("Jack", "Dalton"));
-		daltons.add(Arrays.asList("William", "Dalton"));
-		daltons.add(Arrays.asList("Averell", "Dalton"));
-		
 		switch (tagType) {
 			case CSN :
-				String csn = tagId;
-				String csnRetourne = new String();
-				for (int i = 1; i < csn.length(); i = i + 2) {
-					csnRetourne = csnRetourne + csn.charAt(csn.length() - i - 1) + csn.charAt(csn.length() - i);
-				}
-				tagId = csnRetourne;
-				numDalton = Integer.parseInt(tagId.substring(0, 4), 16) % 4;
-				log.info("Check CSN : " + csnRetourne);
+				numDalton = Integer.parseInt(tagId.substring(4, 6), 16) % 4;
+				log.info("Check CSN : " + tagId);
 				break;
 			case DESFIRE :
 				desfireId = tagId;

@@ -17,6 +17,7 @@
  */
 
 $(document).ready(function() {
+	window.readyToScan = "ok";
 	// Hack to test with a simple browser (without Android phone)
 	window.getEsupNfcStorage = function() {
 		try {
@@ -152,9 +153,11 @@ $(document).ready(function() {
 						}
 						var newValidateModal = $('#validate').mustache('validate-template', {'leoauths' : message}, { method: 'prepend' });
 						if(message[0].status == "none"){
+							window.readyToScan = "ko";
 							var validateModal = $('#validateModal').appendTo("body").modal({backdrop: 'static', keyboard: false, show: true});						
 							validateModal.on('hidden.bs.modal', function () {
 								getEsupNfcStorage().setItem("readyToScan", "ok");
+								window.readyToScan = "ok";
 							});
 							$('#validateButton_'+message[0].id).on('click', function(event) {
 								$.get( "/nfc-ws/validate?id="+message[0].id, function( data ) {
@@ -185,6 +188,7 @@ $(document).ready(function() {
 						try{
 							if(validateAuthWoConfirmation=="true"){
 								getEsupNfcStorage().setItem("readyToScan", "ok");
+								window.readyToScan = "ok";
 							}
 						}catch(e){
 							if(this.debug) $('#status').text(e);
@@ -219,6 +223,7 @@ $(document).ready(function() {
 	            getEsupNfcStorage().setItem("serviceUrl", serviceUrl);
 	            getEsupNfcStorage().setItem("authType", authType);
 	            getEsupNfcStorage().setItem("readyToScan", "ok");
+	            window.readyToScan = "ok";
 	        }catch(e){
 	        	if(this.debug) document.getElementById("debug").innerHTML = e;
 	        }
@@ -243,10 +248,12 @@ $(document).ready(function() {
 						$('#debug').text(JSON.stringify(message))
 					}
 					if (message && message.length) {
+						window.readyToScan = "ko";
 						var newErrorModal = $('#error').mustache('error-template', {'tagerrors' : message[0]}, { method: 'prepend' });
 						var errorModal = $('#errorModal').appendTo("body").modal({backdrop: 'static', keyboard: false, show: true});
 						errorModal.on('hidden.bs.modal', function () {
 							getEsupNfcStorage().setItem("readyToScan", "ok");
+							window.readyToScan = "ok";
 						});
 						this.lastAuthDate = message[0].errorDate;
 					}
@@ -285,12 +292,10 @@ $(document).ready(function(){
 	Chart.defaults.global.title.fontFamily = "Arial";
 	Chart.defaults.global.title.fontSize = 14;
 	Chart.defaults.global.title.display= false;
-	Chart.defaults.global.elements.point.radius=7;
+	Chart.defaults.global.elements.point.radius=6;
 	Chart.defaults.global.elements.point.backgroundColor= "#fff";
 	Chart.defaults.global.elements.point.borderColor= "rgba(0,0,0,1)";
 	Chart.defaults.global.elements.line.tension=0.2;
-	Chart.defaults.global.elements.line.backgroundColor= "rgba(220,220,220,0.5)";
-	Chart.defaults.global.elements.line.borderColor= "rgba(100,100,100,0.7)";
 	
 	$.ajax({
         url: "chartJson?model=numberDeviceByUserAgent&annee="+annee,
@@ -299,16 +304,19 @@ $(document).ready(function(){
         success : function(data) {
         	var ctx = document.getElementById("deviceByUserAgent");
         	var repartionComposantesChart = new Chart(ctx, {
-        		type: 'doughnut',
+        		type: 'pie',
         		data: data,
         		options: {
         			legend:{
-        				display:false
+        				display:true
         			},
-            		animation:{
-            			animateRotate:true,
-            			animateScale:true
-            		},
+            		 animation:{
+             			 duration: 0,
+             		 },        		
+                     hover: {
+                         animationDuration: 0, // duration of animations when hovering an item
+                     },
+                     responsiveAnimationDuration: 0,
                      title: {
                     	 text: "deviceByUserAgent",
                      },
@@ -339,16 +347,16 @@ $(document).ready(function(){
         success : function(data) {
         	var ctx = document.getElementById("tagsByLocation");
         	var repartionComposantesChart = new Chart(ctx, {
-        		type: 'doughnut',
+        		type: 'horizontalBar',
         		data: data,
-        		animation:{
-        			animateRotate:true,
-        			animateScale:true
-        		},
         		options: {
-                     title: {
-                    	 text: "tagsByLocation"
+             		 animation:{
+             			 duration: 0,
+             		 },        		
+                     hover: {
+                         animationDuration: 0, // duration of animations when hovering an item
                      },
+                     responsiveAnimationDuration: 0,
         		tooltips: {
                     callbacks: {
                         label:function(item, data){
@@ -381,14 +389,17 @@ $(document).ready(function(){
         	var repartionComposantesChart = new Chart(ctx, {
         		type: 'doughnut',
         		data: data,
-        		animation:{
-        			animateRotate:true,
-        			animateScale:true
-        		},
         		options: {
                      title: {
                     	 text: "nbTagLastHour"
                      },
+             		 animation:{
+             			 duration: 0,
+             		 },        		
+                     hover: {
+                         animationDuration: 0, // duration of animations when hovering an item
+                     },
+                     responsiveAnimationDuration: 0,
                 },
                 
         	});
@@ -409,6 +420,13 @@ $(document).ready(function(){
                      title: {
                     	 text: "tagsByWeek",
                      },
+             		 animation:{
+             			 duration: 0,
+             		 },        		
+                     hover: {
+                         animationDuration: 0, // duration of animations when hovering an item
+                     },
+                     responsiveAnimationDuration: 0,
                 }
         	});
         }
@@ -418,54 +436,10 @@ $(document).ready(function(){
 	}
 });
 
-Chart.pluginService.register({
-	  beforeRender: function (chart) {
-	    if (chart.config.options.showAllTooltips) {
-	        // create an array of tooltips
-	        // we can't use the chart tooltip because there is only one tooltip per chart
-	        chart.pluginTooltips = [];
-	        chart.config.data.datasets.forEach(function (dataset, i) {
-	            chart.getDatasetMeta(i).data.forEach(function (sector, j) {
-	                chart.pluginTooltips.push(new Chart.Tooltip({
-	                    _chart: chart.chart,
-	                    _chartInstance: chart,
-	                    _data: chart.data,
-	                    _options: chart.options.tooltips,
-	                    _active: [sector]
-	                }, chart));
-	            });
-	        });
-
-	        // turn off normal tooltips
-	        chart.options.tooltips.enabled = false;
-	    }
-	    
-	},
-	  afterDraw: function (chart, easing) {
-	    if (chart.config.options.showAllTooltips) {
-	        // we don't want the permanent tooltips to animate, so don't do anything till the animation runs atleast once
-	        if (!chart.allTooltipsOnce) {
-	            if (easing !== 1)
-	                return;
-	            chart.allTooltipsOnce = true;
-	        }
-
-	        // turn on tooltips
-	        chart.options.tooltips.enabled = true;
-	        Chart.helpers.each(chart.pluginTooltips, function (tooltip) {
-	            tooltip.initialize();
-	            tooltip.update();
-	            // we don't actually need this since we are not animating tooltips
-	            tooltip.pivot();
-	            tooltip.transition(easing).draw();
-	        });
-	        chart.options.tooltips.enabled = false;
-	    }
-	  }
-	});
 
 $(document).ready(function() {
 	/* USUAL FORM RULES */
+	
 	
 	$(function(){
 		
@@ -523,10 +497,11 @@ $(document).ready(function() {
 		$("#eppnInit").focusout(function(){
 			checkLocations();
 		});
+		/*
 		$("#location").focusin(function(){
 			checkLocations();
 		});	
-
+*/
 		
 		function checkLocations(){
 			$('#location').val('');
@@ -536,20 +511,18 @@ $(document).ready(function() {
 			$("input[id^=_application_id]:checked").each(function() {
 		        idApp = $(this).val();
 		    });
-			console.error(idApp);
-			console.error(eppn);
-			
+		
+			 $('#location').empty().append($('<option>').text("Loading...").attr('value', null));
+			 
 			if(eppn!=null && idApp!=null){
-				console.error(idApp);
-				var url = '/manager/devices/locationsJson?eppn='+eppn+'&applicationId='+idApp;			
-				console.error(url);
+				var url = '/manager/devices/locationsJson?eppn='+eppn+'&applicationId='+idApp;
 				$.ajax({
 				    url: url,
 				    type:'GET',
 				    dataType: 'json',
 				    success: function( json ) {
 				        $.each(json, function(i, value) {
-				            $('#location').append($('<option>').text(value).attr('value', value));
+				            $('#location').empty().append($('<option>').text(value).attr('value', value));
 				        });
 				        $("#location").click();
 				    }

@@ -15,19 +15,38 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.esupportail.nfctag.service.api;
+package org.esupportail.nfctag.beans;
 
-import org.esupportail.nfctag.domain.TagLog;
-import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import java.io.Serializable;
 
-public interface TagIdCheckApi {
-	
-	public enum TagType {CSN, DESFIRE};
+public class AuthResultBeanV1 implements Serializable {
 
-	TagLog getTagLogFromTagId(TagType tagType, String tagId) throws EsupNfcTagException;
-	
-	Boolean supportTagType(TagType tagType);
-	
-	String getDescription();
+	private static final long serialVersionUID = 1L;
+
+	public static enum CODE {
+        ERROR,
+        OK,
+        END
+    }
+
+    private CODE code;
+    
+    private String msg;
+    
+    public CODE getCode() {
+		return code;
+	}
+
+	public void setCode(CODE code) {
+		this.code = code;
+	}
+
+	public String getMsg() {
+		return msg;
+	}
+
+	public void setMsg(String msg) {
+		this.msg = msg;
+	}
 	
 }

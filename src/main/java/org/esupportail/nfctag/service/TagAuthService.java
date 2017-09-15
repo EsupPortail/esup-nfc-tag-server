@@ -49,7 +49,7 @@ public class TagAuthService {
 	@Resource
 	ApplicationsService applicationsService;
 	
-	public TagLog auth(TagType tagType, String tagId, String numeroId) throws EsupNfcTagException {
+	public TagLog auth(TagType tagType, String tagId, String numeroId, String cardId) throws EsupNfcTagException {
 		Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
 		Application application = device.getApplication();
 		TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(application.getTagIdCheck());
@@ -64,6 +64,7 @@ public class TagAuthService {
 		tagLog.setNumeroId(device.getNumeroId());
 		tagLog.setEppnInit(device.getEppnInit());
 		tagLog.setStatus(TagLog.Status.none);
+		tagLog.setCsn(cardId);
 		AppliExtApi extApi = applisExtService.get(application.getAppliExt());
 		if(extApi!=null){
 			extApi.isTagable(tagLog);
@@ -71,13 +72,16 @@ public class TagAuthService {
 		tagLog.persist();
 		log.info("Enregitrement effectué : " + tagLog.getFirstname() + " " + tagLog.getLastname() + ", avec le terminal :" + numeroId);
 		
-		if(device.isValidateAuthWoConfirmation() && !this.validateTag(tagLog.getId())) {
-			throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_tagvalidationerror);
+		if(device.isValidateAuthWoConfirmation()){
+			Boolean validateTagOK =  this.validateTag(tagLog.getId());
+			if(!validateTagOK){
+				log.warn(EsupNfcTagErrorMessage.error_esupnfctagexception_tagvalidationerror.toString());
+				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_tagvalidationerror);
+			}
 		}
-		
 		return tagLog;
 	}
-
+	
 	public Boolean validateTag(Long tagId) {
 		Boolean result = false;
 		TagLog tagLog = TagLog.findTagLog(tagId);
@@ -115,5 +119,15 @@ public class TagAuthService {
 		return cancelTagSuccess;
 	}
 
-
+	
+	public String getEppnInit(TagType tagType, String numeroId) throws EsupNfcTagException {
+		Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+		Application application = device.getApplication();
+		TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(application.getTagIdCheck());
+		if (tagIdCheckApi == null) {
+			throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_tagidchecknotdefine);
+		}
+		return device.getEppnInit();
+	}
+	
 }

@@ -39,6 +39,8 @@ public class TagIdCheckRestWs implements TagIdCheckApi {
     
     protected String description;
     
+    protected String idFromEppnInitUrl;
+    
 	public String getDescription() {
 		return description;
 	}
@@ -51,6 +53,10 @@ public class TagIdCheckRestWs implements TagIdCheckApi {
 		this.tagIdCheckUrl = tagIdCheckUrl;
 	}
 	
+	public void setIdFromEppnInitUrl(String idFromEppnInitUrl) {
+		this.idFromEppnInitUrl = idFromEppnInitUrl;
+	}
+
 	public TagIdCheckRestWs() {
 		restTemplate = new RestTemplate();
 	}
@@ -62,17 +68,11 @@ public class TagIdCheckRestWs implements TagIdCheckApi {
 		
 		switch (tagType) {
 			case CSN :
-				String csn = tagId;
-				String csnRetourne = new String();
-				for (int i = 1; i < csn.length(); i = i + 2) {
-					csnRetourne = csnRetourne + csn.charAt(csn.length() - i - 1) + csn.charAt(csn.length() - i);
-				}
-				tagId = csnRetourne;
 				targetUrl= UriComponentsBuilder.fromUriString(tagIdCheckUrl)
-					    .queryParam("csn", csnRetourne)    
+					    .queryParam("csn", tagId)    
 					    .build()
 					    .toUri();
-				log.info("Call " + tagIdCheckUrl + " with csn = " + csnRetourne);
+				log.info("Call " + tagIdCheckUrl + " with csn = " + tagId);
 				break;
 			case DESFIRE :
 				String desfireId = tagId;

@@ -34,6 +34,7 @@
 	    <intercept-url pattern="/manager" access="isAuthenticated()" />
 	    <intercept-url pattern="/manager/taglogs" access="hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_ADMIN')" />
 	    <intercept-url pattern="/manager/**" access="hasRole('ROLE_ADMIN')" />
+	    <intercept-url pattern="/nfc/registerTrusted" access="permitAll" />
 	    <intercept-url pattern="/nfc/**" access="isAuthenticated()" />
 	    <intercept-url pattern="/**" access="permitAll" />
 		<access-denied-handler error-page="/denied" />
@@ -82,8 +83,8 @@
 		class="org.esupportail.nfctag.security.ShibAuthenticatedUserDetailsService">
 		<beans:property name="mappingGroupesRoles">
 		    <beans:map>
-			<beans:entry key="EsupNfcTag_Admin" value="ROLE_ADMIN" />
-			<beans:entry key="EsupNfcTag_Supervisor" value="ROLE_SUPERVISOR" />
+			<beans:entry key="cn=for.esup-nfc-tag.admin,ou=groups,dc=univ-ville,dc=fr" value="ROLE_ADMIN" />
+			<beans:entry key="cn=for.esup-nfc-tag.supervisor,ou=groups,dc=univ-ville,dc=fr" value="ROLE_SUPERVISOR" />
 		    </beans:map>
 		</beans:property>
     </beans:bean>

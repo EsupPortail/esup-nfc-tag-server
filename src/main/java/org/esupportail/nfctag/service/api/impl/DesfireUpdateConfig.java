@@ -15,19 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.esupportail.nfctag.service.api;
+package org.esupportail.nfctag.service.api.impl;
+import org.esupportail.nfctag.beans.DesfireTag;
+import org.esupportail.nfctag.service.api.NfcAuthConfig;
+import org.springframework.roo.addon.javabean.RooJavaBean;
+import org.springframework.roo.addon.tostring.RooToString;
 
-import org.esupportail.nfctag.domain.TagLog;
-import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+@RooJavaBean
+@RooToString
+public class DesfireUpdateConfig extends NfcAuthConfig {
 
-public interface TagIdCheckApi {
+	private DesfireTag desfireTag;
 	
-	public enum TagType {CSN, DESFIRE};
+	@Override
+	public AuthType getAuthType() {
+		return AuthType.DESFIRE;
+	}
 
-	TagLog getTagLogFromTagId(TagType tagType, String tagId) throws EsupNfcTagException;
-	
-	Boolean supportTagType(TagType tagType);
-	
-	String getDescription();
-	
+	public DesfireTag getDesfireTag() {
+		return desfireTag;
+	}
+
+	public void setDesfireTag(DesfireTag desfireTag) {
+		this.desfireTag = desfireTag;
+	}
+
 }

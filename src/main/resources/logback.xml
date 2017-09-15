@@ -65,11 +65,9 @@
 	    
 	<logger name="org.esupportail.nfctag" additivity="false">
 	    <level value="DEBUG" />
-		<appender-ref ref="STDOUT" />
 		<appender-ref ref="FILE" />
-		<!-- 
-		<appender-ref ref="EMAIL" />
-		 -->
+		<appender-ref ref="STDOUT" />
+		<!--appender-ref ref="ERROR" /-->
 	</logger>
 
 </configuration>

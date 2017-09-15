@@ -27,7 +27,6 @@
 	<spring:url value="/resources/js/mustache.js" var="mustache_js_url" />
 	<spring:url value="/resources/js/Chart.js" var="chart_js_url" />
 	<spring:url value="/resources/js/esupnfctag.js" var="esupnfctag_js_url" />
-	
 	<spring:url value="/resources/images/favicon.ico" var="favicon" />
 	
 	<link rel="SHORTCUT ICON" href="${favicon}" />
@@ -61,5 +60,8 @@
 	<script src="${jquery_mustache_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 	<script src="${mustache_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 	<script src="${chart_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
+	
+	<script type="text/javascript" src="https://apis.google.com/js/plusone.js"><!-- --></script>
+
 	<script src="${esupnfctag_js_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 </jsp:root>

@@ -90,12 +90,8 @@
 	</bean>
 
     <!-- desfire service ... -->
-    <bean id="desfireService" class="org.esupportail.nfctag.service.desfire.DesfireService">
-	    <property name="desfireAuthSession">
-	       <bean class="org.esupportail.nfctag.service.desfire.DesfireAuthSession" scope="session">
-	           <aop:scoped-proxy/>
-	       </bean>
-	    </property>
+    <bean id="desfireService" class="org.esupportail.nfctag.service.desfire.DesfireService" scope="session">
+	    <property name="desfireAuthSession" ref="desfireAuthSession"/>
  		<property name="desFireEV1Service">
 	       <bean class="org.esupportail.nfctag.service.desfire.DESFireEV1Service" scope="session">
 	           <aop:scoped-proxy/>

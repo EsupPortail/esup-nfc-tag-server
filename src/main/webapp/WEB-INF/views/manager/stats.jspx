@@ -27,31 +27,43 @@
 var annee = '2016';
 var nbTagLastHour = ${nbTagLastHour};
 </SCRIPT>
-   <h1>STATS</h1>
+   <h1>Stats</h1>
 	<div class="row">
 		<div class="col-lg-12" >
-			<h3>Tags by week</h3>
-			&amp;nbsp;
-			<canvas id="tagsByWeek" height="150">&amp;nbsp;</canvas>
+		<div class="panel panel-primary">
+		<div class="panel-heading"><h5>Tags by month</h5></div>
+		<div class="panel-body ">
+		<canvas height="354" width="354" id="tagsByWeek" style="display: block; width: 354px; height: 354px;"><!--  --></canvas>
+		</div>
+		</div>
 		</div>
 
-		<div class="col-lg-4">
-			<h3>Tags by location</h3>
-			<canvas id="tagsByLocation">&amp;nbsp;</canvas>
+		<div class="col-lg-12" >
+		<div class="panel panel-primary">
+		<div class="panel-heading"><h5>Tags by location</h5></div>
+		<div class="panel-body ">
+		<canvas height="354" width="354" id="tagsByLocation" style="display: block; width: 354px; height: 354px;"><!--  --></canvas>
 		</div>
-		<div class="col-lg-4">
-			<h3>Devices by UserAgent</h3>${nbDevice}
-			<canvas id="deviceByUserAgent">&amp;nbsp;</canvas>
 		</div>
-	
-		<div class="col-lg-4">
-			<h3>Tags last hour</h3>
-		<div style="position: absolute;">
-			<canvas id="nbTagLastHour" ></canvas>
-			</div>
-			<div style="position: absolute;margin-top: 20px;margin-left: 145px;">
-			<h2>${nbTagLastHour}</h2>
-			</div>
 		</div>
+
+		<div class="col-lg-12" >
+		<div class="panel panel-primary">
+		<div class="panel-heading"><h5>Devices by UserAgent : ${nbDevice}</h5></div>
+		<div class="panel-body ">
+		<canvas height="454" width="354" id="deviceByUserAgent" style="display: block; width: 354px; height: 354px;"><!--  --></canvas>
+		</div>
+		</div>
+		</div>
+
+		<div class="col-lg-12" >
+		<div class="panel panel-primary">
+		<div class="panel-heading"><h5>Tags last hour : ${nbTagLastHour}</h5></div>
+		<div class="panel-body ">
+		<canvas height="354" width="354" id="nbTagLastHour" style="display: block; width: 354px; height: 354px;"><!--  --></canvas>
+		</div>
+		</div>
+		</div>
+
    </div>
 </div>
