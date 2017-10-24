@@ -18,6 +18,7 @@
 							<spring:param name="imei" value="${imei}"/>
 							<spring:param name="macAddress" value="${macAddress}"/>
 							<spring:param name="apkVersion" value="${apkVersion}"/>
+							<spring:param name="jarVersion" value="${jarVersion}"/>
 							<spring:param name="numeroId" value="${numeroId}"/>
 						</spring:url>
 						<a href="${register_url}" class="btn btn-lg btn-success">${location}</a>

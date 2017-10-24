@@ -81,6 +81,7 @@ public class DesfireService {
 
 	public NfcResultBean readDesfireId(String result){
 		if(result.length()==0){
+			reset();
 			desfireFlowStep.action = Action.READ;
 		}
 		NfcResultBean authResultBean = new NfcResultBean();
@@ -145,6 +146,7 @@ public class DesfireService {
 		byte fileNo = desFireEV1Service.hexStringToByte(desfireFile.getFileNumber());
 		
 		if(result.length()==0){
+			reset();
 			desfireFlowStep.action = Action.FORMAT;
 		}
 		switch(desfireFlowStep.action){
@@ -287,6 +289,7 @@ public class DesfireService {
 		byte fileNo = desFireEV1Service.hexStringToByte(desfireFile.getFileNumber());
 		
 		if(result.length()==0){
+			reset();
 			desfireFlowStep.action = Action.SELECT_ROOT;
 		}
 		switch(desfireFlowStep.action){

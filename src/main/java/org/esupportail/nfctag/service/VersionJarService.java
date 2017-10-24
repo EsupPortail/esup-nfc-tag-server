@@ -70,6 +70,7 @@ public class VersionJarService {
 	}
 
 	public boolean isUserJarVersionUp2Date(String apkVersion) {
+		log.info("check version : client " + apkVersion + ", server " + versionName +".");
 		return isUserJarVersionDev(apkVersion) || versionName.equals(apkVersion);
 	}
 	

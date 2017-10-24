@@ -4,7 +4,7 @@
 	<jsp:directive.page contentType="text/html;charset=UTF-8" />
 	<jsp:output omit-xml-declaration="yes" />
 	<spring:url value="/j_spring_security_logout" var="logout_url" />
-	<spring:url value="/nfc-index?apkVersion=${apkVersion}&amp;imei=${imei}&amp;macAddress=${macAddress}&amp;numeroId=${numeroId}" var="location_url" htmlEscape="false" />
+	<spring:url value="/nfc-index?jarVersion=${jarVersion}&amp;apkVersion=${apkVersion}&amp;imei=${imei}&amp;macAddress=${macAddress}&amp;numeroId=${numeroId}" var="location_url" htmlEscape="false" />
 	<div id="debug"><!--  --></div>
 	<script type="text/javascript">
 	

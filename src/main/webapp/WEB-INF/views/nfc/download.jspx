@@ -21,6 +21,10 @@
 		<c:if test="${not empty jarVersion}">
 			<h1><u><a href="${jarDlUrl}">esupnfctagdesktop.jar</a></u></h1>
 			<br/>
+			<spring:message code="message_jar_download" /><br/>
+			<a href="${jarDlUrl}">${requestUrl}${jarDlUrl}</a>
+			<br/>
+			<br/>
 			<p><spring:message code="message_jar_warning" /></p>
 		</c:if>
 

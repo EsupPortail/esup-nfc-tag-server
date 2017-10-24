@@ -90,7 +90,7 @@ public class NfcIndexController {
 		}
 		
 		if(numeroId==null || numeroId.isEmpty() || Device.findDevicesByNumeroIdEquals(numeroId).getResultList().isEmpty()) {
-			return "redirect:/nfc/locations?imei=" + imei + "&macAddress=" + macAddress;
+			return "redirect:/nfc/locations?imei=" + imei + "&macAddress=" + macAddress + "&apkVersion=" + versionApkService.getApkVersion() + "&jarVersion=" + versionJarService.getJarVersion();
 		} else {
 			return "redirect:/live?numeroId=" + numeroId;
 		}
@@ -100,9 +100,10 @@ public class NfcIndexController {
 	@RequestMapping(value = "/download")
 	public String download(@RequestParam(required=false) String apkVersion,
 						@RequestParam(required=false) String jarVersion, 
-						Model uiModel) throws IOException {
+						Model uiModel, HttpServletRequest request) throws IOException {
 		uiModel.addAttribute("apkVersion", apkVersion);
 		uiModel.addAttribute("jarVersion", jarVersion);
+		uiModel.addAttribute("requestUrl", request.getScheme() + "://" + request.getHeader("host"));
 		return "nfc/download";
 	}
 	
@@ -157,6 +158,7 @@ public class NfcIndexController {
 			uiModel.addAttribute("imei", device.getImei());
 			uiModel.addAttribute("appLocations", appLocations);
 			uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
+			uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
 		} catch (EmptyResultDataAccessException ex) {
 			log.info(eppn + " is not manager");
 			throw new AccessDeniedException(eppn + " is not manager");
@@ -184,7 +186,7 @@ public class NfcIndexController {
 		
 		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
 		if(devices.isEmpty()) {
-			return "redirect:/nfc/register/?location=" + encodeUrlPathSegment(location, httpServletRequest) + "&applicationId=" + applicationId + "&imei=" + imei + "&macAddress=" + macAddress;
+			return "redirect:/nfc/register/?location=" + encodeUrlPathSegment(location, httpServletRequest) + "&applicationId=" + applicationId + "&imei=" + imei + "&macAddress=" + macAddress + "&apkVersion=" + versionApkService.getApkVersion() + "&jarVersion=" + versionJarService.getJarVersion();
 		}
 
 		Device device = devices.get(0);
@@ -214,6 +216,7 @@ public class NfcIndexController {
 		uiModel.addAttribute("macAddress", macAddress);
 		uiModel.addAttribute("numeroId", numeroId);
 		uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
+		uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
 		return "nfc/register";
 	}
 

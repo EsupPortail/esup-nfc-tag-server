@@ -31,6 +31,7 @@ import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.ApplicationsService;
 import org.esupportail.nfctag.service.VersionApkService;
+import org.esupportail.nfctag.service.VersionJarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,7 +44,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @RequestMapping("/nfc")
 @Controller
@@ -54,6 +54,9 @@ public class NfcRegisterController {
 
 	@Resource
 	private VersionApkService versionApkService;
+
+	@Resource
+	private VersionJarService versionJarService;
 	
 	@Autowired
 	private ApplicationsService applicationsService;
@@ -62,7 +65,27 @@ public class NfcRegisterController {
 	public String selectedLocationForm(
 			@RequestParam(required = true) String imei, 
 			@RequestParam(required = true) String macAddress,
+			@RequestParam(required = false) String apkVersion,
+			@RequestParam(required = false) String jarVersion,
 			Model uiModel) {
+		if(imei.equals("appliJava")){
+			if(jarVersion != null){
+				if(!versionJarService.isUserJarVersionUp2Date(jarVersion)){
+					return "redirect:/nfc-index/download?jarVersion=" + versionJarService.getJarVersion();
+				}
+			}else{
+				return "redirect:/nfc-index/download?jarVersion=" + versionJarService.getJarVersion();
+			}
+		}else{
+			if(apkVersion != null){
+				if(!versionApkService.isUserApkVersionUp2Date(apkVersion)){
+					return "redirect:/nfc-index/download?apkVersion=" + versionApkService.getApkVersion();
+				}
+			}else{
+				return "redirect:/nfc-index/download?apkVersion=" + versionApkService.getApkVersion();
+			}
+		}
+		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String eppn = auth.getName();
 		log.info(eppn + "access to /nfc/locations");
@@ -87,6 +110,7 @@ public class NfcRegisterController {
 			uiModel.addAttribute("imei", imei);
 			uiModel.addAttribute("appLocations", appLocations);
 			uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
+			uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
 		} catch (EmptyResultDataAccessException ex) {
 			log.info(eppn + " is not manager");
 			throw new AccessDeniedException(eppn + " is not manager");
@@ -145,6 +169,7 @@ public class NfcRegisterController {
 		uiModel.addAttribute("macAddress", macAddress);
 		uiModel.addAttribute("numeroId", numeroId);
 		uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
+		uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
 		return "nfc/register";
 	}
 	
