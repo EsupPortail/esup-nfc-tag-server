@@ -26,6 +26,7 @@ import org.esupportail.nfctag.service.api.AppliExtApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -86,6 +87,7 @@ public class AppliExtRestWs implements AppliExtApi {
 
 	public AppliExtRestWs() {
 		restTemplate = new RestTemplate();
+		((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(5000);
 	}
 
 	@Override

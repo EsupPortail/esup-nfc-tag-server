@@ -82,4 +82,12 @@ privileged aspect Application_Roo_JavaBean {
         this.active = active;
     }
     
+    public Boolean Application.getValidateAuthWoConfirmationDefault() {
+        return this.validateAuthWoConfirmationDefault;
+    }
+    
+    public void Application.setValidateAuthWoConfirmationDefault(Boolean validateAuthWoConfirmationDefault) {
+        this.validateAuthWoConfirmationDefault = validateAuthWoConfirmationDefault;
+    }
+    
 }

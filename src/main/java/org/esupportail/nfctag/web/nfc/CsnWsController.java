@@ -22,8 +22,8 @@ import java.io.IOException;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
-import org.esupportail.nfctag.beans.AuthResultBeanV1.CODE;
-import org.esupportail.nfctag.beans.AuthResultBeanV1;
+import org.esupportail.nfctag.beans.NfcResultBean;
+import org.esupportail.nfctag.beans.NfcResultBean.CODE;
 import org.esupportail.nfctag.domain.NfcMessage;
 import org.esupportail.nfctag.domain.TagError;
 import org.esupportail.nfctag.domain.TagLog;
@@ -59,8 +59,9 @@ public class CsnWsController {
 	@Resource 
 	ErrorLongPoolController errorLongPoolController;
 
-	private AuthResultBeanV1 authCsn(String numeroId, String csn) {
-		AuthResultBeanV1 jsonResponseMessage = new AuthResultBeanV1();
+	private NfcResultBean authCsn(String numeroId, String csn) {
+		NfcResultBean jsonResponseMessage = new NfcResultBean();
+		jsonResponseMessage.setFullApdu("");
 		try {
 			TagLog tagLog = tagAuthService.auth(TagType.CSN, csn, numeroId, csn);
 			liveController.handleTagLog(tagLog);
@@ -80,7 +81,7 @@ public class CsnWsController {
 	@RequestMapping(params = {"csn", "arduinoId"})
 	@ResponseBody
 	public String arduinoCsnRequest(String csn, String arduinoId) throws IOException {
-		AuthResultBeanV1 jsonResponseMessage = authCsn(arduinoId, csn);
+		NfcResultBean jsonResponseMessage = authCsn(arduinoId, csn);
 		String resp4arduino = "<";
 		resp4arduino += jsonResponseMessage.getCode();
 		resp4arduino += "\n";
@@ -95,7 +96,7 @@ public class CsnWsController {
 	@RequestMapping(method = RequestMethod.POST, headers = {"Content-type=application/json"}, produces = "application/json;charset=UTF-8")
 	@ResponseBody
 	public String csnRequest(@RequestBody NfcMessage nfcMessage) throws IOException {
-		AuthResultBeanV1 jsonResponseMessage = authCsn(nfcMessage.getNumeroId(), nfcMessage.getCsn());
+		NfcResultBean jsonResponseMessage = authCsn(nfcMessage.getNumeroId(), nfcMessage.getCsn());
 		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 		String json = ow.writeValueAsString(jsonResponseMessage);
 		return json;

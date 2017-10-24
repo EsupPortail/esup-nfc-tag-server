@@ -17,8 +17,10 @@
  */
 package org.esupportail.nfctag.web.manager;
 
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.Resource;
 
@@ -43,7 +45,11 @@ public class StatsController {
 	StatsService statsService;	
 	
 	@RequestMapping()
-	public String index(Model uiModel) {
+	public String index(@RequestParam(required = false, value="annee") String annee, Model uiModel) {
+		if(annee==null) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy");
+		annee = df.format(new Date());
+		}
 		
 		Calendar cal = Calendar.getInstance(); // creates calendar
 	    cal.setTime(new Date()); // sets calendar time/date
@@ -52,9 +58,12 @@ public class StatsController {
 		
 	    Long nbTagLastHour = TagLog.countFindTagLogsByAuthDateBetween(cal.getTime(), new Date());
 	    
+	    List<String> years = TagLog.findYears();
+	    
 	    uiModel.addAttribute("nbDevice", Device.countDevices());
 	    uiModel.addAttribute("nbTagLastHour", nbTagLastHour);
-	    
+	    uiModel.addAttribute("years", years);
+	    uiModel.addAttribute("annee", annee);
 		return "manager/stats";
 	}
 	
@@ -62,7 +71,10 @@ public class StatsController {
 	@RequestMapping(value="/chartJson", headers = "Accept=application/json; charset=utf-8")
 	@ResponseBody 
 	public String getStats(@RequestParam(required = false, value="model") StatsModel model, @RequestParam(required = false, value="annee") String annee) {
-		if(annee==null) annee = "2016";
+		if(annee==null) {
+		SimpleDateFormat df = new SimpleDateFormat("yyyy");
+		annee = df.format(new Date());
+		}
 		
 		String json = "Aucune statistique à récupérer";
 		try {

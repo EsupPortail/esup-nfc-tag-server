@@ -6,16 +6,23 @@
 
 	<div id="col-lg-12">
 		<h3><spring:message code="message_apk_update" /></h3>
-		
 		<spring:url value="/nfc-index/download-apk" var="apkDlUrl"/>
-		<h1><u><a href="${apkDlUrl}">Android App</a></u></h1>
-		<br/>
-		<p><spring:message code="message_apk_warning" /></p>
+		<spring:url value="/nfc-index/download-jar" var="jarDlUrl"/>
+		<c:if test="${not empty apkVersion}">
+			<h1><u><a href="${apkDlUrl}">esupnfctagdroid.apk</a></u></h1>
+			<br/>
+			<p><spring:message code="message_apk_warning" /></p>
+			<ol>
+			  <li><spring:message code="message_apk_desc_1" /> <img src="https://lh3.googleusercontent.com/TIKrKSQIdH_geRzqBuUPndrdfvFyqxeiUm9TxDvuuVLoy4Kwhhhwwh28yhHc=w16" width="18" alt="Settings" title="Settings"/>.</li>
+			  <li><spring:message code="message_apk_desc_2" /></li>
+			  <li><spring:message code="message_apk_desc_3" /></li>
+			</ol>
+		</c:if>
+		<c:if test="${not empty jarVersion}">
+			<h1><u><a href="${jarDlUrl}">esupnfctagdesktop.jar</a></u></h1>
+			<br/>
+			<p><spring:message code="message_jar_warning" /></p>
+		</c:if>
 
-		<ol>
-		  <li><spring:message code="message_apk_desc_1" /> <img src="https://lh3.googleusercontent.com/TIKrKSQIdH_geRzqBuUPndrdfvFyqxeiUm9TxDvuuVLoy4Kwhhhwwh28yhHc=w16" width="18" alt="Settings" title="Settings"/>.</li>
-		  <li><spring:message code="message_apk_desc_2" /></li>
-		  <li><spring:message code="message_apk_desc_3" /></li>
-		</ol>
 	</div>
 </div>

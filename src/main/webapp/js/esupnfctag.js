@@ -293,8 +293,6 @@ $(document).ready(function(){
 	Chart.defaults.global.title.fontSize = 14;
 	Chart.defaults.global.title.display= false;
 	Chart.defaults.global.elements.point.radius=6;
-	Chart.defaults.global.elements.point.backgroundColor= "#fff";
-	Chart.defaults.global.elements.point.borderColor= "rgba(0,0,0,1)";
 	Chart.defaults.global.elements.line.tension=0.2;
 	
 	$.ajax({
@@ -350,6 +348,10 @@ $(document).ready(function(){
         		type: 'horizontalBar',
         		data: data,
         		options: {
+        	         legend: {
+        	             display: false,
+        	             position: 'right'
+        	          },
              		 animation:{
              			 duration: 0,
              		 },        		
@@ -360,7 +362,6 @@ $(document).ready(function(){
         		tooltips: {
                     callbacks: {
                         label:function(item, data){
-                       	 console.log(data);
                        	 var sum = 0;
                        	 data.datasets[0].data.forEach(
                        	     function addNumber(value) { sum += parseInt(value); }
@@ -390,6 +391,9 @@ $(document).ready(function(){
         		type: 'doughnut',
         		data: data,
         		options: {
+        			legend:{
+        				display:true
+        			},
                      title: {
                     	 text: "nbTagLastHour"
                      },
@@ -400,11 +404,18 @@ $(document).ready(function(){
                          animationDuration: 0, // duration of animations when hovering an item
                      },
                      responsiveAnimationDuration: 0,
+             		 tooltips: {
+                        callbacks: {
+                            label:function(item, data){
+                           	 return data.labels[item.index]+" : "+data.datasets[0].data[item.index] + "%";
+                            }
+                        
+                        }
+                    }
                 },
-                
+
         	});
         }
-	
 	});
 	
 	$.ajax({
@@ -414,12 +425,9 @@ $(document).ready(function(){
         success : function(data) {
         	var ctx = document.getElementById("tagsByWeek").getContext("2d");
         	var repartionComposantesChart = new Chart(ctx, {
-        		type: 'line',
+        		type: 'bar',
         		data: data,
         		options: {
-                     title: {
-                    	 text: "tagsByWeek",
-                     },
              		 animation:{
              			 duration: 0,
              		 },        		
@@ -511,8 +519,20 @@ $(document).ready(function() {
 			$("input[id^=_application_id]:checked").each(function() {
 		        idApp = $(this).val();
 		    });
-		
-			 $('#location').empty().append($('<option>').text("Loading...").attr('value', null));
+    		$('#_validateAuthWoConfirmation_id').prop('checked', false);
+			var url = '/manager/devices/getValidateWo?applicationId='+idApp;
+			$.ajax({
+			    url: url,
+			    type:'GET',
+			    dataType: 'json',
+			    success: function( json ) {
+			    	if(json == true){
+			    		$('#_validateAuthWoConfirmation_id').prop('checked', true);
+			    	}
+			    }
+			});
+			
+			$('#location').empty().append($('<option>').text("Loading...").attr('value', null));
 			 
 			if(eppn!=null && idApp!=null){
 				var url = '/manager/devices/locationsJson?eppn='+eppn+'&applicationId='+idApp;
@@ -528,6 +548,7 @@ $(document).ready(function() {
 				    }
 				});
 			}
+			
 		}
 	});
 	

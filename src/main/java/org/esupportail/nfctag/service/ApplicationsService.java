@@ -62,15 +62,12 @@ public class ApplicationsService {
 			AppliExtApi appliExtApi = applisExtService.get(appli.getAppliExt());
 			AppLocation appLocation = new AppLocation(appli, true);
 			try {
-				
 				List<String> locations = appliExtApi.getLocations4Eppn(eppn);
 				if(locations.size()>0 && appli.isActive()) { 
 					appLocation.setLocations(locations);
-				} else {
-					appLocation.setAvailable(false);
 				}
 			} catch(Exception e) {
-				log.error("Exception on" + appli.getName() + "!", e);
+				log.error("Exception on" + appli.getName() + "!");
 				appLocation.setAvailable(false);
 			}
 			appLocations.add(appLocation);

@@ -67,17 +67,17 @@ public class TagLogController {
 			}
 
     	} else if ("applicationName".equals(searchBySelected)) {
-    		taglogs = TagLog.findTagLogsByApplicationNameEquals(searchString).getResultList();
+    		taglogs = TagLog.findTagLogsByApplicationNameEquals(searchString, "authDate", "DESC").getResultList();
     	} else if ("location".equals(searchBySelected)) {
-    		taglogs = TagLog.findTagLogsByLocationEquals(searchString).getResultList();
+    		taglogs = TagLog.findTagLogsByLocationEquals(searchString, "authDate", "DESC").getResultList();
     	} else if ("eppnInit".equals(searchBySelected)) {
-    		taglogs = TagLog.findTagLogsByEppnInitLike(searchString).getResultList();
+    		taglogs = TagLog.findTagLogsByEppnInitLike(searchString, "authDate", "DESC").getResultList();
     	} else if ("numeroId".equals(searchBySelected)) {
-    		taglogs = TagLog.findTagLogsByNumeroIdEquals(searchString).getResultList();
+    		taglogs = TagLog.findTagLogsByNumeroIdEquals(searchString, "authDate", "DESC").getResultList();
     	} else if ("csn".equals(searchBySelected)) {
-    		taglogs = TagLog.findTagLogsByCsnEquals(searchString).getResultList();
+    		taglogs = TagLog.findTagLogsByCsnEquals(searchString, "authDate", "DESC").getResultList();
     	} else if ("desfireId".equals(searchBySelected)) {
-    		taglogs = TagLog.findTagLogsByDesfireIdEquals(searchString).getResultList();
+    		taglogs = TagLog.findTagLogsByDesfireIdEquals(searchString, "authDate", "DESC").getResultList();
     	} else {
 	    	if(sortFieldName == null){
 	    		sortFieldName = "authDate";

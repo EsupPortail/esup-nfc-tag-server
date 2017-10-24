@@ -130,6 +130,11 @@ public class NfcRegisterController {
 			device.setImei(imei);
 			device.setMacAddress(macAddress);
 			device.setUserAgent(userAgent);
+			if(application.getValidateAuthWoConfirmationDefault() != null){
+				device.setValidateAuthWoConfirmation(application.getValidateAuthWoConfirmationDefault());
+			} else{
+				device.setValidateAuthWoConfirmation(false);
+			}
 			device.persist();
 		} else {
 			Device tel = Device.findDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)

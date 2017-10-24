@@ -20,6 +20,7 @@
         <table:column id="c_org_esupportail_nfctag_domain_Application_nfcConfig" property="nfcConfigDesc" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_Application_appliExt" property="appliExtDesc" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_Application_tagIdCheck" property="tagIdCheckDesc" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_Application_validateAuthWoConfirmationDefault" property="validateAuthWoConfirmationDefault" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_Application_active" property="active" z="user-managed"/>
         <table:column render="false" id="c_org_esupportail_nfctag_domain_Application_description" property="description" z="user-managed"/>
         <table:column render="false" id="c_org_esupportail_nfctag_domain_Application_applisExtService" property="applisExtService" z="user-managed"/>

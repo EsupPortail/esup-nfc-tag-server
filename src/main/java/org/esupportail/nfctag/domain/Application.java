@@ -19,7 +19,6 @@ package org.esupportail.nfctag.domain;
 import javax.annotation.Resource;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
-
 import org.esupportail.nfctag.service.ApplisExtService;
 import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.TagIdCheckService;
@@ -35,18 +34,18 @@ import org.springframework.roo.addon.tostring.RooToString;
 @RooJpaActiveRecord(finders = { "findApplicationsByNameEquals" })
 public class Application {
 
-	@Transient
-	@Resource
-	ApplisExtService applisExtService;
+    @Transient
+    @Resource
+    ApplisExtService applisExtService;
 
-	@Transient
-	@Resource
-	NfcAuthConfigService nfcAuthConfigService; 
+    @Transient
+    @Resource
+    NfcAuthConfigService nfcAuthConfigService;
 
-	@Transient
-	@Resource
-	TagIdCheckService tagIdCheckService; 
-	
+    @Transient
+    @Resource
+    TagIdCheckService tagIdCheckService;
+
     @NotNull
     private String name;
 
@@ -60,34 +59,37 @@ public class Application {
     private String tagIdCheck;
 
     private String description;
-    
+
     private boolean active = true;
-    
-    public String getNfcConfigDesc(){
-    	NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(this.nfcConfig);
-    	if(nfcAuthConfig != null) {
-    		return nfcAuthConfig.getDescription();
-    	} else { 
-    		return null;
-    	}
+
+    public String getNfcConfigDesc() {
+        NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(this.nfcConfig);
+        if (nfcAuthConfig != null) {
+            return nfcAuthConfig.getDescription();
+        } else {
+            return null;
+        }
     }
-    
-    public String getAppliExtDesc(){
-    	AppliExtApi extApi = applisExtService.get(this.appliExt);
-    	if(extApi != null) {
-    		return extApi.getDescription();
-    	} else { 
-    		return null;
-    	}
+
+    public String getAppliExtDesc() {
+        AppliExtApi extApi = applisExtService.get(this.appliExt);
+        if (extApi != null) {
+            return extApi.getDescription();
+        } else {
+            return null;
+        }
     }
-    
-    public String getTagIdCheckDesc(){
-    	TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(this.tagIdCheck);
-    	if(tagIdCheckApi != null) {
-    		return tagIdCheckApi.getDescription();
-    	} else { 
-    		return null;
-    	}		
+
+    public String getTagIdCheckDesc() {
+        TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(this.tagIdCheck);
+        if (tagIdCheckApi != null) {
+            return tagIdCheckApi.getDescription();
+        } else {
+            return null;
+        }
     }
-    
+
+    /**
+     */
+    private Boolean validateAuthWoConfirmationDefault;
 }

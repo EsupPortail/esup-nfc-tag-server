@@ -295,11 +295,14 @@ public class DesfireService {
 					authResultBean.setSize(16);
 					desfireFlowStep.action = Action.GET_APPS;
 					break;
-				case GET_APPS: 
-					desfireFlowStep.authStep = 1;
-					authResultBean.setFullApdu(desFireEV1Service.getApplicationsIds1());
-					authResultBean.setSize(16);
-					desfireFlowStep.action = Action.CHECK_APP;
+				case GET_APPS:
+					authResultBean = this.authApp(desFireEV1Service.hexStringToByteArray("000000"), result, desFireEV1Service.hexStringToByteArray("0000000000000000"), (byte) 0x00, KeyType.DES);
+ 					if(authResultBean.getFullApdu() == null) {
+						desfireFlowStep.authStep = 1;
+						authResultBean.setFullApdu(desFireEV1Service.getApplicationsIds1());
+						authResultBean.setSize(16);
+						desfireFlowStep.action = Action.CHECK_APP;
+ 					}
 					break;
 				case CHECK_APP: 
 					authResultBean.setFullApdu(desFireEV1Service.selectApplication(desFireEV1Service.hexStringToByteArray("000000")));

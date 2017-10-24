@@ -14,6 +14,7 @@
             <field:display field="applisExtService" id="s_org_esupportail_nfctag_domain_Application_applisExtService" object="${application}" render="false" z="user-managed"/>
             <field:display field="nfcAuthConfigService" id="s_org_esupportail_nfctag_domain_Application_nfcAuthConfigService" object="${application}" render="false" z="user-managed"/>
             <field:display field="tagIdCheckService" id="s_org_esupportail_nfctag_domain_Application_tagIdCheckService" object="${application}" render="false" z="user-managed"/>
+        	<field:display field="validateAuthWoConfirmationDefault" id="s_org_esupportail_nfctag_domain_Application_validateAuthWoConfirmationDefault" object="${application}" z="user-managed"/>
             <field:display field="active" id="s_org_esupportail_nfctag_domain_Application_active" object="${application}" z="user-managed"/>
         </dl>
     </page:show>

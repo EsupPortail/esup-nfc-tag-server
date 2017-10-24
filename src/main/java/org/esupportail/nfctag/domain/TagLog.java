@@ -18,8 +18,13 @@
 package org.esupportail.nfctag.domain;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+
+import javax.persistence.EntityManager;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Query;
+
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
@@ -72,4 +77,11 @@ public class TagLog {
     public void setStatus(Status status) {
         this.status = status;
     }
+    
+    public static List<String> findYears() {
+        EntityManager em = TagLog.entityManager();
+        Query q = em.createNativeQuery("select trim(to_char(date_part('year', auth_date),'9999')) as year from tag_log group by year");
+        return q.getResultList();
+    }
+    
 }

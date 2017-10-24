@@ -50,4 +50,9 @@ public class IndexController {
 		return "index";
 	}
 
+	@RequestMapping("/downloads")
+	public String download( HttpServletRequest request) {
+		return "downloads";
+	}
+	
 }

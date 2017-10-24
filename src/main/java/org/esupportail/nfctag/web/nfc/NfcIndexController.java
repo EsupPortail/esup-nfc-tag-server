@@ -34,6 +34,7 @@ import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.ApplicationsService;
 import org.esupportail.nfctag.service.VersionApkService;
+import org.esupportail.nfctag.service.VersionJarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,6 +58,9 @@ public class NfcIndexController {
 	
 	@Resource
 	private VersionApkService versionApkService;
+
+	@Resource
+	private VersionJarService versionJarService;
 	
 	@Autowired
 	private ApplicationsService applicationsService;
@@ -65,21 +69,40 @@ public class NfcIndexController {
 	public String index(@RequestParam(required=false) String numeroId, 
 			@RequestParam(required=false) String imei,
 			@RequestParam(required=false) String macAddress,
-			@RequestParam(required=false) String apkVersion) {
-		if(!versionApkService.isUserApkVersionUp2Date(apkVersion)){
-			return "redirect:/nfc-index/download?apkVersion=" + versionApkService.getApkVersion();
-		} else {
-			if(numeroId==null || numeroId.isEmpty() || Device.findDevicesByNumeroIdEquals(numeroId).getResultList().isEmpty()) {
-				return "redirect:/nfc/locations?imei=" + imei + "&macAddress=" + macAddress;
-			} else {
-				return "redirect:/live?numeroId=" + numeroId;
+			@RequestParam(required=false) String apkVersion,
+			@RequestParam(required=false) String jarVersion) {
+		if(imei.equals("appliJava")){
+			if(jarVersion != null){
+				if(!versionJarService.isUserJarVersionUp2Date(jarVersion)){
+					return "redirect:/nfc-index/download?jarVersion=" + versionJarService.getJarVersion();
+				}
+			}else{
+				return "redirect:/nfc-index/download?jarVersion=" + versionJarService.getJarVersion();
 			}
+		}else{
+			if(apkVersion != null){
+				if(!versionApkService.isUserApkVersionUp2Date(apkVersion)){
+					return "redirect:/nfc-index/download?apkVersion=" + versionApkService.getApkVersion();
+				}
+			}else{
+				return "redirect:/nfc-index/download?apkVersion=" + versionApkService.getApkVersion();
+			}
+		}
+		
+		if(numeroId==null || numeroId.isEmpty() || Device.findDevicesByNumeroIdEquals(numeroId).getResultList().isEmpty()) {
+			return "redirect:/nfc/locations?imei=" + imei + "&macAddress=" + macAddress;
+		} else {
+			return "redirect:/live?numeroId=" + numeroId;
 		}
 		
 	}
 	
 	@RequestMapping(value = "/download")
-	public String download(Model uiModel) throws IOException {
+	public String download(@RequestParam(required=false) String apkVersion,
+						@RequestParam(required=false) String jarVersion, 
+						Model uiModel) throws IOException {
+		uiModel.addAttribute("apkVersion", apkVersion);
+		uiModel.addAttribute("jarVersion", jarVersion);
 		return "nfc/download";
 	}
 	
@@ -88,6 +111,16 @@ public class NfcIndexController {
 		String contentType = "application/vnd.android.package-archive";
         response.setContentType(contentType);
         ClassPathResource apkFile = new ClassPathResource("apk/esupnfctagdroid.apk");
+        response.setContentLength((int)apkFile.contentLength());
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + apkFile.getFilename() + "\"");
+        IOUtils.copy(apkFile.getInputStream(), response.getOutputStream());
+	}
+
+	@RequestMapping(value = "/download-jar")
+	public void downloadJar(Model uiModel, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		String contentType = "application/vnd.android.package-archive";
+        response.setContentType(contentType);
+        ClassPathResource apkFile = new ClassPathResource("jar/esupnfctagdesktop.jar");
         response.setContentLength((int)apkFile.contentLength());
         response.setHeader("Content-Disposition", "attachment; filename=\"" + apkFile.getFilename() + "\"");
         IOUtils.copy(apkFile.getInputStream(), response.getOutputStream());
@@ -170,6 +203,11 @@ public class NfcIndexController {
 		device.setLocation(location);
 		device.setApplication(application);
 		device.setMacAddress(macAddress);
+		if(application.getValidateAuthWoConfirmationDefault() != null){
+			device.setValidateAuthWoConfirmation(application.getValidateAuthWoConfirmationDefault());
+		} else{
+			device.setValidateAuthWoConfirmation(false);
+		}
 		device.merge();
 		
 		uiModel.addAttribute("imei", imei);
@@ -198,6 +236,7 @@ public class NfcIndexController {
 			} else {
 				device.setLocation(null);
 				device.setApplication(null);
+				device.setValidateAuthWoConfirmation(false);
 				device.merge();
 			}
 		 }
