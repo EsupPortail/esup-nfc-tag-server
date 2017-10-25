@@ -147,7 +147,12 @@ public class DesfireService {
 		
 		if(result.length()==0){
 			reset();
-			desfireFlowStep.action = Action.FORMAT;
+			if(desfireTag.getFormatBeforeWrite()){
+				desfireFlowStep.action = Action.FORMAT;
+			}else{
+				desfireFlowStep.action = Action.SELECT_ROOT;
+			}
+			
 		}
 		switch(desfireFlowStep.action){
 				case SELECT_ROOT:

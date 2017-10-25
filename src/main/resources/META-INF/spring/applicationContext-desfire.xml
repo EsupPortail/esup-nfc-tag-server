@@ -1,0 +1,177 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+
+    Licensed to ESUP-Portail under one or more contributor license
+    agreements. See the NOTICE file distributed with this work for
+    additional information regarding copyright ownership.
+
+    ESUP-Portail licenses this file to you under the Apache License,
+    Version 2.0 (the "License"); you may not use this file except in
+    compliance with the License. You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+           xmlns:aop="http://www.springframework.org/schema/aop"
+           xmlns:context="http://www.springframework.org/schema/context"
+           xmlns:jee="http://www.springframework.org/schema/jee"
+           xmlns:tx="http://www.springframework.org/schema/tx"
+           xmlns:util="http://www.springframework.org/schema/util"
+           xmlns:p="http://www.springframework.org/schema/p"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd                                                                              
+                   http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd                                                                                    
+                   http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.2.xsd                                                                              
+                   http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.2.xsd                                                                                          
+                   http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd                                                                                             
+                   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+    
+    
+    <!-- ##########  ESUP SGC PART ############ -->
+    
+    <bean id="idp2sTagWriteEsupSgc" class="org.esupportail.nfctag.service.api.impl.TagWriteRestWs">
+		<property name="idFromEppnInitUrl" value="https://esup-sgc-test.univ-rouen.fr/wsrest/nfc/idFromEppnInit"/>
+    </bean>
+
+    <bean id="leocodeTagWriteEsupSgc" class="org.esupportail.nfctag.service.api.impl.TagWriteRestWs">
+		<property name="idFromEppnInitUrl" value="https://esup-sgc-test.univ-rouen.fr/wsrest/nfc/idBuComueFromEppnInit"/>
+    </bean>
+    
+    <bean id="idp2sTagUpdateEsupSgc" class="org.esupportail.nfctag.service.api.impl.TagUpdateRestWs">
+		<property name="wsUrl" value="https://esup-sgc-test.univ-rouen.fr/wsrest/nfc/idFromCsn"/>
+    </bean>
+    
+    <bean id="dateLastUpdateEsupSgc" class="org.esupportail.nfctag.service.api.impl.TagUpdateRestWs">
+		<property name="wsUrl" value="https://esup-sgc-test.univ-rouen.fr/wsrest/nfc/lastUpdateFromCsn"/>
+    </bean>
+    
+    <bean id="desfireComueTagEsupSgc" class="org.esupportail.nfctag.beans.DesfireTag" p:tagWriteApi-ref="idp2sTagWriteEsupSgc" p:formatBeforeWrite="true">
+   	 	<property name="applications">
+			<util:list>
+				<bean class="org.esupportail.nfctag.beans.DesfireApplication"
+					p:desfireAppId="F585C0" p:amks="0B" p:nok="84">
+					<property name="files">
+						<util:list>
+							<bean class="org.esupportail.nfctag.beans.DesfireFile"
+								p:fileNumber="00" p:communicationSettings="03" p:accessRights="1223" p:fileSize="1F0000" p:tagWriteApi-ref="leocodeTagWriteEsupSgc"/>
+						</util:list>
+					</property>
+					<property name="keys">
+						<util:list>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="00" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="01" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="02" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="03" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>
+						</util:list>
+					</property>
+				</bean>
+				<bean class="org.esupportail.nfctag.beans.DesfireApplication"
+					p:desfireAppId="F585C1" p:amks="0B" p:nok="85">
+					<property name="files">
+						<util:list>
+							<bean class="org.esupportail.nfctag.beans.DesfireFile"
+								p:fileNumber="00" p:communicationSettings="03" p:accessRights="1444" p:fileSize="1F0000" p:tagWriteApi-ref="idp2sTagWriteEsupSgc"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireFile"
+								p:fileNumber="01" p:communicationSettings="03" p:accessRights="2444" p:fileSize="1F0000" p:tagWriteApi-ref="idp2sTagWriteEsupSgc"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireFile"
+								p:fileNumber="02" p:communicationSettings="03" p:accessRights="3444" p:fileSize="1F0000" p:tagWriteApi-ref="idp2sTagWriteEsupSgc"/>
+						</util:list>
+					</property>
+					<property name="keys">
+						<util:list>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="00" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="01" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="02" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="03" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>		
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="04" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>	
+						</util:list>
+					</property>
+				</bean>
+				<bean class="org.esupportail.nfctag.beans.DesfireApplication"
+					p:desfireAppId="F58540" p:amks="0B" p:nok="83">
+					<property name="files">
+						<util:list>
+							<bean class="org.esupportail.nfctag.beans.DesfireFile"
+								p:fileNumber="00" p:communicationSettings="03" p:accessRights="1FFF"
+								p:fileSize="1F0000" />
+						</util:list>
+					</property>
+					<property name="keys">
+						<util:list>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey" p:keyNo="00"
+								p:type="AES" p:keyVer="00" p:key="00000000000000000000000000000000" />
+							<bean class="org.esupportail.nfctag.beans.DesfireKey" p:keyNo="01"
+								p:type="AES" p:keyVer="00" p:key="00000000000000000000000000000000" />
+							<bean class="org.esupportail.nfctag.beans.DesfireKey" p:keyNo="02"
+								p:type="AES" p:keyVer="00" p:key="00000000000000000000000000000000" />
+						</util:list>
+					</property>
+				</bean>
+				
+			</util:list>
+		</property>
+    </bean>
+
+
+ 	<bean id="desfireAuthConfigComueWriteEsupSgc" class="org.esupportail.nfctag.service.api.impl.DesfireWriteConfig">
+		<property name="desfireTag" ref="desfireComueTagEsupSgc" />
+		<property name="description" value="Ecriture ESUP SGC"/>
+    </bean>
+
+    <bean id="desfireComueTagUpdateEsupSgc" class="org.esupportail.nfctag.beans.DesfireTag" p:tagUpdateApi-ref="idp2sTagUpdateEsupSgc">
+   	 	<property name="applications">
+			<util:list>
+				<bean class="org.esupportail.nfctag.beans.DesfireApplication"
+					p:desfireAppId="F585C1" p:amks="0B" p:nok="85" p:updateDate="2017-09-01 11:17" p:tagUpdateApi-ref="dateLastUpdateEsupSgc">
+					<property name="files">
+						<util:list>
+							<bean class="org.esupportail.nfctag.beans.DesfireFile"
+								p:fileNumber="00" p:communicationSettings="03" p:accessRights="1444" p:fileSize="1F0000" p:tagUpdateApi-ref="idp2sTagUpdateEsupSgc"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireFile"
+								p:fileNumber="01" p:communicationSettings="03" p:accessRights="2444" p:fileSize="1F0000" p:tagUpdateApi-ref="idp2sTagUpdateEsupSgc"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireFile"
+								p:fileNumber="02" p:communicationSettings="03" p:accessRights="3444" p:fileSize="1F0000" p:tagUpdateApi-ref="idp2sTagUpdateEsupSgc"/>
+						</util:list>
+					</property>
+					<property name="keys">
+						<util:list>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="00" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="01" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="02" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="03" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>		
+							<bean class="org.esupportail.nfctag.beans.DesfireKey"
+								p:keyNo="04" p:keyVer="01" p:type="AES" p:key="00000000000000000000000000000000"/>	
+						</util:list>
+					</property>
+				</bean>
+		
+			</util:list>
+		</property>
+    </bean>
+    
+	<bean id="desfireAuthConfigComueUpdateEsupSgc" class="org.esupportail.nfctag.service.api.impl.DesfireUpdateConfig">
+    	<property name="desfireTag" ref="desfireComueTagUpdateEsupSgc" />
+        <property name="description" value="Mise à jour ESUP SGC"/>
+    </bean>
+    
+</beans>

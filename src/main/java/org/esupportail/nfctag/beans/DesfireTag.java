@@ -18,6 +18,8 @@ public class DesfireTag implements Serializable {
 
 	TagUpdateApi tagUpdateApi = new TagUpdateNone();
 	
+	Boolean formatBeforeWrite;
+	
 	public List<DesfireApplication> getApplications() {
 		return applications;
 	}
@@ -42,6 +44,14 @@ public class DesfireTag implements Serializable {
 		return tagUpdateApi;
 	}
 	
+	public Boolean getFormatBeforeWrite() {
+		return formatBeforeWrite;
+	}
+
+	public void setFormatBeforeWrite(Boolean formatBeforeWrite) {
+		this.formatBeforeWrite = formatBeforeWrite;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
