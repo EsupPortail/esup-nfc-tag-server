@@ -13,13 +13,14 @@ public class DesfireFlowStep implements Serializable {
 	    CHECK_APP,
 	    DELETE_APP, 
 	    CREATE_APP, 
-	    CHANGE_APP_KEY, 
-	    CHANGE_FILE_KEY, 
+	    CHANGE_APP_MASTER_KEY, 
+	    CHANGE_KEYS, 
 	    CREATE_FILE, 
 	    WRITE_FILE, 
 	    SELECT_ROOT, 
 	    FORMAT, 
 	    CHANGE_FILE_KEY_SET, 
+	    CHANGE_PICC_KEY,
 	    UNBRICK, 
 	    SWITCH_TO_AES
 	}

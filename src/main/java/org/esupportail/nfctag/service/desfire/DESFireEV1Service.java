@@ -16,6 +16,9 @@ import java.util.Arrays;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nfcjlib.core.SimpleSCR;
 import nfcjlib.core.util.AES;
 import nfcjlib.core.util.BitOp;
@@ -35,6 +38,8 @@ import nfcjlib.core.util.TripleDES;
  */
 
 public class DESFireEV1Service extends SimpleSCR {
+	
+	protected final static Logger log = LoggerFactory.getLogger(DESFireEV1Service.class);
 	
 	/** A file/key number that does not exist. */
 	private final static byte FAKE_NO = -1;
@@ -255,9 +260,9 @@ public class DESFireEV1Service extends SimpleSCR {
 		apdu[1] = (byte) Command.CHANGE_KEY_SETTINGS.getCode();
 		apdu[4] = 0x01;
 		apdu[5] = keySett;
-		System.err.println("apdu before : "+Dump.hex(apdu));
+		log.trace("apdu before : "+Dump.hex(apdu));
 		apdu = preprocess(apdu, CommunicationSetting.ENCIPHERED);
-		System.err.println("apdu after : "+Dump.hex(apdu));
+		log.trace("apdu after : "+Dump.hex(apdu));
 		return Dump.hex(apdu).replace(" ", "").toUpperCase();
 	}
 
@@ -287,12 +292,12 @@ public class DESFireEV1Service extends SimpleSCR {
 */
 	// version is 1 separate byte for AES, and the LSBit of each byte for DES keys
 	public String changeKey(byte keyNo, byte keyVersion, KeyType type, byte[] newKey, byte[] oldKey) {
-		System.err.println("sessionKey : "+Dump.hex(skey) );
-		System.err.println("kno : "+Dump.hex(kno)+ " = " +Dump.hex((byte)(keyNo & 0x0F)));
+		log.trace("sessionKey : "+Dump.hex(skey) );
+		log.trace("kno : "+Dump.hex(kno)+ " = " +Dump.hex((byte)(keyNo & 0x0F)));
 		if (!validateKey(newKey, type)
 				|| Arrays.equals(aid, new byte[3]) && keyNo != 0x00
 				){
-			System.err.println("You're doing it wrong with kno");
+			log.trace("You're doing it wrong with kno");
 			this.code = Response.WRONG_ARGUMENT.getCode();
 			return null;
 		}
@@ -302,7 +307,7 @@ public class DESFireEV1Service extends SimpleSCR {
 				|| ktype == KeyType.TDES && oldKey.length != 16
 				|| ktype == KeyType.TKTDES && oldKey.length != 24
 				|| ktype == KeyType.AES && oldKey.length != 16) {
-			System.err.println("You're doing it wrong with old key type");
+			log.trace("You're doing it wrong with old key type");
 			this.code = Response.WRONG_ARGUMENT.getCode();
 			return null;
 		}
@@ -342,7 +347,7 @@ public class DESFireEV1Service extends SimpleSCR {
 				keyNo = 0x40;
 				break;
 			case AES:
-				System.err.println("PICC");
+				log.debug("change PICC to AES");
 				keyNo = (byte) 0x80;
 				break;
 			default:
@@ -370,7 +375,7 @@ public class DESFireEV1Service extends SimpleSCR {
 				crc = CRC16.get(newKey);
 				System.arraycopy(crc, 0, plaintext, nklen + addAesKeyVersionByte + 2, 2);
 			}
-			System.err.println("plaintext : " +Dump.hex(plaintext));
+			log.trace("plaintext : " +Dump.hex(plaintext));
 			ciphertext = send(skey, plaintext, ktype, null);
 			break;
 		case TKTDES:
@@ -387,7 +392,7 @@ public class DESFireEV1Service extends SimpleSCR {
 				System.arraycopy(crc, 0, plaintext, nklen + addAesKeyVersionByte + 4, crc.length);
 			}
 
-			System.err.println("plaintext : " +Dump.hex(plaintext));
+			log.trace("plaintext : " +Dump.hex(plaintext));
 			
 			ciphertext = send(skey, plaintext, ktype, iv);
 			iv = Arrays.copyOfRange(ciphertext, ciphertext.length - iv.length, ciphertext.length);
@@ -411,18 +416,18 @@ public class DESFireEV1Service extends SimpleSCR {
 		byte keyversion = (byte) 0x00;
 		byte keyNo = (byte) 0x80;
 		
-		System.err.println("sessionKey : "+Dump.hex(skey));
+		log.trace("sessionKey : "+Dump.hex(skey));
 		
 		byte[] ciphertext = null;
 		
 		byte[] command = {(byte) Command.CHANGE_KEY.getCode(),keyNo, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 		
-		System.err.println("crc32 : "+Dump.hex(command));
+		log.trace("crc32 : "+Dump.hex(command));
 		
 		byte[] crc32Command = calculateApduCRC32R(command, command.length); 
 		
-		System.err.println("crc32 : "+Dump.hex(crc32Command));
-		System.err.println("key length  :"+newKey.length);
+		log.trace("crc32 : "+Dump.hex(crc32Command));
+		log.trace("key length  :"+newKey.length);
 		
 		
 		byte[] fullApdu = new byte[24];
@@ -430,15 +435,15 @@ public class DESFireEV1Service extends SimpleSCR {
 		fullApdu[16] = keyversion;
 		System.arraycopy(crc32Command, 0, fullApdu, 17, crc32Command.length);
 		
-		System.err.println("fullapdu : "+Dump.hex(fullApdu));
+		log.trace("fullapdu : "+Dump.hex(fullApdu));
 		
-		System.err.println("skey : "+Dump.hex(skey));
+		log.trace("skey : "+Dump.hex(skey));
 		
 		ciphertext = send(skey, fullApdu, ktype, new byte[16]);
 		
-		System.err.println("cipher : "+Dump.hex(ciphertext));
+		log.trace("cipher : "+Dump.hex(ciphertext));
 		
-		System.err.println("app : "+Dump.hex(aid));
+		log.trace("app : "+Dump.hex(aid));
 
 
 		byte[] apdu = new byte[5 + 1 + ciphertext.length+1];
@@ -448,7 +453,7 @@ public class DESFireEV1Service extends SimpleSCR {
 		apdu[5] = keyNo;
 		System.arraycopy(ciphertext, 0, apdu, 6, ciphertext.length);
 		
-		System.err.println("finalapdu : "+Dump.hex(apdu));
+		log.trace("finalapdu : "+Dump.hex(apdu));
 		
 		return Dump.hex(apdu).replace(" ", "").toUpperCase();
 		
@@ -1251,11 +1256,11 @@ public class DESFireEV1Service extends SimpleSCR {
 	 */
 	public byte[] preprocess(byte[] apdu, int offset, CommunicationSetting commSett) {
 		if (commSett == null) {
-			System.err.println("preprocess: commSett is null");
+			log.trace("preprocess: commSett is null");
 			return null;
 		}
 		if (skey == null) {
-			System.err.println("preprocess: skey is null");
+			log.trace("preprocess: skey is null");
 			return apdu;
 		}
 
@@ -1351,16 +1356,16 @@ public class DESFireEV1Service extends SimpleSCR {
 	 */
 	public byte[] postprocess(byte[] apdu, int length, CommunicationSetting commSett) {
 		if (commSett == null) {
-			System.err.println("postprocess: commSett is null");
+			log.trace("postprocess: commSett is null");
 			return null;
 		}
 		if (apdu[apdu.length - 1] != 0x00) {
-			System.err.println("postprocess: status <> 00 (" + Response.getResponse(apdu[apdu.length - 1]) + ")");
+			log.trace("postprocess: status <> 00 (" + Response.getResponse(apdu[apdu.length - 1]) + ")");
 			reset();
 			return null;
 		}
 		if (skey == null) {
-			System.err.println("postprocess: skey is null");
+			log.trace("postprocess: skey is null");
 			return Arrays.copyOfRange(apdu, 0, apdu.length - 2);
 		}
 
@@ -1372,7 +1377,7 @@ public class DESFireEV1Service extends SimpleSCR {
 		case MACED:
 			return postprocessMaced(apdu);
 		case ENCIPHERED:
-			System.err.println("process encipherd");
+			log.trace("process encipherd");
 			return postprocessEnciphered(apdu, length);
 		default:
 			return null;  // never reached
@@ -1405,7 +1410,7 @@ public class DESFireEV1Service extends SimpleSCR {
 			byte[] cmac = CMAC.get(cmacType, skey, block2, iv);
 			for (int i = 0, j = apdu.length - 10; i < 8 && j < apdu.length - 2; i++, j++) {
 				if (cmac[i] != apdu[j]) {
-					System.err.println("Received CMAC does not match calculated CMAC.");
+					log.trace("Received CMAC does not match calculated CMAC.");
 					return null;
 				}
 			}
@@ -1420,18 +1425,18 @@ public class DESFireEV1Service extends SimpleSCR {
 
 	public byte[] postprocessEnciphered(byte[] apdu, int length) {
 		
-		System.err.println("keep skey : "+Dump.hex(skey));
+		log.trace("keep skey : "+Dump.hex(skey));
 		
 		assert apdu.length >= 2;
-		System.err.println("new IV : " +  Dump.hex(iv));
+		log.trace("new IV : " +  Dump.hex(iv));
 		
 		byte[] ciphertext = Arrays.copyOfRange(apdu, 0, apdu.length - 2);
 		
-		System.err.println("decript enc txt : " + Dump.hex(ciphertext));
-		System.err.println("key type : " + ktype);
+		log.trace("decript enc txt : " + Dump.hex(ciphertext));
+		log.trace("key type : " + ktype);
 		byte[] plaintext = recv(skey, ciphertext, ktype, iv);
 		
-		System.err.println("plain txt : " + Dump.hex(plaintext));
+		log.trace("plain txt : " + Dump.hex(plaintext));
 		byte[] crc;
 		switch (ktype) {
 		case DES:
@@ -1449,7 +1454,7 @@ public class DESFireEV1Service extends SimpleSCR {
 		
 		for (int i = 0; i < crc.length; i++) {
 			if (crc[i] != plaintext[i + length]) {
-				System.err.println("Received CMAC does not match calculated CMAC.");
+				log.trace("Received CMAC does not match calculated CMAC.");
 				return null;
 			}
 		}
@@ -1866,7 +1871,7 @@ public class DESFireEV1Service extends SimpleSCR {
 		case TKTDES:
 			return TripleDES.decrypt(iv == null ? new byte[8] : iv, key, data);
 		case AES:
-			System.err.println("AES recv");
+			log.trace("AES recv");
 			return AES.decrypt(iv == null ? new byte[16] : iv, key, data);
 		default:
 			return null;
@@ -1919,7 +1924,7 @@ public class DESFireEV1Service extends SimpleSCR {
 
 			break;
 		default:
-			System.err.println("Wrong way (decrypt)");
+			log.trace("Wrong way (decrypt)");
 			return null;
 		}
 
@@ -2024,7 +2029,7 @@ public class DESFireEV1Service extends SimpleSCR {
 				|| type == KeyType.TDES && (key.length != 16)
 				|| type == KeyType.TKTDES && key.length != 24
 				|| type == KeyType.AES && key.length != 16) {
-			System.err.println(String.format("Key validation failed: length is %d and type is %s", key.length, type));
+			log.trace(String.format("Key validation failed: length is %d and type is %s", key.length, type));
 			return false;
 		}
 		return true;

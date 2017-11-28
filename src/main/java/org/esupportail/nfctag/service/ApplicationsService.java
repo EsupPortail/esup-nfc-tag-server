@@ -47,7 +47,7 @@ public class ApplicationsService {
 		if(devices.isEmpty()) {
 			throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_unknowdevice);
 		}
-		log.info("device identify :" + numeroId);
+		log.trace("device identify :" + numeroId);
 		Application application = devices.get(0).getApplication();
 		if(application == null) {
 			throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_locationnotfound);

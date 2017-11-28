@@ -51,7 +51,7 @@
         <table:column link="true" linkPrefix="/manager/devices/numeroid/" id="c_org_esupportail_nfctag_domain_TagLog_numeroId" property="numeroId" z="user-managed" render="${isAdmin}"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_status" property="status" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_csn" property="csn" z="user-managed" render="${isAdmin}"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_desfireId" property="desfireId" z="user-managed" render="${isAdmin}"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_desfireId" property="desfireId" z="user-managed" render="false"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_eppn" property="eppn" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_firstname" property="firstname" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_lastname" property="lastname" z="user-managed"/>

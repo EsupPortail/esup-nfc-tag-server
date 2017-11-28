@@ -63,7 +63,7 @@ public class CsnWsController {
 		NfcResultBean jsonResponseMessage = new NfcResultBean();
 		jsonResponseMessage.setFullApdu("");
 		try {
-			TagLog tagLog = tagAuthService.auth(TagType.CSN, csn, numeroId, csn);
+			TagLog tagLog = tagAuthService.auth(TagType.CSN, csn, numeroId, csn, true);
 			liveController.handleTagLog(tagLog);
 			jsonResponseMessage.setCode(CODE.OK);
 			jsonResponseMessage.setMsg(tagLog.getFirstname() + " " + tagLog.getLastname());

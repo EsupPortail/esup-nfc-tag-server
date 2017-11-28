@@ -18,6 +18,10 @@ import java.util.Arrays;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 
+import org.esupportail.nfctag.service.desfire.DESFireEV1Service;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import nfcjlib.core.util.AES;
 import nfcjlib.core.util.BitOp;
 import nfcjlib.core.util.CMAC;
@@ -35,6 +39,8 @@ import nfcjlib.core.util.TripleDES;
  * @version	9.9.2013, 0.4
  */
 public class DESFireEV1 extends SimpleSCR {
+	
+	protected final static Logger log = LoggerFactory.getLogger(DESFireEV1.class);
 	
 	/** A file/key number that does not exist. */
 	private final static byte FAKE_NO = -1;
@@ -287,7 +293,7 @@ public class DESFireEV1 extends SimpleSCR {
 				|| ktype == KeyType.TKTDES && oldKey.length != 24
 				|| ktype == KeyType.AES && oldKey.length != 16)) {
 			// basic checks to mitigate the possibility of messing up the keys
-			System.err.println("You're doing it wrong, chief! (changeKey: check your args)");
+			log.trace("You're doing it wrong, chief! (changeKey: check your args)");
 			this.code = Response.WRONG_ARGUMENT.getCode();
 			return false;
 		}
@@ -1319,11 +1325,11 @@ public class DESFireEV1 extends SimpleSCR {
 	 */
 	private byte[] preprocess(byte[] apdu, int offset, CommunicationSetting commSett) {
 		if (commSett == null) {
-			System.err.println("preprocess: commSett is null");
+			log.trace("preprocess: commSett is null");
 			return null;
 		}
 		if (skey == null) {
-			System.err.println("preprocess: skey is null");
+			log.trace("preprocess: skey is null");
 			return apdu;
 		}
 
@@ -1419,16 +1425,16 @@ public class DESFireEV1 extends SimpleSCR {
 	 */
 	private byte[] postprocess(byte[] apdu, int length, CommunicationSetting commSett) {
 		if (commSett == null) {
-			System.err.println("postprocess: commSett is null");
+			log.trace("postprocess: commSett is null");
 			return null;
 		}
 		if (apdu[apdu.length - 1] != 0x00) {
-			System.err.println("postprocess: status <> 00 (" + Response.getResponse(apdu[apdu.length - 1]) + ")");
+			log.trace("postprocess: status <> 00 (" + Response.getResponse(apdu[apdu.length - 1]) + ")");
 			reset();
 			return null;
 		}
 		if (skey == null) {
-			System.err.println("postprocess: skey is null");
+			log.trace("postprocess: skey is null");
 			return Arrays.copyOfRange(apdu, 0, apdu.length - 2);
 		}
 
@@ -1472,7 +1478,7 @@ public class DESFireEV1 extends SimpleSCR {
 			byte[] cmac = CMAC.get(cmacType, skey, block2, iv);
 			for (int i = 0, j = apdu.length - 10; i < 8 && j < apdu.length - 2; i++, j++) {
 				if (cmac[i] != apdu[j]) {
-					System.err.println("Received CMAC does not match calculated CMAC.");
+					log.trace("Received CMAC does not match calculated CMAC.");
 					return null;
 				}
 			}
@@ -1506,7 +1512,7 @@ public class DESFireEV1 extends SimpleSCR {
 		}
 		for (int i = 0; i < crc.length; i++) {
 			if (crc[i] != plaintext[i + length]) {
-				System.err.println("Received CMAC does not match calculated CMAC.");
+				log.trace("Received CMAC does not match calculated CMAC.");
 				return null;
 			}
 		}
@@ -1980,7 +1986,7 @@ public class DESFireEV1 extends SimpleSCR {
 			}
 			break;
 		default:
-			System.err.println("Wrong way (decrypt)");
+			log.trace("Wrong way (decrypt)");
 			return null;
 		}
 
@@ -2085,7 +2091,7 @@ public class DESFireEV1 extends SimpleSCR {
 				|| type == KeyType.TDES && (key.length != 16 || !isKey3DES(key))
 				|| type == KeyType.TKTDES && key.length != 24
 				|| type == KeyType.AES && key.length != 16) {
-			System.err.println(String.format("Key validation failed: length is %d and type is %s", key.length, type));
+			log.trace(String.format("Key validation failed: length is %d and type is %s", key.length, type));
 			return false;
 		}
 		return true;

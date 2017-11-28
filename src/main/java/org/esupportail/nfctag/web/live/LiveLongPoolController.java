@@ -86,7 +86,7 @@ public class LiveLongPoolController {
     }
 	
 	@RequestMapping
-	public String index(@RequestParam(required=false) String numeroId, @RequestParam(required=false) String apkVersion, Model uiModel){
+	public String index(@RequestParam(required=false) String numeroId, @RequestParam(required=false) String apkVersion, @RequestParam(required=false) String jarVersion, Model uiModel){
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if(!auth.isAuthenticated()) {
 			return "redirect:/manager";
@@ -94,7 +94,7 @@ public class LiveLongPoolController {
 
 		if(numeroId!=null) {
 			if(Device.countFindDevicesByNumeroIdEquals(numeroId)<1 || Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult().getApplication() == null) {
-				return "redirect:/nfc-index/locations?apkVersion=" + apkVersion + "&numeroId=" + numeroId;		
+				return "redirect:/nfc-index/locations?jarVersion=" + jarVersion + "&apkVersion=" + apkVersion + "&numeroId=" + numeroId;		
 			}else{
 				Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
 				Application app = device.getApplication();
@@ -112,6 +112,8 @@ public class LiveLongPoolController {
 				uiModel.addAttribute("validateAuthWoConfirmation", device.isValidateAuthWoConfirmation());
 				uiModel.addAttribute("numeroId", numeroId);
 				uiModel.addAttribute("eppnInit", device.getEppnInit());
+				uiModel.addAttribute("jarVersion", jarVersion);
+				uiModel.addAttribute("apkVersion", apkVersion);
 				return "live/mobil";
 			}
 		} else {		

@@ -7,6 +7,7 @@ import org.esupportail.nfctag.service.api.TagUpdateApi;
 import org.esupportail.nfctag.service.api.TagWriteApi;
 import org.esupportail.nfctag.service.api.impl.TagUpdateNone;
 import org.esupportail.nfctag.service.api.impl.TagWriteNone;
+import org.esupportail.nfctag.service.desfire.DESFireEV1Service.KeyType;
 
 public class DesfireTag implements Serializable {
 
@@ -18,8 +19,45 @@ public class DesfireTag implements Serializable {
 
 	TagUpdateApi tagUpdateApi = new TagUpdateNone();
 	
-	Boolean formatBeforeWrite;
+	Boolean formatBeforeWrite = false;
 	
+	/**
+	 * PICC master key == key 0
+	 */
+	private String key;
+	
+	private String keyVersion;
+
+	/**
+	 * keyType : AES, DES
+	 */
+	private KeyType keyType;
+	
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+	
+	public String getKeyVersion() {
+		return keyVersion;
+	}
+
+	public void setKeyVersion(String keyVersion) {
+		this.keyVersion = keyVersion;
+	}
+
+	
+	public KeyType getKeyType() {
+		return keyType;
+	}
+
+	public void setKeyType(KeyType keyType) {
+		this.keyType = keyType;
+	}
+
 	public List<DesfireApplication> getApplications() {
 		return applications;
 	}

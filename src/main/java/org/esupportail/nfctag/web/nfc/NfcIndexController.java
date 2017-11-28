@@ -92,7 +92,7 @@ public class NfcIndexController {
 		if(numeroId==null || numeroId.isEmpty() || Device.findDevicesByNumeroIdEquals(numeroId).getResultList().isEmpty()) {
 			return "redirect:/nfc/locations?imei=" + imei + "&macAddress=" + macAddress + "&apkVersion=" + versionApkService.getApkVersion() + "&jarVersion=" + versionJarService.getJarVersion();
 		} else {
-			return "redirect:/live?numeroId=" + numeroId;
+			return "redirect:/live?apkVersion=" + versionApkService.getApkVersion() + "&jarVersion=" + versionJarService.getJarVersion() + "&numeroId=" + numeroId;
 		}
 		
 	}
@@ -231,6 +231,7 @@ public class NfcIndexController {
 		uiModel.addAttribute("macAddress", macAddress);
 		uiModel.addAttribute("numeroId", numeroId);
 		uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
+		uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
 		
 		if(Device.countFindDevicesByNumeroIdEquals(numeroId)>0) {
 			Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();

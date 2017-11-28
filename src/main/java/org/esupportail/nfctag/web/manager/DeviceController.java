@@ -143,7 +143,6 @@ public class DeviceController {
 	@RequestMapping(value="/getValidateWo", headers = "Accept=application/json; charset=utf-8")
 	@ResponseBody
 	public Boolean getValidateWo(@RequestParam(required = true) Long applicationId) {
-		System.err.println(applicationId);
 		Application application = Application.findApplication(applicationId);
 		return application.getValidateAuthWoConfirmationDefault();
 	}

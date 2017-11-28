@@ -22,6 +22,8 @@ import java.util.Date;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
+import org.esupportail.nfctag.beans.NfcResultBean;
+import org.esupportail.nfctag.beans.NfcResultBean.Action;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.domain.TagLog;
@@ -49,14 +51,23 @@ public class TagAuthService {
 	@Resource
 	ApplicationsService applicationsService;
 	
-	public TagLog auth(TagType tagType, String tagId, String numeroId, String cardId) throws EsupNfcTagException {
+	public TagLog auth(TagType tagType, String tagId, String numeroId, String cardId, Boolean validate) throws EsupNfcTagException {
 		Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
 		Application application = device.getApplication();
 		TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(application.getTagIdCheck());
 		if (tagIdCheckApi == null) {
 			throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_tagidchecknotdefine);
 		}
-		TagLog tagLog = tagIdCheckApi.getTagLogFromTagId(tagType, tagId);
+		TagLog tagLog = new TagLog();
+		if(tagType != null){
+			if(tagType.equals(TagType.DESFIRE)) {
+				tagLog = tagIdCheckApi.getTagLogFromTagId(tagType, tagId);
+				tagLog.setDesfireId(tagId);
+			}else if(tagType.equals(TagType.CSN)) {
+				tagLog = tagIdCheckApi.getTagLogFromTagId(tagType, cardId);
+			}
+		}
+                tagLog.setCsn(cardId);
 		tagLog.setNumeroId(device.getNumeroId());
 		tagLog.setLocation(device.getLocation());
 		tagLog.setApplicationName(device.getApplication().getName());
@@ -64,7 +75,6 @@ public class TagAuthService {
 		tagLog.setNumeroId(device.getNumeroId());
 		tagLog.setEppnInit(device.getEppnInit());
 		tagLog.setStatus(TagLog.Status.none);
-		tagLog.setCsn(cardId);
 		AppliExtApi extApi = applisExtService.get(application.getAppliExt());
 		if(extApi!=null){
 			extApi.isTagable(tagLog);
@@ -72,7 +82,7 @@ public class TagAuthService {
 		tagLog.persist();
 		log.info("Enregitrement effectué : " + tagLog.getFirstname() + " " + tagLog.getLastname() + ", avec le terminal :" + numeroId);
 		
-		if(device.isValidateAuthWoConfirmation()){
+		if(device.isValidateAuthWoConfirmation() && validate){
 			Boolean validateTagOK =  this.validateTag(tagLog.getId());
 			if(!validateTagOK){
 				log.warn(EsupNfcTagErrorMessage.error_esupnfctagexception_tagvalidationerror.toString());

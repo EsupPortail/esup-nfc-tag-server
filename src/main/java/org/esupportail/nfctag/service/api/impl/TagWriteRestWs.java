@@ -50,7 +50,7 @@ public class TagWriteRestWs implements TagWriteApi {
 			    .queryParam("eppnInit", eppnInit)    
 			    .build()
 			    .toUri();
-		log.info("Call " + idFromEppnInitUrl + " with eppn = " + eppnInit);
+		log.trace("Call " + idFromEppnInitUrl + " with eppn = " + eppnInit);
 
 		String id = null;
 		try {
@@ -59,7 +59,7 @@ public class TagWriteRestWs implements TagWriteApi {
 			log.warn("tagIdCheck unavailable", e);
 			throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable);
 		}
-		log.info("Got :  " + id);
+		log.trace("Got :  " + id);
 		if(id==null) {
 			//throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_unknowcard);
 		}

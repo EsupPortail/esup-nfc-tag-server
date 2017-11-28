@@ -19,11 +19,6 @@ public class DesfireApplication implements Serializable {
 	private String desfireAppId;
 	
 	/**
-	 * Application master key == key 0
-	 */
-	private String key;
-	
-	/**
 	 * application master key settings
 	 * for delete, create and modification of key
 	 * -> 0B is cool
@@ -76,14 +71,6 @@ public class DesfireApplication implements Serializable {
 
 	public void setDesfireAppId(String desfireAppId) {
 		this.desfireAppId = desfireAppId;
-	}
-
-	public String getKey() {
-		return key;
-	}
-
-	public void setKey(String key) {
-		this.key = key;
 	}
 
 	public String getAmks() {

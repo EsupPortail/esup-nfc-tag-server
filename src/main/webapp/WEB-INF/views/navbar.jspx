@@ -7,10 +7,6 @@
 	<jsp:output omit-xml-declaration="yes" />
 	<spring:message code="application_name" htmlEscape="false" var="app_name" />
 	<spring:url value="/j_spring_security_logout" var="logout_url" />
-	<script type="text/javascript">
-		var msg_location="<spring:message code="message_location_disconnect_location" />";
-		var msg="<spring:message code="message_location_disconnect" />";
-	</script>
 	<div class="container-fluid">
 	<c:choose>
 		<c:when test="${empty param.numeroId and empty numeroId}">
@@ -34,21 +30,29 @@
 	    </sec:authorize>
 		</c:when>
 			<c:otherwise>
-				<spring:url value="/nfc-index/unregister?numeroId=${numeroId}&amp;imei=${imei}&amp;macAddress=${macAddress}&amp;full=false" var="nfc_unregister_url" htmlEscape="false" />
-				<spring:url value="/nfc-index/unregister?numeroId=${numeroId}&amp;imei=${imei}&amp;macAddress=${macAddress}&amp;full=true" var="nfc_unregister_url_full" htmlEscape="false" />
+				<spring:url value="/nfc-index/unregister?jarVersion=${jarVersion}&amp;numeroId=${numeroId}&amp;imei=${imei}&amp;macAddress=${macAddress}&amp;full=false" var="nfc_unregister_url" htmlEscape="false" />
+				<spring:url value="/nfc-index/unregister?jarVersion=${jarVersion}&amp;numeroId=${numeroId}&amp;imei=${imei}&amp;macAddress=${macAddress}&amp;full=true" var="nfc_unregister_url_full" htmlEscape="false" />
 				<c:choose>
 					<c:when test="${not empty location}">
 						<ul class="list-inline navbar-right visible-xs-block visible-lg-block visible-md-block visible-sm-block text-right"> 
-				      		<li><a href="${nfc_unregister_url}" onclick="return confirm(msg_location)" class="btn btn-default navbar-btn btn-success"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a></li>
+				      		<li><a id="unregister" href="${nfc_unregister_url}" class="btn btn-default navbar-btn btn-success"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a></li>
 				      	</ul>
 					</c:when>
 					<c:otherwise>
 						<ul class="list-inline navbar-right visible-xs-block visible-lg-block visible-md-block visible-sm-block text-right"> 
-				      		<li><a href="#" onclick="return androidLogout('${nfc_unregister_url_full}')" class="btn btn-default navbar-btn btn-danger"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a></li>
+				      		<li><a id="unregisterfull" href="${nfc_unregister_url_full}" class="btn btn-default navbar-btn btn-danger"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a></li>
 				      	</ul>
 					</c:otherwise>
 				</c:choose>
 			</c:otherwise>
 		</c:choose>
+		<div id="dialog" class="modal" title="Confirmation">
+  			<spring:message code="message_location_disconnect_location" />
+		</div>
+
+		<div id="dialogfull" class="modal" title="Confirmation">
+  			<spring:message code="message_location_disconnect" />
+		</div>
+		
 	</div>
 </div>
