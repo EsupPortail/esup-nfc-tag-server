@@ -26,13 +26,20 @@ You have to install a Shibboleth Provider on Apache (mod_shib) which proxy pass 
      ShibUseHeaders On
    </Location>
 
+   <Location /admin>
+     AuthType shibboleth
+     ShibRequestSetting requireSession 1
+     require shib-session
+     ShibUseHeaders On
+   </Location>
+
    <Location /nfc>
      AuthType shibboleth
      ShibRequestSetting requireSession 1
      require shib-session
      ShibUseHeaders On
    </Location>
-`̀``
+```
 
    
 ### EsupNfcTagServer Test of the Android part without EsupNfcTagDrid
