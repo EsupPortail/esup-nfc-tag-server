@@ -67,7 +67,7 @@ public class TagAuthService {
 				tagLog = tagIdCheckApi.getTagLogFromTagId(tagType, cardId);
 			}
 		}
-                tagLog.setCsn(cardId);
+		tagLog.setCsn(cardId);
 		tagLog.setNumeroId(device.getNumeroId());
 		tagLog.setLocation(device.getLocation());
 		tagLog.setApplicationName(device.getApplication().getName());
@@ -97,7 +97,7 @@ public class TagAuthService {
 		TagLog tagLog = TagLog.findTagLog(tagId);
 		Application app = Application.findApplicationsByNameEquals(tagLog.getApplicationName()).getSingleResult();
 		AppliExtApi extApi = applisExtService.get(app.getAppliExt());
-		if(extApi!=null) {
+		if(extApi!=null && tagLog.getStatus().equals(TagLog.Status.none)) {
 			result = extApi.validateTag(tagLog);
 		}
 		if(result){
@@ -115,7 +115,7 @@ public class TagAuthService {
 		TagLog tagLog = TagLog.findTagLog(tagId);
 		Application app = Application.findApplicationsByNameEquals(tagLog.getApplicationName()).getSingleResult();
 		AppliExtApi extApi = applisExtService.get(app.getAppliExt());
-		if(extApi!=null) {
+		if(extApi!=null && tagLog.getStatus().equals(TagLog.Status.none)) {
 			cancelTagSuccess = extApi.cancelTag(tagLog);
 		}
 		if(cancelTagSuccess){
@@ -125,7 +125,6 @@ public class TagAuthService {
 		}else{
 			log.info("Status don't change for " + tagLog.getEppn() );
 		}
-		log.info("Status change to [" + tagLog.getStatus() + "] for " + tagLog.getEppn() );
 		return cancelTagSuccess;
 	}
 

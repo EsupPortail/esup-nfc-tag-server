@@ -1,6 +1,7 @@
 package org.esupportail.nfctag.web.wsrest;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -67,7 +68,11 @@ public class WsRestController {
 	@RequestMapping(value = "/deviceControl", method=RequestMethod.GET)
 	@ResponseBody
 	public String nfcDeviceControl(@RequestParam String numeroId) throws IOException, EsupNfcTagException {
-		Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
-		return device.getEppnInit();
+		String eppnInit = null;
+		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
+		if(devices.size() > 0) {
+			eppnInit = devices.get(0).getEppnInit();
+		}
+		return eppnInit;
 	}
 }

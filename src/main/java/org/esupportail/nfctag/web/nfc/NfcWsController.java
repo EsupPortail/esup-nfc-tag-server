@@ -56,8 +56,7 @@ public class NfcWsController {
 	@RequestMapping(value="/cancel",params = {"id"})
 	@ResponseBody
 	public Boolean cancelTag(long id, Model uiModel) throws IOException {
-		tagAuthService.cancelTag(id);
-		return true;
+		return tagAuthService.cancelTag(id);
 	}
 
 	@RequestMapping(value="/location", produces = "application/json")

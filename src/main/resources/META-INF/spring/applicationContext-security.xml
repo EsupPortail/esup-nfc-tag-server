@@ -27,14 +27,11 @@
     
     <!-- HTTP security configurations -->
     <http disable-url-rewriting="true" use-expressions="true" entry-point-ref="http403EntryPoint">
-		<intercept-url pattern="/nfc-ws" access="permitAll" />
-		<intercept-url pattern="/logs" access="permitAll" />
-		<intercept-url pattern="/live" access="permitAll" />
+		<intercept-url pattern="/wsrest/**" access="hasIpAddress('127.0.0.1')" /> <!-- Esup-SGC IP Address -->
 	    <intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />
 	    <intercept-url pattern="/manager" access="isAuthenticated()" />
 	    <intercept-url pattern="/manager/taglogs" access="hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_ADMIN')" />
 	    <intercept-url pattern="/manager/**" access="hasRole('ROLE_ADMIN')" />
-	    <intercept-url pattern="/nfc/registerTrusted" access="permitAll" />
 	    <intercept-url pattern="/nfc/**" access="isAuthenticated()" />
 	    <intercept-url pattern="/**" access="permitAll" />
 		<access-denied-handler error-page="/denied" />
