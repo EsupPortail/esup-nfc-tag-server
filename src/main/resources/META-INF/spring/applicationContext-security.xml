@@ -20,8 +20,10 @@
 -->
 <beans:beans xmlns="http://www.springframework.org/schema/security" 
              xmlns:beans="http://www.springframework.org/schema/beans" 
+             xmlns:util="http://www.springframework.org/schema/util"
              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+             xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+             					 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.2.xsd
                                  http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security-3.2.xsd">
     
     
@@ -47,7 +49,7 @@
 		<beans:constructor-arg value="/"/>
     </beans:bean>
     
-    <beans:bean id="shibFilter" class="org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter">
+    <beans:bean id="shibFilter" class="org.esupportail.nfctag.security.ShibRequestHeaderAuthenticationFilter">
 		<beans:property name="principalRequestHeader" value="REMOTE_USER"/>
 		<beans:property name="credentialsRequestHeader" value="MEMBER"/>
 		<beans:property name="exceptionIfHeaderMissing" value="false"/>
@@ -56,11 +58,11 @@
 
     <authentication-manager alias="authenticationManager">
 		<authentication-provider ref="preauthAuthProvider" />	
-		<!--  <authentication-provider ref="casAuthenticationProvider" />-->
     </authentication-manager>
     
     <beans:bean id="preauthAuthProvider" class="org.springframework.security.web.authentication.preauth.PreAuthenticatedAuthenticationProvider">
 		<beans:property name="preAuthenticatedUserDetailsService" ref="authUserDetailsService"/>
+		<beans:property name="throwExceptionWhenTokenRejected" value="true"/>
     </beans:bean>
 
     <beans:bean id="concurrencyFilter"
@@ -76,14 +78,56 @@
 
     <beans:bean id="sessionRegistry" class="org.springframework.security.core.session.SessionRegistryImpl" />
 
-    <beans:bean id="authUserDetailsService"
+
+	<beans:bean id="authUserDetailsService"
 		class="org.esupportail.nfctag.security.ShibAuthenticatedUserDetailsService">
-		<beans:property name="mappingGroupesRoles">
-		    <beans:map>
+		<beans:property name="mappingGroupesRoles" ref="nfcMappingGroupesRoles"/>
+		<beans:property name="ldapGroup2UserRoleService" ref="ldapGroup2UserRoleService"/>
+	</beans:bean>
+    
+     	
+    <beans:bean id="ldapContextSourcePool" class="org.springframework.ldap.pool.factory.PoolingContextSource">
+      <beans:property name="contextSource" ref="ldapContextSource" />
+      <beans:property name="dirContextValidator" ref="dirContextValidator"/>
+      <beans:property name="testWhileIdle" value="true"/>
+      <beans:property name="testOnBorrow" value="true"/>
+   </beans:bean>
+   
+   <beans:bean id="dirContextValidator"
+            class="org.springframework.ldap.pool.validation.DefaultDirContextValidator"/>
+	
+    <beans:bean id="ldapContextSource"
+		class="org.springframework.ldap.core.support.LdapContextSource">
+		<beans:property name="url" value="ldap://ldap.univ-ville.fr" />
+		<beans:property name="base" value="dc=univ-ville,dc=fr" />
+		<beans:property name="userDn" value="cn=admin,dc=univ-ville,dc=fr" />
+		<beans:property name="password" value="esup" />
+	</beans:bean>    
+	
+	<beans:bean id="ldapTemplate" class="org.springframework.ldap.core.LdapTemplate">
+		<beans:constructor-arg ref="ldapContextSourcePool" />
+	</beans:bean>
+	
+	
+	<beans:bean id="ldapGroup2UserRoleService"
+		class="org.esupportail.nfctag.security.LdapGroup2UserRoleService">
+		<beans:property name="mappingGroupesRoles" ref="nfcMappingGroupesRoles"/>
+		<beans:property name="groupService" ref="groupService"/>
+	</beans:bean>
+	
+		
+	<beans:bean id="groupService" class="org.esupportail.nfctag.security.GroupService">
+		<beans:property name="ldapTemplate" ref="ldapTemplate"/>
+		<beans:property name="groupSearchBase" value="ou=groups" />
+		<beans:property name="groupSearchFilter" value="member={0}"/>
+		<beans:property name="memberSearchBase" value="ou=people"/>
+		<beans:property name="memberSearchFilter" value="memberOf={0}"/>
+	</beans:bean>
+	
+	<util:map id="nfcMappingGroupesRoles">
 			<beans:entry key="cn=for.esup-nfc-tag.admin,ou=groups,dc=univ-ville,dc=fr" value="ROLE_ADMIN" />
 			<beans:entry key="cn=for.esup-nfc-tag.supervisor,ou=groups,dc=univ-ville,dc=fr" value="ROLE_SUPERVISOR" />
-		    </beans:map>
-		</beans:property>
-    </beans:bean>
+	</util:map>
+	
 	
 </beans:beans>
