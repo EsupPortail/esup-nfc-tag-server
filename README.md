@@ -65,4 +65,3 @@ You have to know a valid CSN.
 Take care to give a "LSB transformed csn" like given by usuals tag readers ...  
 The numeroId is given by EsupNfcTagServer.
 
-

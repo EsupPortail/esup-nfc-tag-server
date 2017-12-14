@@ -17,6 +17,7 @@
  */
 package org.esupportail.nfctag.service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
@@ -38,22 +39,27 @@ public class VersionApkService {
     
     @PostConstruct
     protected void extractVersionApk() throws IOException {
-		InputStream apkFile = new ClassPathResource("apk/esupnfctagdroid.apk").getInputStream();
-		ZipInputStream zin = new ZipInputStream(apkFile);
-		ZipEntry ze = zin.getNextEntry();
-		while (ze!=null && !"assets/versionApk.txt".equals(ze.getName())) {
-			log.trace("APK scan : " + ze.getName());
-		    zin.closeEntry();
-		    ze = zin.getNextEntry();
-		}
-		if(ze!=null && "assets/versionApk.txt".equals(ze.getName())) {
-			byte[] bytes = new byte[(int)ze.getSize()];
-			zin.read(bytes);
-			versionName = new String(bytes);
-		}
-		zin.closeEntry();
-		zin.close();
-		log.info("APK version is : " + versionName);
+    	try {
+			InputStream apkFile = new ClassPathResource("apk/esupnfctagdroid.apk").getInputStream();
+			log.info("esupnfctagdroid.apk found");
+			ZipInputStream zin = new ZipInputStream(apkFile);
+			ZipEntry ze = zin.getNextEntry();
+			while (ze!=null && !"assets/versionApk.txt".equals(ze.getName())) {
+				log.trace("APK scan : " + ze.getName());
+			    zin.closeEntry();
+			    ze = zin.getNextEntry();
+			}
+			if(ze!=null && "assets/versionApk.txt".equals(ze.getName())) {
+				byte[] bytes = new byte[(int)ze.getSize()];
+				zin.read(bytes);
+				versionName = new String(bytes);
+			}
+			zin.closeEntry();
+			zin.close();
+			log.info("APK version is : " + versionName);
+    	} catch(FileNotFoundException fnfe) {
+    		log.warn("esupnfctagdroid.apk not found");
+    	}
     }
     
 	public String getApkVersion() {

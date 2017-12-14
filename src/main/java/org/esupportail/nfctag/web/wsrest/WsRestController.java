@@ -8,6 +8,8 @@ import java.util.Random;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 @Controller
 public class WsRestController {
 
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
 	
 	/**
 	 * Example : 
@@ -31,6 +34,8 @@ public class WsRestController {
 	public String nfcRegisterTrusted(
 			@RequestBody Map<String, String> params,
 			@RequestHeader(required = false, value="User-Agent") String userAgent, Model uiModel) throws IOException, EsupNfcTagException {
+		
+		log.info("nfcRegisterTrusted called : " + params);
 		
 		String applicationName = params.get("applicationName");
 		String eppnInit = params.get("eppnInit");

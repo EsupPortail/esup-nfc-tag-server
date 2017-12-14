@@ -17,6 +17,7 @@
  */
 package org.esupportail.nfctag.service;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.zip.ZipEntry;
@@ -38,22 +39,27 @@ public class VersionJarService {
     
     @PostConstruct
     protected void extractVersionJar() throws IOException {
-		InputStream jarFile = new ClassPathResource("jar/esupnfctagdesktop.jar").getInputStream();
-		ZipInputStream zin = new ZipInputStream(jarFile);
-		ZipEntry ze = zin.getNextEntry();
-		while (ze!=null && !"versionJar.txt".equals(ze.getName())) {
-			log.trace("JAR scan : " + ze.getName());
-		    zin.closeEntry();
-		    ze = zin.getNextEntry();
-		}
-		if(ze!=null && "versionJar.txt".equals(ze.getName())) {
-			byte[] bytes = new byte[(int)ze.getSize()];
-			zin.read(bytes);
-			versionName = new String(bytes);
-		}
-		zin.closeEntry();
-		zin.close();
-		log.info("JAR version is : " + versionName);
+    	try {
+			InputStream jarFile = new ClassPathResource("jar/esupnfctagdesktop.jar").getInputStream();
+			log.info("esupnfctagdesktop.jar found");
+			ZipInputStream zin = new ZipInputStream(jarFile);
+			ZipEntry ze = zin.getNextEntry();
+			while (ze!=null && !"versionJar.txt".equals(ze.getName())) {
+				log.trace("JAR scan : " + ze.getName());
+			    zin.closeEntry();
+			    ze = zin.getNextEntry();
+			}
+			if(ze!=null && "versionJar.txt".equals(ze.getName())) {
+				byte[] bytes = new byte[(int)ze.getSize()];
+				zin.read(bytes);
+				versionName = new String(bytes);
+			}
+			zin.closeEntry();
+			zin.close();
+			log.info("JAR version is : " + versionName);
+    	} catch(FileNotFoundException fnfe) {
+    		log.warn("esupnfctagdesktop.jar not found");
+    	}
     }
     
 	public String getJarVersion() {

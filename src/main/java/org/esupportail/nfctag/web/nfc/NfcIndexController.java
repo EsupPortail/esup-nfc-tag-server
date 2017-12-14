@@ -17,6 +17,7 @@
  */
 package org.esupportail.nfctag.web.nfc;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
@@ -108,23 +109,35 @@ public class NfcIndexController {
 	}
 	
 	@RequestMapping(value = "/download-apk")
-	public void downloadApk(Model uiModel, HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String contentType = "application/vnd.android.package-archive";
-        response.setContentType(contentType);
-        ClassPathResource apkFile = new ClassPathResource("apk/esupnfctagdroid.apk");
-        response.setContentLength((int)apkFile.contentLength());
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + apkFile.getFilename() + "\"");
-        IOUtils.copy(apkFile.getInputStream(), response.getOutputStream());
+	public String downloadApk(Model uiModel, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		try {
+			String contentType = "application/vnd.android.package-archive";
+	        response.setContentType(contentType);
+	        ClassPathResource apkFile = new ClassPathResource("apk/esupnfctagdroid.apk");
+	        response.setContentLength((int)apkFile.contentLength());
+	        response.setHeader("Content-Disposition", "attachment; filename=\"" + apkFile.getFilename() + "\"");
+	        IOUtils.copy(apkFile.getInputStream(), response.getOutputStream());
+	        return null;
+		} catch(FileNotFoundException fnfe) {
+			uiModel.addAttribute("notAvailableMessage", "L'application APK Android n'est actuellement pas disponible");
+			return "apkJarNotAvailable";
+		}
 	}
 
 	@RequestMapping(value = "/download-jar")
-	public void downloadJar(Model uiModel, HttpServletRequest request, HttpServletResponse response) throws IOException {
-		String contentType = "application/vnd.android.package-archive";
-        response.setContentType(contentType);
-        ClassPathResource apkFile = new ClassPathResource("jar/esupnfctagdesktop.jar");
-        response.setContentLength((int)apkFile.contentLength());
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + apkFile.getFilename() + "\"");
-        IOUtils.copy(apkFile.getInputStream(), response.getOutputStream());
+	public String downloadJar(Model uiModel, HttpServletRequest request, HttpServletResponse response) throws IOException {
+		try {
+			String contentType = "application/vnd.android.package-archive";
+	        response.setContentType(contentType);
+	        ClassPathResource apkFile = new ClassPathResource("jar/esupnfctagdesktop.jar");
+	        response.setContentLength((int)apkFile.contentLength());
+	        response.setHeader("Content-Disposition", "attachment; filename=\"" + apkFile.getFilename() + "\"");
+	        IOUtils.copy(apkFile.getInputStream(), response.getOutputStream());
+	        return null;
+		} catch(FileNotFoundException fnfe) {
+			uiModel.addAttribute("notAvailableMessage", "L'application Java n'est actuellement pas disponible");
+			return "apkJarNotAvailable";
+		}
 	}
 	
 	/**
