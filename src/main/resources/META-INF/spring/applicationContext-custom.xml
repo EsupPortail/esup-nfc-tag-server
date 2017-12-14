@@ -36,92 +36,33 @@
     
     <bean id="dummyExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtDummy"/>
     
-    <bean id="multipassExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
-    	<property name="isTagableUrl" value="https://multipass.univ-ville.fr/wsrest/leocarte/livraison/isTagable"/>
-    	<property name="validateTagUrl" value="https://multipass.univ-ville.fr/wsrest/leocarte/livraison/validateTag"/>
-    	<property name="getLocationsUrl" value="https://multipass.univ-ville.fr/wsrest/leocarte/locations"/>
-    	<property name="description" value="Web Service multipass de livraison leocarte"/>
-    </bean>
-
     <bean id="esupSgcLivraisonExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
-    	<property name="isTagableUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/isTagable"/>
-    	<property name="validateTagUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/validateTag"/>
-    	<property name="getLocationsUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/locationsLivreur"/>
+    	<property name="isTagableUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/isTagable"/>
+    	<property name="validateTagUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/validateTag"/>
+    	<property name="getLocationsUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/locationsLivreur"/>
     	<property name="description" value="Web Service livraison SGC"/>
     </bean>
 
-    <bean id="carteCultureExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
-    	<property name="isTagableUrl" value="https://carte-culture-test.univ-ville.fr/nfc-ws/isTagable"/>
-    	<property name="validateTagUrl" value="https://carte-culture-test.univ-ville.fr/nfc-ws/validateTag"/>
-    	<property name="getLocationsUrl" value="https://carte-culture-test.univ-ville.fr/nfc-ws/getLocations"/>
-    	<property name="description" value="Web Service Carte Culture"/>
-    	<property name="backgroundColor" value="rgb(121, 119, 0)"/>
-    	<property name="header" value="https://carte-culture-test.univ-ville.fr/resources/images/logo.jpg"/>    	
-    </bean>
-
-
-    <bean id="gereleclesExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
-    	<property name="isTagableUrl" value="https://gerelecles.univ-ville.fr/surveillant/istagable.php"/>
-    	<property name="validateTagUrl" value="https://gerelecles.univ-ville.fr/surveillant/validatetag.php"/>
-    	<property name="getLocationsUrl" value="https://gerelecles.univ-ville.fr/surveillant/getlocations.php"/>
-    	<property name="description" value="Web Service Gerelecles du SUN"/>
-    	<!--property name="backgroundColor" value="rgb(121, 119, 0)"/-->
-    	<property name="header" value="https://gerelecles.univ-ville.fr/images/logo.png"/>    	
-    </bean>
  
     <bean id="tagIdCheckApiLdap" class="org.esupportail.nfctag.service.api.impl.TagIdCheckLdap">
     	<property name="desfireSuffix" value="univ-ville.fr"/>
-		<property name="description" value="via LDAP"/>
+	<property name="description" value="via LDAP"/>
     </bean>
  
-    <bean id="tagIdCheckApiDonuts" class="org.esupportail.nfctag.service.api.impl.TagIdCheckSql">
-		<property name="dataSource" ref="donutsDataSource" />
-		<property name="csnAuthSql" value="SELECT * FROM EasyId WHERE csn=? AND statut=1" />
-		<property name="desfireAuthSql" value="select * from EasyId where identifiantP2S=? and statut=1" />
-		<property name="description" value="via Donuts"/>
-    </bean>	
-
-    <bean id="tagIdCheckApiMultipass" class="org.esupportail.nfctag.service.api.impl.TagIdCheckRestWs">
-		<property name="tagIdCheckUrl" value="https://multipass.univ-ville.fr/wsrest/leocarte/tagIdCheck"/>
-		<property name="idFromEppnInitUrl" value="https://multipass.univ-ville.fr/wsrest/leocarte/idFromEppnInit"/>
-		<property name="description" value="via Multipass"/>
-    </bean>
-
     <bean id="tagIdCheckApiDummy" class="org.esupportail.nfctag.service.api.impl.TagIdCheckDummyWs">
     	<property name="description" value="TagIdCheckDummy"/>
     </bean>
 
-    <bean id="tagIdCheckApiCarteCulture" class="org.esupportail.nfctag.service.api.impl.TagIdCheckRestWs">
-		<property name="tagIdCheckUrl" value="https://carte-culture-test.univ-ville.fr/nfc-ws/tagIdCheck"/>
-		<property name="description" value="via Carte Culture"/>
-    </bean>
-        
-    <bean id="csnAuthConfig" class="org.esupportail.nfctag.service.api.impl.CsnAuthConfig">
+     <bean id="csnAuthConfig" class="org.esupportail.nfctag.service.api.impl.CsnAuthConfig">
     	<property name="description" value="Authentification CSN"/>
     </bean>
     
-    <bean id="desfireAuthConfigComue" class="org.esupportail.nfctag.service.api.impl.DesfireReadConfig">
-		<property name="desfireKeyNumber" value="01"/>
-		<property name="desfireFileNumber" value="00"/>
-		<property name="desfireAppId" value="F585C1"/>
-		<property name="desfireFileSize" value="1F0000"/>
-		<property name="desfireFileOffset" value="000000"/>
-		<property name="desfireKey" value="00000000000000000000000000000000"/> 
-		<property name="description" value="Authentification DESFIRE COMUE"/>
-    </bean>
-
-    <bean id="donutsDataSource" class="org.springframework.jndi.JndiObjectFactoryBean">
-		<property name="jndiName" value="java:comp/env/jdbc/donutsDb" />
-		<property name="lookupOnStartup" value="false"/>
-		<property name="proxyInterface" value="javax.sql.DataSource"/>
-    </bean>
-
     <bean id="ldapContextSourceUnivRouen"
 		class="org.springframework.ldap.core.support.LdapContextSource">
 		<property name="url" value="ldap://ldap.univ-ville.fr" />
 		<property name="base" value="dc=univ-ville,dc=fr" />
-		<property name="userDn" value="cn=esup-nfc,dc=univ-ville,dc=fr" />
-		<property name="password" value="passeldap" />
+		<property name="userDn" value="cn=admin,dc=univ-ville,dc=fr" />
+		<property name="password" value="esup" />
 	</bean>    
 
 
@@ -139,30 +80,30 @@
     <!-- ##########  ESUP SGC PART ############ -->
     
     <bean id="esupSgcExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
-    	<property name="isTagableUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/isTagable"/>
-    	<property name="validateTagUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/validateTag"/>
-    	<property name="getLocationsUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/locations"/>
+    	<property name="isTagableUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/isTagable"/>
+    	<property name="validateTagUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/validateTag"/>
+    	<property name="getLocationsUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/locations"/>
     	<property name="description" value="Web Service Esup SGC"/>
     </bean>
 
 	<bean id="esupSgcUpdateExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
-        <property name="isTagableUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/isTagable"/>
-        <property name="validateTagUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/validateTag"/>
-        <property name="getLocationsUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/locationsUpdater"/>
+        <property name="isTagableUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/isTagable"/>
+        <property name="validateTagUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/validateTag"/>
+        <property name="getLocationsUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/locationsUpdater"/>
         <property name="description" value="Web Service Update Esup SGC"/>
     </bean>
 
 	<bean id="esupSgcSearchExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
-        <property name="isTagableUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/isTagable"/>
-        <property name="validateTagUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/validateTag"/>
-        <property name="getLocationsUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/locationsSearch"/>
+        <property name="isTagableUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/isTagable"/>
+        <property name="validateTagUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/validateTag"/>
+        <property name="getLocationsUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/locationsSearch"/>
         <property name="description" value="Web Service Search Esup SGC"/>
     </bean>
 
     <bean id="tagIdCheckApiEsupSgc" class="org.esupportail.nfctag.service.api.impl.TagIdCheckRestWs">
-		<property name="tagIdCheckUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/tagIdCheck"/>
-		<property name="idFromEppnInitUrl" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/idFromEppnInit"/>
+		<property name="tagIdCheckUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/tagIdCheck"/>
+		<property name="idFromEppnInitUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/idFromEppnInit"/>
 		<property name="description" value="via Esup SGC"/>
     </bean>
-    
+
 </beans>
