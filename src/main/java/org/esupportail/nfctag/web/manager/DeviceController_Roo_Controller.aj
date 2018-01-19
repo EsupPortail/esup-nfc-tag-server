@@ -9,6 +9,8 @@ import javax.validation.Valid;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.web.manager.DeviceController;
+import org.joda.time.format.DateTimeFormat;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -20,19 +22,9 @@ import org.springframework.web.util.WebUtils;
 
 privileged aspect DeviceController_Roo_Controller {
     
-    @RequestMapping(method = RequestMethod.POST, produces = "text/html")
-    public String DeviceController.create(@Valid Device device, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
-        if (bindingResult.hasErrors()) {
-            populateEditForm(uiModel, device);
-            return "manager/devices/create";
-        }
-        uiModel.asMap().clear();
-        device.persist();
-        return "redirect:/manager/devices/" + encodeUrlPathSegment(device.getId().toString(), httpServletRequest);
-    }
-    
     @RequestMapping(value = "/{id}", produces = "text/html")
     public String DeviceController.show(@PathVariable("id") Long id, Model uiModel) {
+        addDateTimeFormatPatterns(uiModel);
         uiModel.addAttribute("device", Device.findDevice(id));
         uiModel.addAttribute("itemId", id);
         return "manager/devices/show";
@@ -65,8 +57,14 @@ privileged aspect DeviceController_Roo_Controller {
         return "redirect:/manager/devices";
     }
     
+    void DeviceController.addDateTimeFormatPatterns(Model uiModel) {
+        uiModel.addAttribute("device_createdate_date_format", DateTimeFormat.patternForStyle("MM", LocaleContextHolder.getLocale()));
+        uiModel.addAttribute("device_lastusedate_date_format", DateTimeFormat.patternForStyle("MM", LocaleContextHolder.getLocale()));
+    }
+    
     void DeviceController.populateEditForm(Model uiModel, Device device) {
         uiModel.addAttribute("device", device);
+        addDateTimeFormatPatterns(uiModel);
         uiModel.addAttribute("applications", Application.findAllApplications());
     }
     

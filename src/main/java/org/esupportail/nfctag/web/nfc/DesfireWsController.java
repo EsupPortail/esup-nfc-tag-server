@@ -91,7 +91,6 @@ public class DesfireWsController {
 		NfcResultBean nfcResultBean = new NfcResultBean();
 				
 		desfireService.setNumeroId(numeroId);
-		//String command = "";
 		
 		String function = "READ";
 		if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireReadConfig){
@@ -100,20 +99,6 @@ public class DesfireWsController {
 			function = "WRITE";
 		}else if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireUpdateConfig){
 			function = "UPDATE";
-		}
-		
-		if("WRITE".equals(function)) {
-			DesfireTag desfireTag =  desfireService.getDesfireTagToWrite();
-			String desfireId = desfireTag.getTagWriteApi().getIdFromEppnInit(eppnInit);
-			if(desfireId == null) {
-				log.info("No Tag id selected for "  + eppnInit + " but it want to write one.");
-				TagError tagError = new TagError();
-				nfcResultBean.setCode(CODE.ERROR);
-				nfcResultBean.setFullApdu(null);
-				nfcResultBean.setMsg("Aucun individu sélectionné");		
-				errorLongPoolController.handleError(tagError);
-				return nfcResultBean;
-			}
 		}
 		
 		if("ERROR".equals(result)) {
@@ -141,7 +126,7 @@ public class DesfireWsController {
 			log.trace("READ");
 			nfcResultBean = desfireService.readDesfireId(result);
 		} else if("WRITE".equals(function)) {
-			nfcResultBean = desfireService.writeCard(result, eppnInit);
+			nfcResultBean = desfireService.writeCard(result, eppnInit, cardId);
 			if(nfcResultBean.getAction().equals(Action.write)){
 				write = true;
 			}
@@ -152,7 +137,6 @@ public class DesfireWsController {
 			}
 		}
 		
-		//authResultBean.setMsg(command);
 		log.debug("next command for step " + desfireService.getStep() + " must be : " + nfcResultBean.getFullApdu());
 		
 		if("END".equals(nfcResultBean.getFullApdu())) {
@@ -168,6 +152,7 @@ public class DesfireWsController {
 				response = DESFireEV1Service.Response.getResponse(Integer.parseInt(msg, 16));
 			}
 			log.trace("Final response  : " + response);
+			TagType tagType = TagType.CSN;
 			if(response.equals(DESFireEV1Service.Response.OPERATION_OK)){
 				String desfireId = "";
 				if("READ".equals(function)) {
@@ -175,20 +160,19 @@ public class DesfireWsController {
 					log.trace("desfireId crypted  : " + result);
 					desfireId = desfireService.decriptIDP2S(result);
 					log.trace("desfireId descrypted  : " + desfireId);
+					tagType = TagType.DESFIRE;
 				} else if ("WRITE".equals(function)) {
 					DesfireTag desfireTag =  desfireService.getDesfireTagToWrite();
-					desfireId = desfireTag.getTagWriteApi().getIdFromEppnInit(eppnInit);
 					if(write) nfcResultBean.setAction(Action.write);
 				} else if ("UPDATE".equals(function)) {
 					DesfireTag desfireTag =  desfireService.getDesfireTagToUpdate();
-					desfireId = desfireTag.getTagUpdateApi().getIdFromCsn(cardId);
 					if(update) nfcResultBean.setAction(Action.update);
 				}
 				boolean validate = true;
 				if(nfcResultBean.getAction().equals(Action.none)){
 					validate = false;
 				}
-				TagLog tagLog = tagAuthService.auth(TagType.DESFIRE, desfireId, numeroId, cardId, validate);
+				TagLog tagLog = tagAuthService.auth(tagType, desfireId, numeroId, cardId, validate);
 				liveController.handleTagLog(tagLog);
 				nfcResultBean.setMsg(tagLog.getFirstname() + " " + tagLog.getLastname());
 

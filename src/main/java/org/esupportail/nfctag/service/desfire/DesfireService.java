@@ -118,7 +118,7 @@ public class DesfireService {
 		return desfireUpdateConfig.getDesfireTag();
 	}
 	
-	public NfcResultBean writeCard(String result, String eppnInit){
+	public NfcResultBean writeCard(String result, String eppnInit, String csn){
 		NfcResultBean authResultBean = new NfcResultBean();
 		authResultBean.setAction(NfcResultBean.Action.none);
 		authResultBean.setCode(CODE.OK);
@@ -251,14 +251,11 @@ public class DesfireService {
 					desfireFlowStep.writeStep = 0;
 					break;
 				case WRITE_FILE:	
-					if(desfireFlowStep.writeStep==0) {
-						// authResultBean = this.authApp(aid, result, appKey, (byte) 0x00, KeyType.AES); - no need here
-					}
 					if(authResultBean.getFullApdu() == null || desfireFlowStep.writeStep>0) {
 						if(desfireFlowStep.writeStep==0 || result.endsWith("AF")) {
 							desfireFlowStep.authStep = 1;
 							TagWriteApi tagWriteApi = desfireFile.getTagWriteApi();
-							String desfireId = tagWriteApi.getIdFromEppnInit(eppnInit);
+							String desfireId = tagWriteApi.getIdFromCsn(csn);
 							log.debug("Write by " + eppnInit + " - Write in file " + fileNo +" : " + desfireId);
 							authResultBean.setFullApdu(desFireEV1Service.writeData(fileNo, desfireId));
 							authResultBean.setSize(16);						
@@ -266,7 +263,7 @@ public class DesfireService {
 						} else {
 							desfireFlowStep.writeStep = 0;
 							desfireFlowStep.action = Action.CHANGE_FILE_KEY_SET;
-							authResultBean = writeCard(result, eppnInit);
+							authResultBean = writeCard(result, eppnInit, csn);
 						} 
 					} 
 					break;

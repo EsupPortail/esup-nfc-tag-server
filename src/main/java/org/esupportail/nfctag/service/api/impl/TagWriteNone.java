@@ -17,23 +17,17 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
-import java.util.Date;
-
 import org.esupportail.nfctag.service.api.TagWriteApi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
 public class TagWriteNone implements TagWriteApi {
 
-	private final Logger log = LoggerFactory.getLogger(getClass());
-	
     protected RestTemplate restTemplate;
     
-    protected String idFromEppnInitUrl;
+    protected String idFromCsnUrlTemplate;
 	
-	public void setIdFromEppnInitUrl(String idFromEppnInitUrl) {
-		this.idFromEppnInitUrl = idFromEppnInitUrl;
+	public void setIdFromCsnUrlTemplate(String idFromCsnUrlTemplate) {
+		this.idFromCsnUrlTemplate = idFromCsnUrlTemplate;
 	}
 
 	public TagWriteNone() {
@@ -41,7 +35,7 @@ public class TagWriteNone implements TagWriteApi {
 	}
 
 	@Override
-	public String getIdFromEppnInit(String eppnInit) {
+	public String getIdFromCsn(String csn) {
 		return "00";
 	}
 	

@@ -18,6 +18,7 @@
 package org.esupportail.nfctag.service.api.impl;
 
 import java.net.URI;
+import java.text.MessageFormat;
 
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
@@ -34,10 +35,15 @@ public class TagWriteRestWs implements TagWriteApi {
 	
     protected RestTemplate restTemplate;
     
-    protected String idFromEppnInitUrl;
+    protected String idFromCsnUrlTemplate;
 	
-	public void setIdFromEppnInitUrl(String idFromEppnInitUrl) {
-		this.idFromEppnInitUrl = idFromEppnInitUrl;
+    protected String getIdFromCsnUrl(String csn){
+    	String url = MessageFormat.format(idFromCsnUrlTemplate, csn);
+    	return url;
+    }
+    
+	public void setIdFromCsnUrlTemplate(String idFromCsnUrlTemplate) {
+		this.idFromCsnUrlTemplate = idFromCsnUrlTemplate;
 	}
 
 	public TagWriteRestWs() {
@@ -45,12 +51,11 @@ public class TagWriteRestWs implements TagWriteApi {
 	}
 
 	@Override
-	public String getIdFromEppnInit(String eppnInit) {
-		URI targetUrl= UriComponentsBuilder.fromUriString(idFromEppnInitUrl)
-			    .queryParam("eppnInit", eppnInit)    
+	public String getIdFromCsn(String csn) {
+		URI targetUrl= UriComponentsBuilder.fromUriString(getIdFromCsnUrl(csn))
 			    .build()
 			    .toUri();
-		log.trace("Call " + idFromEppnInitUrl + " with eppn = " + eppnInit);
+		log.trace("Call " + getIdFromCsnUrl(csn) + " with csn = " + csn);
 
 		String id = null;
 		try {

@@ -21,6 +21,6 @@ import java.util.Date;
 
 public interface TagWriteApi {
 
-	String getIdFromEppnInit(String eppnInit);
+	String getIdFromCsn(String csn);
 
 }

@@ -65,6 +65,22 @@ privileged aspect Device_Roo_JavaBean {
         this.location = location;
     }
     
+    public Date Device.getCreateDate() {
+        return this.createDate;
+    }
+    
+    public void Device.setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+    
+    public Date Device.getLastUseDate() {
+        return this.lastUseDate;
+    }
+    
+    public void Device.setLastUseDate(Date lastUseDate) {
+        this.lastUseDate = lastUseDate;
+    }
+    
     public Application Device.getApplication() {
         return this.application;
     }

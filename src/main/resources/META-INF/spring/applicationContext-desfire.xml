@@ -34,9 +34,8 @@
                    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
     
     
-    
     <bean id="idp2sTagWriteEsupSgc" class="org.esupportail.nfctag.service.api.impl.TagWriteRestWs">
-               <property name="idFromEppnInitUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/idFromEppnInit"/>
+	<property name="idFromCsnUrlTemplate" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/idFromCsn?csn={0}&amp;appName=access-control"/>
     </bean>
 
     <bean id="daltonTagEsupSgc" class="org.esupportail.nfctag.beans.DesfireTag" p:tagWriteApi-ref="idp2sTagWriteEsupSgc">
@@ -47,5 +46,4 @@
       <property name="description" value="Ecriture ESUP SGC"/>
     </bean>
 
-    
 </beans>

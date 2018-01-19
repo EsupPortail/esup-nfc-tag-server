@@ -21,6 +21,7 @@ import java.util.Date;
 import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
 import org.springframework.roo.addon.tostring.RooToString;
@@ -55,6 +56,12 @@ public class Device {
     
     private String location;
     
+    @DateTimeFormat(style = "MM")
+    private Date createDate;
+    
+    @DateTimeFormat(style = "MM")
+    private Date lastUseDate;
+    
     @ManyToOne
     private Application application;
     
@@ -64,5 +71,5 @@ public class Device {
     public String getApplicationName(){
     	return this.getApplication()!=null ? this.getApplication().getName() : "";
     }
-
+    
 }

@@ -15,10 +15,6 @@ public class DesfireTag implements Serializable {
 
 	private List<DesfireApplication> applications;
 	
-	TagWriteApi tagWriteApi = new TagWriteNone();
-
-	TagUpdateApi tagUpdateApi = new TagUpdateNone();
-	
 	Boolean formatBeforeWrite = false;
 	
 	/**
@@ -64,22 +60,6 @@ public class DesfireTag implements Serializable {
 
 	public void setApplications(List<DesfireApplication> applications) {
 		this.applications = applications;
-	}
-
-	public TagWriteApi getTagWriteApi() {
-		return tagWriteApi;
-	}
-
-	public void setTagWriteApi(TagWriteApi tagWriteApi) {
-		this.tagWriteApi = tagWriteApi;
-	}
-
-	public void setTagUpdateApi(TagUpdateApi tagUpdateApi) {
-		this.tagUpdateApi = tagUpdateApi;
-	}
-	
-	public TagUpdateApi getTagUpdateApi() {
-		return tagUpdateApi;
 	}
 	
 	public Boolean getFormatBeforeWrite() {

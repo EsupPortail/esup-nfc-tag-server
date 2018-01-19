@@ -18,6 +18,7 @@
 package org.esupportail.nfctag.web.nfc;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -159,6 +160,7 @@ public class NfcRegisterController {
 			} else{
 				device.setValidateAuthWoConfirmation(false);
 			}
+			device.setCreateDate(new Date());
 			device.persist();
 		} else {
 			Device tel = Device.findDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)

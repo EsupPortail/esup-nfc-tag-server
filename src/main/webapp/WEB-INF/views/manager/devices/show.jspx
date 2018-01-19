@@ -4,8 +4,8 @@
     <jsp:output omit-xml-declaration="yes"/>
     <h1>
         <spring:message code="label_org_esupportail_nfctag_domain_device"/> : 
-        <a href="/manager/taglogs?searchBySelected=numeroId&amp;searchString=${device.numeroId}" >${device.numeroId}</a>
-        </h1>
+        <a href="/manager/taglogs?searchBySelected=numeroId&amp;searchString=${device.numeroId}">${device.numeroId}</a>
+    </h1>
     <page:show id="ps_org_esupportail_nfctag_domain_Device" object="${device}" path="/manager/devices" z="user-managed">
         <dl class="dl-horizontal">
             <field:display field="numeroId" id="s_org_esupportail_nfctag_domain_Device_numeroId" object="${device}" z="user-managed"/>
@@ -16,6 +16,8 @@
             <field:display field="location" id="s_org_esupportail_nfctag_domain_Device_location" object="${device}" z="user-managed"/>
             <field:display field="application" id="s_org_esupportail_nfctag_domain_Device_application" object="${device}" z="user-managed"/>
             <field:display field="validateAuthWoConfirmation" id="s_org_esupportail_nfctag_domain_Device_validateAuthWoConfirmation" object="${device}" z="user-managed"/>
+	        <field:display date="true" dateTimePattern="${device_createdate_date_format}" field="createDate" id="s_org_esupportail_nfctag_domain_Device_createDate" object="${device}" z="xdyAHuhFC6ih7Bt4ZFH35jdQA0U="/>
+        	<field:display date="true" dateTimePattern="${device_lastusedate_date_format}" field="lastUseDate" id="s_org_esupportail_nfctag_domain_Device_lastUseDate" object="${device}" z="2QWSvm73Jkd8E0D4pzP9eiipTMc="/>
         </dl>
         <field:display date="true" dateTimePattern="${device_lastpolldate_date_format}" field="lastPollDate" id="s_org_esupportail_nfctag_domain_Device_lastPollDate" object="${device}" render="false" z="user-managed"/>
     </page:show>

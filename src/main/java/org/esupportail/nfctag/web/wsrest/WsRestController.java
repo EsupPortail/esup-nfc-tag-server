@@ -1,6 +1,7 @@
 package org.esupportail.nfctag.web.wsrest;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -27,7 +28,7 @@ public class WsRestController {
 	
 	/**
 	 * Example : 
-	 * curl -v -X POST -H "Content-Type: application/json" -d '{"eppnInit":"bonamvin@univ-rouen.fr","userAgent":"arduino-prototype","applicationName":"SGC","location":"Ecriture"}' http://localhost:8080/wsrest/register
+	 * curl -v -X POST -H "Content-Type: application/json" -d '{"eppnInit":"joe.dalton@univ-ville.fr","userAgent":"arduino-prototype","applicationName":"SGC","location":"Ecriture"}' http://localhost:8080/wsrest/register
 	 */
 	@RequestMapping(value = "/register", method=RequestMethod.POST)
 	@ResponseBody
@@ -60,6 +61,7 @@ public class WsRestController {
 			if(imei != null) device.setImei(imei);
 			if(macAddress != null) device.setMacAddress(macAddress);
 			if(userAgent != null) device.setUserAgent(userAgent);
+			device.setCreateDate(new Date());
 			device.persist();
 		} else {
 			Device tel = Device.findDevicesByLocationAndEppnInit(location, eppnInit)

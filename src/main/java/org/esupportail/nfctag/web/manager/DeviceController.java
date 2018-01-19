@@ -18,14 +18,17 @@
 package org.esupportail.nfctag.web.manager;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.esupportail.nfctag.domain.AppLocation;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.ApplicationsService;
-import org.esupportail.nfctag.service.api.impl.AppliExtRestWs;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,8 +39,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -53,6 +58,18 @@ public class DeviceController {
 	@Autowired
 	private ApplicationsService applicationsService;
 	
+    @RequestMapping(method = RequestMethod.POST, produces = "text/html")
+    public String create(@Valid Device device, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
+        if (bindingResult.hasErrors()) {
+            populateEditForm(uiModel, device);
+            return "manager/devices/create";
+        }
+        uiModel.asMap().clear();
+        device.setCreateDate(new Date());
+        device.persist();
+        return "redirect:/manager/devices/" + encodeUrlPathSegment(device.getId().toString(), httpServletRequest);
+    }
+    
     @RequestMapping(value = "/numeroid/{numeroId}", produces = "text/html")
     public String numeroId(@PathVariable("numeroId") String numeroId, Model uiModel) {
     	try{

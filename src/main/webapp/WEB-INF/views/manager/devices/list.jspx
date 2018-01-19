@@ -80,6 +80,8 @@
         <table:column id="c_org_esupportail_nfctag_domain_Device_userAgent" render="false" property="userAgent" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_Device_application" sort="true" property="applicationName" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_Device_location" property="location" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_Device_validateAuthWoConfirmation" sort="true" property="validateAuthWoConfirmation" z="user-managed"/>
+        <table:column label="vwoc" id="c_org_esupportail_nfctag_domain_Device_validateAuthWoConfirmation" sort="true" property="validateAuthWoConfirmation" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_Device_createDate" sort="true" property="createDate" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_Device_lastUseDate" sort="true" property="lastUseDate" z="user-managed"/>
     </table:table>
 </div>

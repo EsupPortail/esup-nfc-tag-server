@@ -53,6 +53,8 @@ public class TagAuthService {
 	
 	public TagLog auth(TagType tagType, String tagId, String numeroId, String cardId, Boolean validate) throws EsupNfcTagException {
 		Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+		device.setLastUseDate(new Date());
+		device.merge();
 		Application application = device.getApplication();
 		TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(application.getTagIdCheck());
 		if (tagIdCheckApi == null) {
