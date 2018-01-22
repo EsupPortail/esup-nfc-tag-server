@@ -38,7 +38,7 @@
 	<property name="idFromCsnUrlTemplate" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/idFromCsn?csn={0}&amp;appName=access-control"/>
     </bean>
 
-    <bean id="daltonTagEsupSgc" class="org.esupportail.nfctag.beans.DesfireTag" p:tagWriteApi-ref="idp2sTagWriteEsupSgc">
+    <bean id="daltonTagEsupSgc" class="org.esupportail.nfctag.beans.DesfireTag">
     </bean>
 
     <bean id="desfireAuthConfigDaltonWriteEsupSgc" class="org.esupportail.nfctag.service.api.impl.DesfireWriteConfig">
