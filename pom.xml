@@ -597,35 +597,51 @@
 				</dependencies>
 			</plugin>
 
-                        <plugin>
-                            <groupId>com.mycila.maven-license-plugin</groupId>
-                            <artifactId>maven-license-plugin</artifactId>
-                            <version>1.9.0</version>
-                            <configuration>
-                                <header>src/etc/header.txt</header>
-                                <includes>
-                                    <include>src/main/java/org/esupportail/**/*.java</include>
-                                    <include>src/main/webapp/WEB-INF</include>
-                                    <include>src/main/webapp/css/esupnfctag.css</include>
-                                    <include>src/main/webapp/js/esupnfctag.js</include>
-                                    <include>src/main/resources/**</include>
-                                </includes>
-                            </configuration>
-                        </plugin>
-                        <plugin>
-                            <groupId>org.jasig.maven</groupId>
-                            <artifactId>maven-notice-plugin</artifactId>
-                            <version>1.0.4</version>
-                            <configuration>
-                                <noticeTemplate>src/etc/NOTICE.template</noticeTemplate>
-                                <licenseMapping>
-                                    <param>https://source.jasig.org/licenses/license-mappings.xml</param>
-                                    <param>src/etc/license-mappings.xml</param>
-                                </licenseMapping>
-                            </configuration>
-                        </plugin>
+            <plugin>
+                <groupId>com.mycila.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>1.9.0</version>
+                <configuration>
+                    <header>src/etc/header.txt</header>
+                    <includes>
+                        <include>src/main/java/org/esupportail/**/*.java</include>
+                        <include>src/main/webapp/WEB-INF</include>
+                        <include>src/main/webapp/css/esupnfctag.css</include>
+                        <include>src/main/webapp/js/esupnfctag.js</include>
+                        <include>src/main/resources/**</include>
+                    </includes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jasig.maven</groupId>
+                <artifactId>maven-notice-plugin</artifactId>
+                <version>1.0.4</version>
+                <configuration>
+                    <noticeTemplate>src/etc/NOTICE.template</noticeTemplate>
+                    <licenseMapping>
+                        <param>https://source.jasig.org/licenses/license-mappings.xml</param>
+                        <param>src/etc/license-mappings.xml</param>
+                    </licenseMapping>
+                </configuration>
+            </plugin>
 
-
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>1.2.1</version>
+				<executions>
+					<execution>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<executable>java</executable>
+					<mainClass>org.esupportail.nfctag.batch.BatchMain</mainClass>
+					<classpathScope>compile</classpathScope>
+				</configuration>
+			</plugin>
 
 		</plugins>
 	</build>

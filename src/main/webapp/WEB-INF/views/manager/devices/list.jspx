@@ -15,41 +15,17 @@
     </h1>
     <form action="devices" class="form-inline">
         <div class="input-group">
-            <div class="input-group-addon"><spring:message code="label_org_esupportail_nfctag_domain_device_application"/></div>
+            <div class="input-group-addon"><spring:message code="title_filter"/></div>
             <div class="input-group-btn">
-                <button aria-expanded="true" aria-haspopup="true" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="dropdownMenu1" type="button">
-                    <c:choose>
-                        <c:when test="${not empty application}">
-          					${application.name}
-       					</c:when>
-                        <c:otherwise>
-          				-- Choisir --
-       					</c:otherwise>
-                    </c:choose>
-                    <span class="caret"/>
-                </button>
-                <ul aria-labelledby="dropdownMenu1" class="dropdown-menu">
+                <select class="selectpicker" id="searchAttribut" name="applicationFilter" onchange="submit()">
+                	<option value="">-- Application --</option>
                     <c:forEach items="${applications}" var="application">
-                        <li>
-                            <a href="devices?applicationFilter=${application.id}">${application.name}</a>
-                        </li>
-                    </c:forEach>
-                </ul>
-            </div>
-        </div>
-        
-        <div class="input-group">
-            <div class="input-group-addon"><spring:message code="title_search_by"/></div>
-            <div class="input-group-btn">
-                <select class="selectpicker" id="searchAttribut" name="searchBySelected">
-                	<option value="">&amp;nbsp;</option>
-                    <c:forEach items="${listSearchBy}" var="searchBy">
                     <c:choose>
-                    <c:when test="${searchBySelected eq searchBy }">
-                    	<option value="${searchBy}" selected="selected"><spring:message code="label_org_esupportail_nfctag_domain_device_${fn:toLowerCase(searchBy)}"/></option>
+                    <c:when test="${applicationFilter eq application.name}">
+                    	<option value="${application.name}" selected="selected">${application.name}</option>
                     </c:when>
                     <c:otherwise>
-                    	<option value="${searchBy}"><spring:message code="label_org_esupportail_nfctag_domain_device_${fn:toLowerCase(searchBy)}"/></option>
+                    	<option value="${application.name}">${application.name}</option>
                     </c:otherwise>
                     </c:choose>
                     </c:forEach>
@@ -57,6 +33,7 @@
             </div>
         </div>
         <div class="input-group">
+        <div class="input-group-addon"><spring:message code="title_search"/></div>
             <div class="input-group-btn">
                 <input class="form-control" data-provide="typeahead" id="multiSearch" name="searchString" type="text" value="${searchString}"/>
             </div>

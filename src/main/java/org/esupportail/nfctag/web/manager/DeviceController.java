@@ -21,12 +21,21 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Join;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.esupportail.nfctag.domain.AppLocation;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
+import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.ApplicationsService;
 import org.slf4j.Logger;
@@ -84,41 +93,63 @@ public class DeviceController {
  
     @RequestMapping(produces = "text/html")
     public String list(
-    		@RequestParam(value = "applicationFilter", required = false) Long applicationFilter,
-    		@RequestParam(value = "searchBySelected", required = false) String searchBySelected,
     		@RequestParam(value = "searchString", required = false) String searchString,
+    		@RequestParam(value = "applicationFilter", required = false) String applicationFilter,
     		@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "size", required = false) Integer size, @RequestParam(value = "sortFieldName", required = false) String sortFieldName, @RequestParam(value = "sortOrder", required = false) String sortOrder, Model uiModel) {
 
-    	if (applicationFilter!=null) {
-    		Application application = Application.findApplication(applicationFilter);
-    		uiModel.addAttribute("devices", Device.findDevicesByApplicationEquals(application).getResultList());
-        	uiModel.addAttribute("application", application);
-    	}else if ("eppnInit".equals(searchBySelected)) {
-    		uiModel.addAttribute("devices", Device.findDevicesByEppnInitLike(searchString).getResultList());
-    	}else if ("numeroId".equals(searchBySelected)) {
-    		uiModel.addAttribute("devices", Device.findDevicesByNumeroIdEquals(searchString).getResultList());
-    	}else if ("imei".equals(searchBySelected)) {
-    		uiModel.addAttribute("devices", Device.findDevicesByImeiLike(searchString).getResultList());
-    	} else if ("macAddress".equals(searchBySelected)) {
-    		uiModel.addAttribute("devices", Device.findDevicesByMacAddressEquals(searchString).getResultList());
-    	} else if ("location".equals(searchBySelected)) {
-    		uiModel.addAttribute("devices", Device.findDevicesByLocationEquals(searchString).getResultList());
-    	}else {
-		    if (page != null || size != null) {
-		        int sizeNo = size == null ? 10 : size.intValue();
-		        final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
-		        uiModel.addAttribute("devices", Device.findDeviceEntries(firstResult, sizeNo, sortFieldName, sortOrder));
-		        float nrOfPages = (float) Device.countDevices() / sizeNo;
-		        uiModel.addAttribute("maxPages", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));
-		    } else {
-		        uiModel.addAttribute("devices", Device.findAllDevices(sortFieldName, sortOrder));
-		    }
+    	if(sortFieldName == null){
+    		sortFieldName = "lastUseDate";
+    		sortOrder = "DESC";
     	}
+
+        int sizeNo = size == null ? 10 : size.intValue();
+        final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
+    	List<Device> devices = Device.findDeviceEntries(firstResult, sizeNo, sortFieldName, sortOrder);
+
+    	EntityManager em = Device.entityManager();
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<Device> query = criteriaBuilder.createQuery(Device.class);
+        Root<Device> c = query.from(Device.class);
+        final List<Predicate> predicates = new ArrayList<Predicate>();
+        final List<Order> orders = new ArrayList<Order>();
     	
-    	uiModel.addAttribute("searchString", searchString);
-        uiModel.addAttribute("searchBySelected", searchBySelected);
-        uiModel.addAttribute("listSearchBy", listSearchBy);
+        if(applicationFilter != null && applicationFilter != ""){
+        	Join<Device, Application> u = c.join("application");
+        	predicates.add(criteriaBuilder.equal(u.get("name"), applicationFilter));
+
+        }else{
+        	applicationFilter="";
+        }
+        
+        orders.add(criteriaBuilder.desc(c.get(sortFieldName)));
+        
+        if(searchString!=null && searchString!=""){
+	        Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal(searchString));
+	        Expression<Double> fullTestSearchRanking = criteriaBuilder.function("ts_rank", Double.class, criteriaBuilder.literal(searchString));
+	        predicates.add(criteriaBuilder.isTrue(fullTestSearchExpression));
+	        orders.add(criteriaBuilder.desc(fullTestSearchRanking));
+        }else{
+        	searchString="";
+        }
+        
+        query.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
+        query.orderBy(orders);
+        query.select(c);
+        devices = em.createQuery(query).setFirstResult(firstResult).setMaxResults(sizeNo).getResultList();
+        
+        float nrOfPages = (float) em.createQuery(query).getResultList().size() / sizeNo;
+        
+        uiModel.addAttribute("maxPages", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));
         uiModel.addAttribute("applications", Application.findAllApplications());
+        uiModel.addAttribute("status", TagLog.Status.values());
+        uiModel.addAttribute("page", page);
+        uiModel.addAttribute("size", size);
+    	uiModel.addAttribute("devices", devices);
+    	uiModel.addAttribute("searchString", searchString);
+        uiModel.addAttribute("applicationFilter", applicationFilter);
+        uiModel.addAttribute("listSearchBy", listSearchBy);
+        uiModel.addAttribute("queryUrl", "?applicationFilter="+applicationFilter+"&searchString="+searchString);
+        addDateTimeFormatPatterns(uiModel);
         return "manager/devices/list";
     }
     

@@ -1,32 +1,36 @@
-EsupNfcTagServer is the server part of the EsupNfcTag project
-============================
+Esup NFC Tag Server - EsupPortail
+=================================
 
-EsupNfcTagServer goal should be used with EsupNfcTagDrid (the Google Android App).
+Application permettant d'utiliser comme lecteur/borne de badge NFC :
 
-EsupNfcTagDrid allows the use of an android to swipe a tag. 
+- un smartphone Android (EsupNfcTagDroid : https://github.com/EsupPortail/esup-nfc-tag-droid)
+- ou ordinateur + lecteur usb NFC (EsupNfcTagDesktop : https://github.com/EsupPortail/esup-nfc-tag-desktop)
+- ou encore éventuellement un Arduino (EsupNfcTagArduino : https://github.com/EsupPortail/esup-nfc-tag-arduino) 
 
-EsupNfcTagDrid can read directly the Tag Serial Number (UID) or read an identifiant protected by an AES Mifare Desfire Authentication.
+Ce projet vise à permettre et faciliter le développement de services autour des cartes NFC dites "multiservice"
 
-The main part of the GUI is provided to EsupNfcTagDrid by EsupNfcTagServer inside a webview (standard web HTML application).
-   
-   
-### Installation
+Il propose une architecture standardisée et connectée autour du badgeage d'une carte présentant un identifiant (CSN ou identifiant codé en Desfire AES) correspondant à une carte valide d'un individu connu du système d'information.
 
-EsupNfcTagServer needs Shibboleth to identify users.
+L'application EsupNfcTagServer, elle est développée en Spring (ROO) et tourne sur Tomcat.
 
-You have to install a Shibboleth Provider on Apache (mod_shib) which proxy pass your EsupNfcTagServer web application.
 
-/manager and /nfc must require shibboleth session : 
+## Installation
+
+### Pré-requis
+* Java (JDK - JAVA SE 8):  http://www.oracle.com/technetwork/java/javase/downloads/index.html
+* Maven (dernière version 3.0.x) : http://maven.apache.org/download.cgi
+* Postgresql 9 : le mieux est de l'installer via le système de paquets de votre linux.
+* Tomcat (Tomcat 8)
+* Apache + libapache2-mod-shib2 : https://services.renater.fr/federation/docs/installation/sp
+* Git
+
+### Configuration Apache Shibboleth 
+L'authentification repose sur Shibboleth. Apache doit être configuré pour faire du mod_shib.
+
+Une fois le SP Shibboleth et Apache configurés usuellement (voir : https://services.renater.fr/federation/docs/installation/sp), il faut sécuriser /manager et /nfc en ajoutant ceci à la conf apache (à adapter cependant en fonction des versions d'Apache et mod_shib) :
 
 ```
    <Location /manager>
-     AuthType shibboleth
-     ShibRequestSetting requireSession 1
-     require shib-session
-     ShibUseHeaders On
-   </Location>
-
-   <Location /admin>
      AuthType shibboleth
      ShibRequestSetting requireSession 1
      require shib-session
@@ -41,27 +45,49 @@ You have to install a Shibboleth Provider on Apache (mod_shib) which proxy pass 
    </Location>
 ```
 
-   
-### EsupNfcTagServer Test of the Android part without EsupNfcTagDrid
+### Configuration PostgreSQL
 
-
-#### web part : 
-
-For a first access, you can use :  
-chrome http://esupnfctag.univ-ville.fr/nfc-index?apkVersion=1-2016-06-03-14-55-00&imei=123456
-
-Next you can use the provided url (after auth part anbd redirections), that is to say : 
-http://esupnfctag.univ-ville.fr/live?numeroId=6847041179388220887
-
-#### nfc part : 
-
-With CSN mode, you can call for example : 
-
+* pg_hba.conf : ajout de
 ```
-curl -X POST -H "Content-type:application/json" -d '{"csn":"045371d2fd3a80","numeroId":"6847041179388220887"}' http://esupnfctag.univ-ville.fr/csn-ws
+host all all 127.0.0.1/32 password
 ```
 
-You have to know a valid CSN.
-Take care to give a "LSB transformed csn" like given by usuals tag readers ...  
-The numeroId is given by EsupNfcTagServer.
+* redémarrage de postgresql
+* psql
+```
+create database esupnfctag;
+create USER esupnfctag with password 'esup';
+grant ALL ON DATABASE esupnfctag to esupnfctag;
+```
+
+### Paramétrage mémoire JVM :
+
+Pensez à paramétrer les espaces mémoire JVM : 
+```
+export JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
+```
+
+Pour maven :
+```
+export MAVEN_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
+
+### Recupération des sources
+
+```
+git clone https://github.com/EsupPortail/esup-nfc-tag-server
+```
+
+### Obtention du war pour déploiement sur tomcat ou autre :
+```
+mvn clean package
+```
+
+### Lancement de la mise à jour de la base de données
+```
+mvn exec:java -Dexec.args="dbupgrade"
+```
+
+## Configuration
+
+Voir la page wiki Esup : https://www.esup-portail.org/wiki/display/ESUPNFC/EsupNfcTagServer
 

@@ -27,6 +27,15 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.persistence.EntityManager;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.TagLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,59 +56,72 @@ public class TagLogController {
 	
     @RequestMapping(produces = "text/html")
     public String list(
-    		@RequestParam(value = "searchBySelected", required = false) String searchBySelected,
     		@RequestParam(value = "searchString", required = false) String searchString,
+    		@RequestParam(value = "applicationFilter", required = false) String applicationFilter,
+    		@RequestParam(value = "statusFilter", required = false) String statusFilter,
     		@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "size", required = false) Integer size, @RequestParam(value = "sortFieldName", required = false) String sortFieldName, @RequestParam(value = "sortOrder", required = false) String sortOrder, Model uiModel) {
 
-    	List<TagLog> taglogs = new ArrayList<TagLog>();
-    	
-    	if ("authDate".equals(searchBySelected)) {
-			try {
-	    		DateFormat format = new SimpleDateFormat("dd/MM/yyyy", Locale.FRANCE);
-				Date dateBegin = format.parse(searchString);
-				Calendar calendar = Calendar.getInstance();
-				calendar.setTime(dateBegin);
-				calendar.add(Calendar.DATE, 1);
-				Date dateEnd = calendar.getTime();
-	    		taglogs = TagLog.findTagLogsByAuthDateBetween(dateBegin, dateEnd).getResultList();
-			} catch (ParseException e) {
-				log.warn("Unparseable date : " + searchString);
-			}
-
-    	} else if ("applicationName".equals(searchBySelected)) {
-    		taglogs = TagLog.findTagLogsByApplicationNameEquals(searchString, "authDate", "DESC").getResultList();
-    	} else if ("location".equals(searchBySelected)) {
-    		taglogs = TagLog.findTagLogsByLocationEquals(searchString, "authDate", "DESC").getResultList();
-    	} else if ("eppnInit".equals(searchBySelected)) {
-    		taglogs = TagLog.findTagLogsByEppnInitLike(searchString, "authDate", "DESC").getResultList();
-    	} else if ("numeroId".equals(searchBySelected)) {
-    		taglogs = TagLog.findTagLogsByNumeroIdEquals(searchString, "authDate", "DESC").getResultList();
-    	} else if ("csn".equals(searchBySelected)) {
-    		taglogs = TagLog.findTagLogsByCsnEquals(searchString, "authDate", "DESC").getResultList();
-    	} else if ("desfireId".equals(searchBySelected)) {
-    		taglogs = TagLog.findTagLogsByDesfireIdEquals(searchString, "authDate", "DESC").getResultList();
-    	} else {
-	    	if(sortFieldName == null){
-	    		sortFieldName = "authDate";
-	    		sortOrder = "DESC";
-	    	}
-	        if (page != null || size != null) {
-	            int sizeNo = size == null ? 10 : size.intValue();
-	            final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
-	            taglogs = TagLog.findTagLogEntries(firstResult, sizeNo, sortFieldName, sortOrder);
-	            float nrOfPages = (float) TagLog.countTagLogs() / sizeNo;
-	            uiModel.addAttribute("maxPages", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));
-	        } else {
-	            taglogs = TagLog.findAllTagLogs(sortFieldName, sortOrder);
-	        }
+    	if(sortFieldName == null){
+    		sortFieldName = "authDate";
+    		sortOrder = "DESC";
     	}
 
+        int sizeNo = size == null ? 10 : size.intValue();
+        final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
+    	List<TagLog> taglogs = TagLog.findTagLogEntries(firstResult, sizeNo, sortFieldName, sortOrder);
+
+    	EntityManager em = TagLog.entityManager();
+        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
+        CriteriaQuery<TagLog> query = criteriaBuilder.createQuery(TagLog.class);
+        Root<TagLog> c = query.from(TagLog.class);
+        final List<Predicate> predicates = new ArrayList<Predicate>();
+        final List<Order> orders = new ArrayList<Order>();
+    	
+        if(applicationFilter != null && applicationFilter != ""){
+        	System.err.println(applicationFilter);
+        	predicates.add(criteriaBuilder.equal(c.get("applicationName"), applicationFilter));
+        }else{
+        	applicationFilter="";
+        }
+
+        if(statusFilter != null && statusFilter != ""){
+        	System.err.println(statusFilter);
+        	predicates.add(criteriaBuilder.equal(c.get("status"), TagLog.Status.valueOf(statusFilter)));
+        }else{
+        	statusFilter="";
+        }
+        
+        orders.add(criteriaBuilder.desc(c.get(sortFieldName)));
+        
+        if(searchString!=null && searchString!=""){
+	        Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal(searchString));
+	        Expression<Double> fullTestSearchRanking = criteriaBuilder.function("ts_rank", Double.class, criteriaBuilder.literal(searchString));
+	        predicates.add(criteriaBuilder.isTrue(fullTestSearchExpression));
+	        orders.add(criteriaBuilder.desc(fullTestSearchRanking));
+        }else{
+        	searchString="";
+        }
+        
+        query.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
+        query.orderBy(orders);
+        query.select(c);
+        taglogs = em.createQuery(query).setFirstResult(firstResult).setMaxResults(sizeNo).getResultList();
+        
+        float nrOfPages = (float) em.createQuery(query).getResultList().size() / sizeNo;
+        
+        uiModel.addAttribute("maxPages", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));
+        uiModel.addAttribute("applications", Application.findAllApplications());
+        uiModel.addAttribute("status", TagLog.Status.values());
+        uiModel.addAttribute("page", page);
+        uiModel.addAttribute("size", size);
     	uiModel.addAttribute("taglogs", taglogs);
     	uiModel.addAttribute("searchString", searchString);
-        uiModel.addAttribute("searchBySelected", searchBySelected);
+        uiModel.addAttribute("applicationFilter", applicationFilter);
+        uiModel.addAttribute("statusFilter", statusFilter);
         uiModel.addAttribute("listSearchBy", listSearchBy);
+        uiModel.addAttribute("queryUrl", "?statusFilter="+statusFilter+"&applicationFilter="+applicationFilter+"&searchString="+searchString);
         addDateTimeFormatPatterns(uiModel);
         return "manager/taglogs/list";
     }
-    
+
 }
