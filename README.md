@@ -70,6 +70,7 @@ export JAVA_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
 Pour maven :
 ```
 export MAVEN_OPTS="-Xms1024m -Xmx1024m -XX:MaxPermSize=256m"
+```
 
 ### Recupération des sources
 
