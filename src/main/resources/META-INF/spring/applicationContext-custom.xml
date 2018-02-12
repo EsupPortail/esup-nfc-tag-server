@@ -110,7 +110,7 @@
     	<property name="isTagableUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/isTagable"/>
     	<property name="validateTagUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/validateTag"/>
     	<property name="getLocationsUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/locationsVerso"/>
-    	<property name="displayUrl" value="https://esup-sgc.univ-ville.fr/verso"/>
+    	<property name="displayUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/verso"/>
     	<property name="description" value="Web Service Verso"/>
     </bean>
     
