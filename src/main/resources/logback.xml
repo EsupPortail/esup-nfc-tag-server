@@ -28,7 +28,7 @@
     	    </layout>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>TRACE</level>
+			<level>DEBUG</level>
 		</filter>
 	</appender>
 	
@@ -40,7 +40,7 @@
     	    </layout>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
-			<level>TRACE</level>
+			<level>DEBUG</level>
 		</filter>
     </appender>
     
@@ -59,7 +59,7 @@
     </appender>
 
 	<root>
-		<level value="WARN" />
+		<level value="INFO" />
 		<appender-ref ref="STDOUT" />
 	</root>
 	    

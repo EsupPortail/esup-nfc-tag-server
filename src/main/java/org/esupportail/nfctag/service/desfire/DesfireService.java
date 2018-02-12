@@ -344,7 +344,6 @@ public class DesfireService {
 			log.error(e.getMessage());
 		}
 		
-		//log.trace("schemaDate : " + updateDate);
 		byte amks= desFireEV1Service.hexStringToByte(desfireApp.getAmks());
 		byte nok = desFireEV1Service.hexStringToByte(desfireApp.getNok());
 		
@@ -480,9 +479,6 @@ public class DesfireService {
 					desfireFlowStep.writeStep = 0;
 					break;
 				case WRITE_FILE:	
-					if(desfireFlowStep.writeStep==0) {
-						// authResultBean = this.authApp(aid, result, appKey, (byte) 0x00, KeyType.AES); - no need here
-					}
 					if(authResultBean.getFullApdu() == null || desfireFlowStep.writeStep>0) {
 						if(desfireFlowStep.writeStep==0 || result.endsWith("AF")) {
 							desfireFlowStep.authStep = 1;

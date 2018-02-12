@@ -101,10 +101,11 @@ public class LiveLongPoolController {
 				String nfcAuthConfigKey = app.getNfcConfig(); 
 				NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(nfcAuthConfigKey);
 				AppliExtApi appliExtApi = applisExtService.get(app.getAppliExt());
-				
+
 				uiModel.addAttribute("pageHeader", appliExtApi.getHeader());
 				uiModel.addAttribute("backgroundColor", appliExtApi.getBackgroundColor());
 				uiModel.addAttribute("isActiv", app.isActive());
+				uiModel.addAttribute("isDisplay", appliExtApi.isDisplay());
 				uiModel.addAttribute("imei", device.getImei());
 				uiModel.addAttribute("macAddress", device.getMacAddress());
 				uiModel.addAttribute("location", device.getLocation());

@@ -18,6 +18,7 @@
 package org.esupportail.nfctag.service.api.impl;
 
 import java.net.URI;
+import java.text.MessageFormat;
 import java.util.Date;
 
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
@@ -37,6 +38,17 @@ public class TagUpdateRestWs implements TagUpdateApi {
     
     protected String wsUrl;
 	
+    protected String idFromCsnUrlTemplate;
+    
+    protected String getIdFromCsnUrl(String csn){
+    	String url = MessageFormat.format(idFromCsnUrlTemplate, csn);
+    	return url;
+    }
+    
+	public void setIdFromCsnUrlTemplate(String idFromCsnUrlTemplate) {
+		this.idFromCsnUrlTemplate = idFromCsnUrlTemplate;
+	}
+	
 	public void setWsUrl(String wsUrl) {
 		this.wsUrl = wsUrl;
 	}
@@ -44,14 +56,13 @@ public class TagUpdateRestWs implements TagUpdateApi {
 	public TagUpdateRestWs() {
 		restTemplate = new RestTemplate();
 	}
-
+	
 	@Override
 	public String getIdFromCsn(String csn) {
-		URI targetUrl= UriComponentsBuilder.fromUriString(wsUrl)
-			    .queryParam("csn", csn)    
+		URI targetUrl= UriComponentsBuilder.fromUriString(getIdFromCsnUrl(csn))
 			    .build()
 			    .toUri();
-		log.info("Call " + wsUrl + " with csn = " + csn);
+		log.trace("Call " + getIdFromCsnUrl(csn) + " with csn = " + csn);
 
 		String id = null;
 		try {
@@ -60,7 +71,7 @@ public class TagUpdateRestWs implements TagUpdateApi {
 			log.warn("tagIdCheck unavailable", e);
 			throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable);
 		}
-		log.info("Got :  " + id);
+		log.trace("Got :  " + id);
 		if(id==null) {
 			//throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_unknowcard);
 		}

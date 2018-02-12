@@ -60,22 +60,22 @@ public class CsnWsController {
 	ErrorLongPoolController errorLongPoolController;
 
 	private NfcResultBean authCsn(String numeroId, String csn) {
-		NfcResultBean jsonResponseMessage = new NfcResultBean();
-		jsonResponseMessage.setFullApdu("");
+		NfcResultBean nfcResultBean = new NfcResultBean();
+		nfcResultBean.setFullApdu("");
 		try {
-			TagLog tagLog = tagAuthService.auth(TagType.CSN, csn, numeroId, csn, true);
+			TagLog tagLog = tagAuthService.auth(TagType.CSN, csn, numeroId, csn, null, true);
 			liveController.handleTagLog(tagLog);
-			jsonResponseMessage.setCode(CODE.OK);
-			jsonResponseMessage.setMsg(tagLog.getFirstname() + " " + tagLog.getLastname());
+			nfcResultBean.setCode(CODE.OK);
+			nfcResultBean.setMsg(tagLog.getFirstname() + " " + tagLog.getLastname());
 		} catch(EsupNfcTagException e) {
 			TagError tagError = new TagError(e);
 			tagError.setNumeroId(numeroId);
 			errorLongPoolController.handleError(tagError);
-			jsonResponseMessage.setCode(CODE.ERROR);
-			jsonResponseMessage.setMsg(e.getMessage());
+			nfcResultBean.setCode(CODE.ERROR);
+			nfcResultBean.setMsg(e.getMessage());
 			log.error("EsupNfcTagException during csnRequest with csn = " + csn + " and numeroId=" + numeroId + " - "+ e.getMessage());
 		}
-		return jsonResponseMessage;
+		return nfcResultBean;
 	}
 
 	@RequestMapping(params = {"csn", "arduinoId"})

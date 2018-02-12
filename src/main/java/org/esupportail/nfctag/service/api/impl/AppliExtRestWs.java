@@ -48,8 +48,10 @@ public class AppliExtRestWs implements AppliExtApi {
 	protected String validateTagUrl;
     
     protected String getLocationsUrl;
-
-    public String getHeader() {
+    
+    protected String displayUrl;
+    
+	public String getHeader() {
 		return header;
 	}
 
@@ -85,6 +87,10 @@ public class AppliExtRestWs implements AppliExtApi {
 		this.getLocationsUrl = getLocationsUrl;
 	}
 
+    public void setDisplayUrl(String displayUrl) {
+		this.displayUrl = displayUrl;
+	}
+	
 	public AppliExtRestWs() {
 		restTemplate = new RestTemplate();
 		((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(5000);
@@ -141,4 +147,29 @@ public class AppliExtRestWs implements AppliExtApi {
 		return true;
 	}
 	
+	@Override
+	public boolean isDisplay(){
+		if(displayUrl != null && displayUrl != ""){
+			return true;
+		}else{
+			return false;
+		}
+	}
+	
+	@Override
+	public String getDisplay(TagLog tagLog){
+		log.info("get display for : " + tagLog);
+		try {
+			String display = restTemplate.getForObject(displayUrl + "?csn=" + tagLog.getCsn(), String.class);
+			return display;
+		} catch(HttpServerErrorException e) {
+			if(e.getStatusCode() != HttpStatus.SERVICE_UNAVAILABLE) {
+				log.warn("HttpServerErrorException : " + e.getMessage() + " - " + e.getResponseBodyAsString());
+			}
+			return null;
+		}catch (Exception e) {
+			log.warn("error to get display : " + e.getMessage());
+			return null;
+		}	
+	}
 }

@@ -61,4 +61,14 @@ public class AppliExtDummy implements AppliExtApi {
 		return true;
 	}
 
+	@Override
+	public boolean isDisplay(){
+		return true;
+	}
+	
+	@Override
+	public String getDisplay(TagLog tagLog){
+		return tagLog.getCsn() + "<br/>" + tagLog.getDesfireId();
+	}
+	
 }

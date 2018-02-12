@@ -32,8 +32,8 @@
 				<tbody id="lastleoauth" style="display:none;"><!--  --></tbody>
 			</table> 
 		</div>
-	&amp;nbsp;
 	<div id="validate"><!--  --></div>
+	<div id="display"><!--  --></div>
 	<div id="error" class="text-danger"><!--  --></div>
 	<div id="debug" class="text-warning"><!--  --></div>
 	<script type="text/javascript">
@@ -41,6 +41,7 @@
 		var serviceUrl = '${serviceUrl}';
 		var authType = '${authType}';
 		var eppnInit = '${eppnInit}';
+		var isDisplay = '${isDisplay}';
 		var validateAuthWoConfirmation = '${validateAuthWoConfirmation}';
 	</script>
 	</c:when>

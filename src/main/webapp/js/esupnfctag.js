@@ -110,6 +110,7 @@ $(document).ready(function() {
 		return false;
 	}
 	*/
+	  
 	/* MUSTACHE TEMPLATES */
 	if(typeof numeroId != 'undefined'){
 		if(numeroId!=""){
@@ -156,6 +157,19 @@ $(document).ready(function() {
 					</div> \
 				</div> \
 			</div>{{/tagerrors}}');
+
+	$.Mustache.add('display-template', '{{#display}} \
+			<div id="displayModal" class="modal fade" role="dialog" style="width: 100%; background-color: rgba(115, 210, 22, 0.5);"> \
+				<div class="modal-dialog" > \
+					<div class="modal-content"> \
+						<!-- dialog body --> \
+						<div class="modal-body" style="text-align: center"> \
+							<h1>{{{display}}}</h1> \
+							<button id="cancelButton_{{id}}" type="button" data-dismiss="modal" class="btn btn-danger btn-lg">Fermer</button> \
+						</div> \
+					</div> \
+				</div> \
+			</div>{{/display}}');
 	
 	/* ESUP LONG POLL PROTOTYPE */
 	
@@ -189,12 +203,12 @@ $(document).ready(function() {
 		//return setTimeout(this.load, 1000);
 	}
 	
-	
+
 
 	/* LIVE LONG POLL */
 	
 	var liveLongPoll = Object.create(esupLongPoll);
-
+	
 	liveLongPoll.load = function() {
 		if(this.debug) {
 			$('#status').text("Getting Taglogs...")
@@ -204,6 +218,7 @@ $(document).ready(function() {
 				url : "/live/taglogs?authDateTimestamp=" + this.lastAuthDate + "&numeroId=" + numeroId,
 				context: this,
 				success : function(message) {
+					
 					if (this.debug) {
 						$('#debug').text(JSON.stringify(message))
 					}
@@ -227,6 +242,17 @@ $(document).ready(function() {
 									if(data==true){
 										$('#status_'+message[0].id).html('<span class="icon-tag glyphicon glyphicon-ok-circle text-success"><!-- --></span>');
 										$('#row_'+message[0].id).toggleClass("success");
+										if(isDisplay != "false"){
+											$.get( "/nfc-ws/display?id="+message[0].id, function( display ) {
+												if(display != "" && display != "null"){
+													var newDisplayModal = $('#display').mustache('display-template', {'display' : display}, { method: 'prepend' });
+													var displayModal = $('#displayModal').appendTo("body").modal({backdrop: 'static', keyboard: false, show: true});
+													displayModal.on('hidden.bs.modal', function () {
+														
+													});
+												}
+											});
+										}
 									}
 								});
 							});

@@ -32,6 +32,10 @@ public interface AppliExtApi {
 	
 	boolean cancelTag(TagLog tagLog);
 	
+	boolean isDisplay();
+	
+	String getDisplay(TagLog tagLog);
+	
 	String getDescription();
 	
 	String getHeader();

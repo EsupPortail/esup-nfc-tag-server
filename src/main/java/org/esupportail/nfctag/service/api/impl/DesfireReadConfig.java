@@ -24,8 +24,10 @@ import org.springframework.roo.addon.tostring.RooToString;
 @RooToString
 public class DesfireReadConfig extends NfcAuthConfig {
 	
-	private String desfireAppId;
+	private String desfireAppName;
 	
+	private String desfireAppId;
+
 	private String desfireKeyNumber;
 	
 	private String desfireKey;
@@ -43,6 +45,14 @@ public class DesfireReadConfig extends NfcAuthConfig {
 	@Override
 	public AuthType getAuthType() {
 		return AuthType.DESFIRE;
+	}
+
+		public String getDesfireAppName() {
+		return desfireAppName;
+	}
+
+	public void setDesfireAppName(String desfireAppName) {
+		this.desfireAppName = desfireAppName;
 	}
 
 	public String getDesfireAppId() {

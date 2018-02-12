@@ -59,6 +59,13 @@ public class NfcWsController {
 		return tagAuthService.cancelTag(id);
 	}
 
+	@RequestMapping(value="/display",params = {"id"})
+	@ResponseBody
+	public String getDisplay(long id, Model uiModel) throws IOException {
+		log.info("get display");
+		return tagAuthService.getDisplay(id);
+	}
+	
 	@RequestMapping(value="/location", produces = "application/json")
 	@ResponseBody
 	public String getLocation(
@@ -82,7 +89,6 @@ public class NfcWsController {
 		}
 		return "{"+locationName+"}";
 	}
-	
 }
 
 

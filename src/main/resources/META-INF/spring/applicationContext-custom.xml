@@ -36,14 +36,6 @@
     
     <bean id="dummyExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtDummy"/>
     
-    <bean id="esupSgcLivraisonExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
-    	<property name="isTagableUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/isTagable"/>
-    	<property name="validateTagUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/validateTag"/>
-    	<property name="getLocationsUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/locationsLivreur"/>
-    	<property name="description" value="Web Service livraison SGC"/>
-    </bean>
-
- 
     <bean id="tagIdCheckApiLdap" class="org.esupportail.nfctag.service.api.impl.TagIdCheckLdap">
     	<property name="desfireSuffix" value="univ-ville.fr"/>
 	<property name="description" value="via LDAP"/>
@@ -53,32 +45,39 @@
     	<property name="description" value="TagIdCheckDummy"/>
     </bean>
 
-     <bean id="csnAuthConfig" class="org.esupportail.nfctag.service.api.impl.CsnAuthConfig">
+    <bean id="csnAuthConfig" class="org.esupportail.nfctag.service.api.impl.CsnAuthConfig">
     	<property name="description" value="Authentification CSN"/>
     </bean>
     
-    <bean id="ldapContextSourceUnivRouen"
-		class="org.springframework.ldap.core.support.LdapContextSource">
-		<property name="url" value="ldap://ldap.univ-ville.fr" />
-		<property name="base" value="dc=univ-ville,dc=fr" />
-		<property name="userDn" value="cn=admin,dc=univ-ville,dc=fr" />
-		<property name="password" value="esup" />
-	</bean>    
-
-
-	<bean id="ldapTemplateUnivRouen" class="org.springframework.ldap.core.LdapTemplate">  
-    	<constructor-arg ref="ldapContextSourceUnivRouen" />  
+    <bean id="desfireAuthSiServices" class="org.esupportail.nfctag.service.api.impl.DesfireReadConfig">
+	<property name="desfireKeyNumber" value="01"/>
+	<property name="desfireFileNumber" value="00"/>
+	<property name="desfireAppId" value="XXXXXX"/>
+	<property name="desfireAppName" value="si-service"/>
+	<property name="desfireFileSize" value="1F0000"/>
+	<property name="desfireFileOffset" value="000000"/>
+	<property name="desfireKey" value="00000000000000000000000000000000"/> 
+	<property name="description" value="Authentification SI Service"/>
     </bean>
 
+    <bean id="ldapContextSourceUnivVille" class="org.springframework.ldap.core.support.LdapContextSource">
+	<property name="url" value="ldap://ldap.univ-ville.fr" />
+	<property name="base" value="dc=univ-ville,dc=fr" />
+	<property name="userDn" value="cn=admin,dc=univ-ville,dc=fr" />
+	<property name="password" value="esup" />
+    </bean>    
+
+    <bean id="ldapTemplateUnivVille" class="org.springframework.ldap.core.LdapTemplate">  
+    	<constructor-arg ref="ldapContextSourceUnivVille" />  
+    </bean>
    	
-	<bean id="ldapServiceUnivRouen" class="org.esupportail.nfctag.service.LdapService">
-		<property name="ldapTemplate" ref="ldapTemplateUnivRouen" />
-	</bean> 
+    <bean id="ldapServiceUnivVille" class="org.esupportail.nfctag.service.LdapService">
+	<property name="ldapTemplate" ref="ldapTemplateUnivVille" />
+    </bean> 
     
-    
-    
+   	 
     <!-- ##########  ESUP SGC PART ############ -->
-    
+
     <bean id="esupSgcExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
     	<property name="isTagableUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/isTagable"/>
     	<property name="validateTagUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/validateTag"/>
@@ -93,17 +92,32 @@
         <property name="description" value="Web Service Update Esup SGC"/>
     </bean>
 
-	<bean id="esupSgcSearchExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
+    <bean id="esupSgcSearchExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
         <property name="isTagableUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/isTagable"/>
         <property name="validateTagUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/validateTag"/>
         <property name="getLocationsUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/locationsSearch"/>
         <property name="description" value="Web Service Search Esup SGC"/>
     </bean>
 
-    <bean id="tagIdCheckApiEsupSgc" class="org.esupportail.nfctag.service.api.impl.TagIdCheckRestWs">
-		<property name="tagIdCheckUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/tagIdCheck"/>
-		<property name="idFromEppnInitUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/idFromEppnInit"/>
-		<property name="description" value="via Esup SGC"/>
+    <bean id="esupSgcLivraisonExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
+    	<property name="isTagableUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/isTagable"/>
+    	<property name="validateTagUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/validateTag"/>
+    	<property name="getLocationsUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/locationsLivreur"/>
+    	<property name="description" value="Web Service livraison SGC"/>
     </bean>
 
+    <bean id="esupSgcVersoExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtRestWs">
+    	<property name="isTagableUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/isTagable"/>
+    	<property name="validateTagUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/validateTag"/>
+    	<property name="getLocationsUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/locationsVerso"/>
+    	<property name="displayUrl" value="https://esup-sgc.univ-ville.fr/verso"/>
+    	<property name="description" value="Web Service Verso"/>
+    </bean>
+    
+    <bean id="tagIdCheckApiEsupSgc" class="org.esupportail.nfctag.service.api.impl.TagIdCheckRestWs">
+	<property name="tagIdCheckUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/tagIdCheck"/>
+	<property name="idFromEppnInitUrl" value="https://esup-sgc.univ-ville.fr/wsrest/nfc/idFromEppnInit"/>
+	<property name="description" value="via Esup SGC"/>
+    </bean>
+    
 </beans>
