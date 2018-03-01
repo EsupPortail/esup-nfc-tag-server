@@ -25,7 +25,7 @@ public class LdapGroup2UserRoleService {
 	
 	public Set<String> getRoles(String eppn) {
 		Set<String> roles = new HashSet<String>();
-		for(String groupName : groupService.getGroupOfNamesForEppn(eppn)) {
+		for(String groupName : groupService.getGroups(eppn)) {
 			if(mappingGroupesRoles.containsKey(groupName)) {
 				String role = mappingGroupesRoles.get(groupName);
 				roles.add(role);

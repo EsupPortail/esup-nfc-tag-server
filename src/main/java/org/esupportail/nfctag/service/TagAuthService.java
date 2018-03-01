@@ -51,7 +51,7 @@ public class TagAuthService {
 	@Resource
 	ApplicationsService applicationsService;
 	
-	public TagLog auth(TagType tagType, String tagId, String numeroId, String cardId, String appName, Boolean validate) throws EsupNfcTagException {
+	public TagLog auth(TagType tagType, String tagId, String numeroId, String cardId, Boolean validate) throws EsupNfcTagException {
 		Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
 		device.setLastUseDate(new Date());
 		device.merge();
@@ -61,13 +61,12 @@ public class TagAuthService {
 			throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_tagidchecknotdefine);
 		}
 		TagLog tagLog = new TagLog();
-		
 		if(tagType != null){
 			if(tagType.equals(TagType.DESFIRE)) {
-				tagLog = tagIdCheckApi.getTagLogFromTagId(tagType, tagId, appName);
+				tagLog = tagIdCheckApi.getTagLogFromTagId(tagType, tagId);
 				tagLog.setDesfireId(tagId);
 			}else if(tagType.equals(TagType.CSN)) {
-				tagLog = tagIdCheckApi.getTagLogFromTagId(tagType, cardId, appName);
+				tagLog = tagIdCheckApi.getTagLogFromTagId(tagType, cardId);
 			}
 		}
 		tagLog.setCsn(cardId);

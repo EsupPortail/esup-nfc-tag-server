@@ -24,7 +24,7 @@ public interface TagIdCheckApi {
 	
 	public enum TagType {CSN, DESFIRE};
 
-	TagLog getTagLogFromTagId(TagType tagType, String tagId, String appName) throws EsupNfcTagException;
+	TagLog getTagLogFromTagId(TagType tagType, String tagId) throws EsupNfcTagException;
 	
 	Boolean supportTagType(TagType tagType);
 	

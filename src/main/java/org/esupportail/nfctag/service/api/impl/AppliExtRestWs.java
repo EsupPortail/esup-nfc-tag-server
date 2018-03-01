@@ -25,16 +25,11 @@ import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMess
 import org.esupportail.nfctag.service.api.AppliExtApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class AppliExtRestWs implements AppliExtApi {
 
@@ -165,12 +160,7 @@ public class AppliExtRestWs implements AppliExtApi {
 	public String getDisplay(TagLog tagLog){
 		log.info("get display for : " + tagLog);
 		try {
-			HttpHeaders headers = new HttpHeaders();
-			headers.setContentType(MediaType.APPLICATION_JSON);
-			ObjectMapper mapper = new ObjectMapper();
-			String jsonInString = mapper.writeValueAsString(tagLog);
-			HttpEntity<String> entity = new HttpEntity<String>(jsonInString, headers);
-			String display = restTemplate.postForObject(displayUrl, entity, String.class);
+			String display = restTemplate.getForObject(displayUrl + "?csn=" + tagLog.getCsn(), String.class);
 			return display;
 		} catch(HttpServerErrorException e) {
 			if(e.getStatusCode() != HttpStatus.SERVICE_UNAVAILABLE) {

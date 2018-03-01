@@ -61,7 +61,7 @@ public class TagIdCheckSql implements TagIdCheckApi {
 	}
 	
 	@Override
-	public TagLog getTagLogFromTagId(TagType tagType, String tagId, String appName){
+	public TagLog getTagLogFromTagId(TagType tagType, String tagId){
 		
 		String authSql = "";
 		switch (tagType) {

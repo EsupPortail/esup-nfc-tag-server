@@ -78,12 +78,14 @@ public class TagLogController {
         final List<Order> orders = new ArrayList<Order>();
     	
         if(applicationFilter != null && applicationFilter != ""){
+        	System.err.println(applicationFilter);
         	predicates.add(criteriaBuilder.equal(c.get("applicationName"), applicationFilter));
         }else{
         	applicationFilter="";
         }
 
         if(statusFilter != null && statusFilter != ""){
+        	System.err.println(statusFilter);
         	predicates.add(criteriaBuilder.equal(c.get("status"), TagLog.Status.valueOf(statusFilter)));
         }else{
         	statusFilter="";

@@ -52,7 +52,7 @@ public class TagIdCheckLdap implements TagIdCheckApi {
 	}
 	
 	@Override
-	public TagLog getTagLogFromTagId(TagType tagType, String tagId, String appName){
+	public TagLog getTagLogFromTagId(TagType tagType, String tagId){
 		TagLog tagLog = null;
 		String cardUidType = null;
 		switch (tagType) {

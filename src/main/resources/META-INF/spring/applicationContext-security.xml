@@ -116,7 +116,7 @@
 	</beans:bean>
 	
 		
-	<beans:bean id="groupService" class="org.esupportail.nfctag.security.GroupService">
+	<beans:bean id="groupService" class="org.esupportail.nfctag.security.LdapGroupService">
 		<beans:property name="ldapTemplate" ref="ldapTemplate"/>
 		<beans:property name="groupSearchBase" value="ou=groups" />
 		<beans:property name="groupSearchFilter" value="member={0}"/>

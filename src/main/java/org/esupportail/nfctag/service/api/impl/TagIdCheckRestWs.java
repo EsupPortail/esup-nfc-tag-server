@@ -62,7 +62,7 @@ public class TagIdCheckRestWs implements TagIdCheckApi {
 	}
 	
 	@Override
-	public TagLog getTagLogFromTagId(TagType tagType, String tagId, String appName) throws EsupNfcTagException {
+	public TagLog getTagLogFromTagId(TagType tagType, String tagId) throws EsupNfcTagException {
 		
 		URI targetUrl = null;
 		
@@ -77,8 +77,7 @@ public class TagIdCheckRestWs implements TagIdCheckApi {
 			case DESFIRE :
 				String desfireId = tagId;
 				targetUrl= UriComponentsBuilder.fromUriString(tagIdCheckUrl)
-					    .queryParam("desfireId", desfireId)   
-					    .queryParam("appName", appName)
+					    .queryParam("desfireId", desfireId)    
 					    .build()
 					    .toUri();
 				log.info("Call " + tagIdCheckUrl + " with desfireId = " + desfireId);
