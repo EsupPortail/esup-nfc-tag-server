@@ -53,6 +53,7 @@
 	<property name="desfireKeyNumber" value="01"/>
 	<property name="desfireFileNumber" value="00"/>
 	<property name="desfireAppId" value="XXXXXX"/>
+	<property name="desfireAppName" value="si-service"/>
 	<property name="desfireFileSize" value="1F0000"/>
 	<property name="desfireFileOffset" value="000000"/>
 	<property name="desfireKey" value="00000000000000000000000000000000"/> 

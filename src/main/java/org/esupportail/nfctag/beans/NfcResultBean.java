@@ -49,7 +49,17 @@ public class NfcResultBean implements Serializable {
     
     private String msg;
     
-    public void setSize(String size) {
+    private long taglogId;
+    
+    public long getTaglogId() {
+		return taglogId;
+	}
+
+	public void setTaglogId(long taglogId) {
+		this.taglogId = taglogId;
+	}
+
+	public void setSize(String size) {
 		this.size = size;
 	}
 

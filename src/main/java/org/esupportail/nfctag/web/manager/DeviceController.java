@@ -112,20 +112,23 @@ public class DeviceController {
         Root<Device> c = query.from(Device.class);
         final List<Predicate> predicates = new ArrayList<Predicate>();
         final List<Order> orders = new ArrayList<Order>();
-    	
+        
+        if("DESC".equals(sortOrder.toUpperCase())){
+        	orders.add(criteriaBuilder.desc(c.get(sortFieldName)));
+        }else{
+        	orders.add(criteriaBuilder.asc(c.get(sortFieldName)));
+        }
+        
         if(applicationFilter != null && applicationFilter != ""){
         	Join<Device, Application> u = c.join("application");
         	predicates.add(criteriaBuilder.equal(u.get("name"), applicationFilter));
-
         }else{
         	applicationFilter="";
         }
         
-        orders.add(criteriaBuilder.desc(c.get(sortFieldName)));
-        
         if(searchString!=null && searchString!=""){
-	        Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal(searchString));
-	        Expression<Double> fullTestSearchRanking = criteriaBuilder.function("ts_rank", Double.class, criteriaBuilder.literal(searchString));
+	        Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal("'"+searchString+"'"));
+	        Expression<Double> fullTestSearchRanking = criteriaBuilder.function("ts_rank", Double.class, criteriaBuilder.literal("'"+searchString+"'"));
 	        predicates.add(criteriaBuilder.isTrue(fullTestSearchExpression));
 	        orders.add(criteriaBuilder.desc(fullTestSearchRanking));
         }else{

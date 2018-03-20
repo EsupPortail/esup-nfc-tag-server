@@ -62,7 +62,7 @@
     </sec:authorize>
     <page:list id="pl_org_esupportail_nfctag_domain_TagLog" items="${taglogs}" z="user-managed"/>
     <table:table data="${taglogs}" delete="false" id="l_org_esupportail_nfctag_domain_TagLog" path="/manager/taglogs" update="false" z="user-managed" view="${isAdmin}">
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_authDate" property="authDate" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_authDate" sort="true" property="authDate" z="user-managed"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_applicationName" property="applicationName" z="user-managed"/>
         <table:column link="true" linkPrefix="/manager/taglogs?searchBySelected=location&amp;searchString="  id="c_org_esupportail_nfctag_domain_TagLog_location" property="location" z="user-managed"/>
         <table:column link="true" linkPrefix="/manager/taglogs?searchBySelected=eppnInit&amp;searchString=" id="c_org_esupportail_nfctag_domain_TagLog_eppnInit" property="eppnInit" z="user-managed"/>

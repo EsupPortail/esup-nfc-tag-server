@@ -159,13 +159,13 @@ $(document).ready(function() {
 			</div>{{/tagerrors}}');
 
 	$.Mustache.add('display-template', '{{#display}} \
-			<div id="displayModal" class="modal fade" role="dialog" style="width: 100%; background-color: rgba(115, 210, 22, 0.5);"> \
+			<div id="displayModal" class="modal fade" role="dialog" style="width: 100%;"> \
 				<div class="modal-dialog" > \
 					<div class="modal-content"> \
 						<!-- dialog body --> \
 						<div class="modal-body" style="text-align: center"> \
 							<h1>{{{display}}}</h1> \
-							<button id="cancelButton_{{id}}" type="button" data-dismiss="modal" class="btn btn-danger btn-lg">Fermer</button> \
+							<button id="cancelButton}" type="button" data-dismiss="modal" class="btn btn-danger btn-lg">Fermer</button> \
 						</div> \
 					</div> \
 				</div> \
@@ -232,7 +232,29 @@ $(document).ready(function() {
 						var newValidateModal = $('#validate').mustache('validate-template', {'leoauths' : message}, { method: 'prepend' });
 						if(message[0].status == "none"){
 							window.readyToScan = "ko";
-							var validateModal = $('#validateModal').appendTo("body").modal({backdrop: 'static', keyboard: false, show: true});						
+							if(isDisplay != "false"){
+								$("#displayModal").remove()
+								$.get( "/nfc-ws/display?id="+message[0].id, function( display ) {
+									if(display != "" && display != "null"){
+										var newDisplayModal = $('#display').mustache('display-template', {'display' : display}, { method: 'prepend' });
+										var displayModal = $('#displayModal').appendTo('body').modal({backdrop: 'static', keyboard: false, show: true});
+										$(".modal-backdrop.in").hide();
+										$.get( "/nfc-ws/validate?id="+message[0].id, function( data ) {
+											if(data==true){
+												$('#status_'+message[0].id).html('<span class="icon-tag glyphicon glyphicon-ok-circle text-success"><!-- --></span>');
+												$('#row_'+message[0].id).toggleClass("success");
+
+											}
+										});
+										getEsupNfcStorage().setItem("readyToScan", "ok");
+										window.readyToScan = "ok";
+										displayModal.on('hidden.bs.modal', function () {
+										});
+									}
+								});
+							}else{
+							
+							var validateModal = $('#validateModal').appendTo('body').modal({backdrop: 'static', keyboard: false, show: true});						
 							validateModal.on('hidden.bs.modal', function () {
 								getEsupNfcStorage().setItem("readyToScan", "ok");
 								window.readyToScan = "ok";
@@ -242,17 +264,7 @@ $(document).ready(function() {
 									if(data==true){
 										$('#status_'+message[0].id).html('<span class="icon-tag glyphicon glyphicon-ok-circle text-success"><!-- --></span>');
 										$('#row_'+message[0].id).toggleClass("success");
-										if(isDisplay != "false"){
-											$.get( "/nfc-ws/display?id="+message[0].id, function( display ) {
-												if(display != "" && display != "null"){
-													var newDisplayModal = $('#display').mustache('display-template', {'display' : display}, { method: 'prepend' });
-													var displayModal = $('#displayModal').appendTo("body").modal({backdrop: 'static', keyboard: false, show: true});
-													displayModal.on('hidden.bs.modal', function () {
-														
-													});
-												}
-											});
-										}
+
 									}
 								});
 							});
@@ -265,6 +277,7 @@ $(document).ready(function() {
 								});
 								
 							});
+							}
 						}
 						this.lastAuthDate = message[0].authDate;
 						setTimeout(function(){
@@ -339,7 +352,7 @@ $(document).ready(function() {
 					if (message && message.length) {
 						window.readyToScan = "ko";
 						var newErrorModal = $('#error').mustache('error-template', {'tagerrors' : message[0]}, { method: 'prepend' });
-						var errorModal = $('#errorModal').appendTo("body").modal({backdrop: 'static', keyboard: false, show: true});
+						var errorModal = $('#errorModal').appendTo('body').modal({backdrop: 'static', keyboard: false, show: true});
 						errorModal.on('hidden.bs.modal', function () {
 							getEsupNfcStorage().setItem("readyToScan", "ok");
 							window.readyToScan = "ok";

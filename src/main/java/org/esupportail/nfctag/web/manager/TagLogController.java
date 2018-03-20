@@ -77,31 +77,34 @@ public class TagLogController {
         final List<Predicate> predicates = new ArrayList<Predicate>();
         final List<Order> orders = new ArrayList<Order>();
     	
+        if("DESC".equals(sortOrder.toUpperCase())){
+        	orders.add(criteriaBuilder.desc(c.get(sortFieldName)));
+        }else{
+        	orders.add(criteriaBuilder.asc(c.get(sortFieldName)));
+        }
+        
         if(applicationFilter != null && applicationFilter != ""){
-        	System.err.println(applicationFilter);
         	predicates.add(criteriaBuilder.equal(c.get("applicationName"), applicationFilter));
         }else{
         	applicationFilter="";
         }
 
         if(statusFilter != null && statusFilter != ""){
-        	System.err.println(statusFilter);
         	predicates.add(criteriaBuilder.equal(c.get("status"), TagLog.Status.valueOf(statusFilter)));
         }else{
         	statusFilter="";
         }
         
-        orders.add(criteriaBuilder.desc(c.get(sortFieldName)));
-        
         if(searchString!=null && searchString!=""){
-	        Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal(searchString));
-	        Expression<Double> fullTestSearchRanking = criteriaBuilder.function("ts_rank", Double.class, criteriaBuilder.literal(searchString));
+	        Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal("'"+searchString+"'"));
+	        Expression<Double> fullTestSearchRanking = criteriaBuilder.function("ts_rank", Double.class, criteriaBuilder.literal("'"+searchString+"'"));
 	        predicates.add(criteriaBuilder.isTrue(fullTestSearchExpression));
 	        orders.add(criteriaBuilder.desc(fullTestSearchRanking));
         }else{
         	searchString="";
         }
         
+        orders.add(criteriaBuilder.desc(c.get(sortFieldName)));        
         query.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
         query.orderBy(orders);
         query.select(c);

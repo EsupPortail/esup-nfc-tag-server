@@ -21,7 +21,7 @@ public class DbToolService {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	final static String currentEsupSgcVersion = "0.1.x";
+	final static String currentEsupSgcVersion = "0.2.x";
 		
 	@Resource
 	DataSource dataSource;
@@ -55,14 +55,37 @@ public class DbToolService {
 				connection.close();
 				
 				log.warn("\n\n#####\n\t" +
-	    				"Pensez à mettre à jour les configurations de l'application depuis l'IHM !" +
+	    				"Mise en place des index de recherche" +
 	    				"\n#####\n");
 	    		
 	    		esupSgcVersion = "0.1.x";
 	    		
 			} else {
 				log.warn("\n\n#####\n\t" +
-	    				"Base de données à jour !" +
+	    				"Base de données à jour 0.0.x" +
+	    				"\n#####\n");
+			}
+			
+			if ("0.1.x".equals(esupSgcVersion)) {
+				
+				InputStream is = getClass().getResourceAsStream("/update-0.1.x.sql");
+				String sqlUpdate = new Scanner(is,"UTF-8").useDelimiter("\\A").next();
+		        
+				log.warn("La commande SQL suivante va être exécutée : \n" + sqlUpdate);
+				Connection connection = dataSource.getConnection();
+				CallableStatement statement = connection.prepareCall(sqlUpdate);
+				statement.execute();
+				connection.close();
+				
+				log.warn("\n\n#####\n\t" +
+	    				"Mise en place des triggers" +
+	    				"\n#####\n");
+	    		
+	    		esupSgcVersion = "0.2.x";
+	    		
+			} else {
+				log.warn("\n\n#####\n\t" +
+	    				"Base de données à jour 0.1.x" +
 	    				"\n#####\n");
 			}
 			appliVersion.setEsupNfcTagVersion(currentEsupSgcVersion);

@@ -54,7 +54,7 @@ public class TagIdCheckDummyWs implements TagIdCheckApi {
 	}
 	
 	@Override
-	public TagLog getTagLogFromTagId(TagType tagType, String tagId) throws EsupNfcTagException {
+	public TagLog getTagLogFromTagId(TagType tagType, String tagId, String appName) throws EsupNfcTagException {
 		
 		String desfireId = null;
 		

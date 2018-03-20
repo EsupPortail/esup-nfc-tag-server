@@ -78,7 +78,7 @@ public class DesfireWsController {
 
 	@RequestMapping(produces = "application/json")
 	@ResponseBody
-	public NfcResultBean process(@RequestParam String numeroId, @RequestParam String cardId, @RequestParam String result, HttpSession session) throws EsupNfcTagException, JsonProcessingException {
+	public NfcResultBean process(@RequestParam String numeroId, @RequestParam String cardId, @RequestParam String result, HttpSession session) {
 		if(desfireService.getStep()==null) {
 			eppnInit = tagAuthService.getEppnInit(TagType.DESFIRE, numeroId);
 		}
@@ -90,8 +90,9 @@ public class DesfireWsController {
 		NfcResultBean nfcResultBean = new NfcResultBean();
 				
 		desfireService.setNumeroId(numeroId);
-		
+	
 		String function = "READ";
+		
 		if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireReadConfig){
 			function = "READ";
 		}else if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireWriteConfig){
@@ -151,10 +152,16 @@ public class DesfireWsController {
 				response = DESFireEV1Service.Response.getResponse(Integer.parseInt(msg, 16));
 			}
 			log.trace("Final response  : " + response);
-			TagType tagType = TagType.CSN;
 			if(response.equals(DESFireEV1Service.Response.OPERATION_OK)){
+				
+				TagType tagType = TagType.CSN;
 				String desfireId = "";
+				String appName = "";
+				boolean validate = true;
+				
 				if("READ".equals(function)) {
+					DesfireReadConfig desfireReadConfig = (DesfireReadConfig) desfireAuthSession.getDesfireAuthConfig();
+					appName = desfireReadConfig.getDesfireAppName();
 					nfcResultBean.setAction(Action.read);
 					log.trace("desfireId crypted  : " + result);
 					desfireId = desfireService.decriptIDP2S(result);
@@ -167,16 +174,26 @@ public class DesfireWsController {
 					DesfireTag desfireTag =  desfireService.getDesfireTagToUpdate();
 					if(update) nfcResultBean.setAction(Action.update);
 				}
-				boolean validate = true;
 				if(nfcResultBean.getAction().equals(Action.none)){
 					validate = false;
 				}
-				TagLog tagLog = tagAuthService.auth(tagType, desfireId, numeroId, cardId, validate);
+				try {
+				TagLog tagLog = tagAuthService.auth(tagType, desfireId, numeroId, cardId, appName, validate);
 				liveController.handleTagLog(tagLog);
 				nfcResultBean.setMsg(tagLog.getFirstname() + " " + tagLog.getLastname());
+				nfcResultBean.setTaglogId(tagLog.getId());
+				}catch (EsupNfcTagException e){
+					log.error("auth exception : " + e.getMessage(), e);
+					TagError tagError = new TagError(e);
+					tagError.setNumeroId(numeroId);
+					errorLongPoolController.handleError(tagError);
+					nfcResultBean.setCode(CODE.ERROR);
+					nfcResultBean.setMsg(e.getMessage());
+				}
 
 			} else {
 				TagError tagError = new TagError();
+				log.error("desfire error : " + tagError.getException().getMessage());
 				errorLongPoolController.handleError(tagError);
 				nfcResultBean.setCode(CODE.ERROR);
 				nfcResultBean.setFullApdu(response.toString());
