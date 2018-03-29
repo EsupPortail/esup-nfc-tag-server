@@ -7,7 +7,9 @@ public class DesfireFlowStep implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	public enum Action {
-	    READ, 
+		GET_FILE_SETTINGS,
+	    READ,
+	    MORE,
 	    END, 
 	    GET_APPS, 
 	    CHECK_APP,

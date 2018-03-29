@@ -58,6 +58,9 @@ public class DesfireService {
 	private ApplicationsService applicationsService;
 	
 	private NfcAuthConfigService nfcAuthConfigService;
+	
+	public String tempRead = "";
+	public String tempFileSize = "";
 
 	public void setDesfireAuthSession(DesfireAuthSession desfireAuthSession) {
 		this.desfireAuthSession = desfireAuthSession;
@@ -82,7 +85,7 @@ public class DesfireService {
 	public NfcResultBean readDesfireId(String result){
 		if(result.length()==0){
 			reset();
-			desfireFlowStep.action = Action.READ;
+			desfireFlowStep.action = Action.GET_FILE_SETTINGS;
 		}
 		NfcResultBean authResultBean = new NfcResultBean();
 		authResultBean.setCode(CODE.OK);
@@ -90,19 +93,50 @@ public class DesfireService {
 		byte[] aid = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getDesfireAppId());
 		byte keyNo = desFireEV1Service.hexStringToByte(desfireReadConfig.getDesfireKeyNumber());
 		byte[] key = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getDesfireKey());
+		byte fileNo = desFireEV1Service.hexStringToByte(desfireReadConfig.getDesfireFileNumber());
+		byte[] offset = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getDesfireFileOffset());
 		byte[] payload = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getReadFilePayload());
+		
 		switch(desfireFlowStep.action){
-			case READ:
+			case GET_FILE_SETTINGS:
+				tempFileSize = "";
 				authResultBean = this.authApp(aid, result, key, keyNo, KeyType.AES);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
-					authResultBean.setFullApdu(desFireEV1Service.readData(payload));
-					authResultBean.setSize(32);
-					desfireFlowStep.action = Action.END;
+					authResultBean.setFullApdu(desFireEV1Service.getFileSettings(fileNo));
+					desfireFlowStep.action = Action.READ;
 				}
 				break;
-			case END:
-				authResultBean.setFullApdu("END");
+			case READ:
+				tempRead = "";
+				if(tempFileSize.equals("")){
+					System.err.println(result);
+					tempFileSize = result.substring(8, 14);
+					System.err.println(tempFileSize);
+				}
+				byte[] length = desFireEV1Service.hexStringToByteArray(tempFileSize);
+				authResultBean = this.authApp(aid, result, key, keyNo, KeyType.AES);
+				if(authResultBean.getFullApdu() == null) {
+					desfireFlowStep.authStep = 1;
+					authResultBean.setFullApdu(desFireEV1Service.readData(fileNo, offset, length));
+					authResultBean.setSize(32);
+					desfireFlowStep.action = Action.MORE;
+				}
+				break;
+			case MORE:
+				System.err.println(result);
+				if(result.endsWith("AF")){
+					tempRead += result.substring(0, result.length() - 4);
+					System.err.println("temp : " + tempRead);
+					authResultBean.setFullApdu(desFireEV1Service.readMore());
+					System.err.println(authResultBean.getFullApdu());
+					authResultBean.setSize(32);
+					desfireFlowStep.action = Action.MORE;
+				}else if(result.endsWith("9100")){
+					tempRead += result;
+					System.err.println("end : " + tempRead);
+					authResultBean.setFullApdu("END");
+				}
 				break;
 		}
 		return authResultBean;
@@ -175,10 +209,22 @@ public class DesfireService {
 		KeyType keyKeyType = desfireKey.getType();
 		
 		DesfireFile desfireFile = desfireApp.getFiles().get(desfireFlowStep.currentFile);
-		byte[] writepayload = desFireEV1Service.hexStringToByteArray(desfireFile.getWriteFilePayload());
 		byte[] accessRights = desFireEV1Service.hexStringToByteArray(desfireFile.getAccessRights());
 		byte cms = desFireEV1Service.hexStringToByte(desfireFile.getCommunicationSettings());
 		byte fileNo = desFireEV1Service.hexStringToByte(desfireFile.getFileNumber());
+		
+		TagWriteApi tagWriteApi = desfireFile.getTagWriteApi();
+		String desfireId = tagWriteApi.getIdFromCsn(csn);
+		String writePayload;
+		if(desfireFile.getFileSize() != null){
+			writePayload = desfireFile.getWriteFilePayload() + desfireFile.getFileSize();
+		} else{
+			int fileSize = desfireId.length() / 2;
+			String hexSize = leftPad(Integer.toHexString(fileSize), 6, "0".toCharArray()[0]);
+			writePayload = desfireFile.getWriteFilePayload() + desFireEV1Service.swapPairs(desFireEV1Service.hexStringToByteArray(hexSize));
+			
+		}
+		byte[] byteWritePayload = desFireEV1Service.hexStringToByteArray(writePayload);
 		
 		if(result.length()==0){
 			reset();
@@ -243,7 +289,7 @@ public class DesfireService {
 					if(authResultBean.getFullApdu() == null) {
 						log.debug("Write by " + eppnInit + " - Create file in " + desFireEV1Service.byteArrayToHexString(aid) +" : " + fileNo);
 						desfireFlowStep.authStep = 1;
-						authResultBean.setFullApdu(desFireEV1Service.createStdDataFile(writepayload));
+						authResultBean.setFullApdu(desFireEV1Service.createStdDataFile(byteWritePayload));
 						authResultBean.setSize(16);					
 						desfireFlowStep.action = Action.WRITE_FILE;
 						desfireFlowStep.authStep = 1;
@@ -252,14 +298,17 @@ public class DesfireService {
 					break;
 				case WRITE_FILE:	
 					if(authResultBean.getFullApdu() == null || desfireFlowStep.writeStep>0) {
-						if(desfireFlowStep.writeStep==0 || result.endsWith("AF")) {
+						System.err.println(desfireId);
+						System.err.println(desfireId.length());
+						if(desfireFlowStep.writeStep==0) {
 							desfireFlowStep.authStep = 1;
-							TagWriteApi tagWriteApi = desfireFile.getTagWriteApi();
-							String desfireId = tagWriteApi.getIdFromCsn(csn);
 							log.debug("Write by " + eppnInit + " - Write in file " + fileNo +" : " + desfireId);
 							authResultBean.setFullApdu(desFireEV1Service.writeData(fileNo, desfireId));
 							authResultBean.setSize(16);						
 							desfireFlowStep.writeStep++;
+						}else if(desfireFlowStep.writeStep > 0 && result.endsWith("AF")){
+							authResultBean.setFullApdu(desFireEV1Service.writeMore(desfireId));
+							authResultBean.setSize(16);							
 						} else {
 							desfireFlowStep.writeStep = 0;
 							desfireFlowStep.action = Action.CHANGE_FILE_KEY_SET;
@@ -565,21 +614,13 @@ public class DesfireService {
 	}
 	
 	
-	public String decriptIDP2S(String apdu){
+	public String decriptDesfireId(String apdu){
 		byte[] resultByte = desFireEV1Service.hexStringToByteArray(apdu);
-		DesfireReadConfig desfireReadConfig = (DesfireReadConfig) desfireAuthSession.getDesfireAuthConfig();
-		String fileSize = desfireReadConfig.getDesfireFileSize();
-		byte[] fileSizeByte = desFireEV1Service.swapPairsByte(desFireEV1Service.hexStringToByteArray(fileSize));
-		int length = 0;
-		int pow = 1;
-		for(int i = 2 ; i>=0; i--) {
-			length += Math.pow(fileSizeByte[i], pow);
-			pow = pow*256;
-		}
-		log.trace("length : " + length);
+		int length = Integer.parseInt(desFireEV1Service.swapPairs(desFireEV1Service.hexStringToByteArray(tempFileSize)), 16);
 		byte[] resultDecript = desFireEV1Service.postprocess(resultByte, length, DESFireEV1Service.CommunicationSetting.ENCIPHERED);
 		String hexaResult =  desFireEV1Service.byteArrayToHexString(resultDecript);
-		log.trace("En hexa : " + hexaResult);
+		log.info("En hexa : " + hexaResult);
+		log.info("En hexa : " + hexaResult.substring(0, length));
 		return hexaResult;
 	}
 	
@@ -659,4 +700,13 @@ public class DesfireService {
 		return authResultBean;
 	}
 	
+	   public static String leftPad(String originalString, int length,
+		         char padCharacter) {
+		      String paddedString = originalString;
+		      while (paddedString.length() < length) {
+		         paddedString = padCharacter + paddedString;
+		      }
+		      return paddedString;
+		   }
+	   
 }

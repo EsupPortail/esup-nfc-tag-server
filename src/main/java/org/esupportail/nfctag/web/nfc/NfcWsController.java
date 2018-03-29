@@ -24,7 +24,10 @@ import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
 import org.esupportail.nfctag.domain.Device;
+import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.TagAuthService;
+import org.esupportail.nfctag.service.api.NfcAuthConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -34,6 +37,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -43,6 +47,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 public class NfcWsController {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
+	
+	@Resource
+	NfcAuthConfigService nfcAuthConfigService;
 	
 	@Resource
 	TagAuthService tagAuthService;
@@ -89,6 +96,20 @@ public class NfcWsController {
 		}
 		return "{"+locationName+"}";
 	}
+	
+	@RequestMapping(value = "/deviceAuthConfig", method=RequestMethod.GET)
+	@ResponseBody
+	public String nfcDeviceAuthMethod(@RequestParam String numeroId) throws IOException, EsupNfcTagException {
+		String deviceAuthConfig = null;
+		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
+		if(devices.size() > 0) {
+			String nfcAuthConfigKey = devices.get(0).getApplication().getNfcConfig(); 
+			NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(nfcAuthConfigKey);
+			deviceAuthConfig = nfcAuthConfig.getAuthType().toString();
+		}
+		return deviceAuthConfig;
+	}
+	
 }
 
 

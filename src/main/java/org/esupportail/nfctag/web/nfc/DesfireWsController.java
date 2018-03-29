@@ -146,14 +146,15 @@ public class DesfireWsController {
 			nfcResultBean.setSize(0);
 			nfcResultBean.setAction(Action.none);
 			desfireService.reset();
-			DESFireEV1Service.Response response = DESFireEV1Service.Response.UNKNOWN_CODE; 
+			DESFireEV1Service.Response response = DESFireEV1Service.Response.UNKNOWN_CODE;
+			if("READ".equals(function)){
+				result = desfireService.tempRead;
+			}
 			if(result != ""){
 				String msg = result.substring(result.length() - 2);
 				response = DESFireEV1Service.Response.getResponse(Integer.parseInt(msg, 16));
 			}
-			log.trace("Final response  : " + response);
 			if(response.equals(DESFireEV1Service.Response.OPERATION_OK)){
-				
 				TagType tagType = TagType.CSN;
 				String desfireId = "";
 				String appName = "";
@@ -163,9 +164,9 @@ public class DesfireWsController {
 					DesfireReadConfig desfireReadConfig = (DesfireReadConfig) desfireAuthSession.getDesfireAuthConfig();
 					appName = desfireReadConfig.getDesfireAppName();
 					nfcResultBean.setAction(Action.read);
-					log.trace("desfireId crypted  : " + result);
-					desfireId = desfireService.decriptIDP2S(result);
-					log.trace("desfireId descrypted  : " + desfireId);
+					log.debug("desfireId crypted  : " + result);
+					desfireId = desfireService.decriptDesfireId(result);
+					log.debug("desfireId descrypted  : " + desfireId);
 					tagType = TagType.DESFIRE;
 				} else if ("WRITE".equals(function)) {
 					DesfireTag desfireTag =  desfireService.getDesfireTagToWrite();
@@ -192,7 +193,7 @@ public class DesfireWsController {
 				}
 
 			} else {
-				TagError tagError = new TagError();
+				TagError tagError = new TagError(new Exception(response.toString()));
 				log.error("desfire error : " + tagError.getException().getMessage());
 				errorLongPoolController.handleError(tagError);
 				nfcResultBean.setCode(CODE.ERROR);

@@ -28,7 +28,7 @@ public class WsRestController {
 	
 	/**
 	 * Example : 
-	 * curl -v -X POST -H "Content-Type: application/json" -d '{"eppnInit":"bonamvin@univ-rouen.fr","userAgent":"arduino-prototype","applicationName":"SGC","location":"Ecriture"}' http://localhost:8080/wsrest/register
+	 * curl -v -X POST -H "Content-Type: application/json" -d '{"eppnInit":"esup@univ-ville.fr","userAgent":"arduino-prototype","applicationName":"SGC","location":"Ecriture"}' http://localhost:8080/wsrest/register
 	 */
 	@RequestMapping(value = "/register", method=RequestMethod.POST)
 	@ResponseBody
@@ -82,4 +82,5 @@ public class WsRestController {
 		}
 		return eppnInit;
 	}
+	
 }

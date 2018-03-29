@@ -26,7 +26,7 @@ public class DesfireFile implements Serializable {
 	public String getWriteFilePayload() {
 		// accessRights is setting after write command here
 		// return fileNumber + communicationSettings + accessRights + fileSize;
-		return fileNumber + communicationSettings + "EEEE" + fileSize;
+		return fileNumber + communicationSettings + "EEEE";
 	}
 
 	public String getFileNumber() {

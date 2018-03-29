@@ -983,8 +983,40 @@ public class DESFireEV1Service extends SimpleSCR {
 	 * 					the entire file is read, starting from offset.
 	 * @return			{@code true} on success, {@code false otherwise}
 	 */
-	public String readData(byte[] payload) {
+	public String readData(byte fileNo, byte[] offset, byte[] length) {
+		
+		byte[] payload = new byte[7];
+		payload[0] = fileNo;
+		System.arraycopy(offset, 0, payload, 1, 3);
+		System.arraycopy(length, 0, payload, 4, 3);
 		return read(payload, Command.READ_DATA.getCode());
+	}
+
+	/* Support method for readData/readRecords. */
+	private String read(byte[] payload, int cmd) {
+
+		// record files: file settings could be cached,
+		// returning an erroneous number of current records
+		if (cmd == 0xBB && !updateFileSett(payload[0], true))
+			return null;
+		byte[] apdu = new byte[13];
+		apdu[0] = (byte) 0x90;
+		apdu[1] = (byte) cmd;
+		apdu[2] = 0x00;
+		apdu[3] = 0x00;
+		apdu[4] = 0x07;
+		System.arraycopy(payload, 0, apdu, 5, 7);
+		apdu[12] = 0x00;
+
+		preprocess(apdu, CommunicationSetting.PLAIN);
+		
+		return Dump.hex(apdu).replace(" ", "").toUpperCase();
+		
+	}
+	
+	public String readMore(){
+		byte[] apdu = new byte[] {(byte) 0x90, (byte) Command.MORE.getCode(), 0x00, 0x00, 0x00};
+		return Dump.hex(apdu).replace(" ", "").toUpperCase();
 	}
 
 	/**
@@ -1000,29 +1032,49 @@ public class DESFireEV1Service extends SimpleSCR {
 	 * 					<br>the data (1+ bytes)
 	 * @return			{@code true} on success, {@code false otherwise}
 	 */
-	public String writeData1(String value) {
-		
-		byte[] valueHex = hexStringToByteArray(value);
-		byte[] payload = new byte[7 + valueHex.length];
-		payload[0] = (byte) 0x00;
-		payload[4] = Byte.parseByte(Integer.toHexString(valueHex.length),16);
-		System.arraycopy(valueHex, 0, payload, 7, valueHex.length);
-		
-		return write1(payload, (byte) Command.WRITE_DATA.getCode());
-	}
-	
-	public String writeData2(byte[] payload) {
-		return write2(payload, (byte) Command.WRITE_DATA.getCode());
-	}
 	
 	public String writeData(byte fileNo, String value) {
+		// 47 : max length for the first sent = (60 - 6 - 7) (max apdu size - cmd - prepayload)
+		payloadSent = 0;
 		byte[] valueHex = hexStringToByteArray(value);
-		byte[] payload = new byte[7 + valueHex.length];
-		payload[0] = fileNo;
-		payload[4] = Byte.parseByte(Integer.toHexString(valueHex.length),16);
-		System.arraycopy(valueHex, 0, payload, 7, valueHex.length);
+		int valueHexSize = valueHex.length;
+		if(valueHexSize > 47) {
+			valueHexSize = 47;
+		}
 		
-		return write(payload, (byte) Command.WRITE_DATA.getCode());
+		byte[] payload = new byte[7 + valueHexSize];
+		payload[0] = fileNo;
+		payload[4] = (byte) valueHex.length;
+		System.arraycopy(valueHex, 0, payload, 7, valueHexSize);
+		int totalPayload = payload.length;
+		
+		byte[] apdu = new byte[6 + totalPayload];
+		apdu[0] = (byte) 0x90;
+		apdu[1] = (byte) Command.WRITE_DATA.getCode();
+		apdu[4] = (byte) totalPayload;
+		System.arraycopy(payload, 0, apdu, 5, totalPayload);
+		
+		return Dump.hex(apdu).replace(" ", "").toUpperCase();
+		
+	}
+	
+
+	public String writeMore(String value) {
+		// 54 : max length for the next sent = (60 - 6) (max apdu size - cmd)
+		byte[] valueHex = hexStringToByteArray(value);
+		int valueOffset = 47 + (54 * payloadSent);
+		int valueLength = valueHex.length - valueOffset;
+		if(valueLength > 54){
+			valueLength = 54;
+		}
+
+		byte[] fullApdu = new byte[6 + valueLength];
+		fullApdu[0] = (byte) 0x90;
+		fullApdu[1] = (byte) Command.MORE.getCode();
+		fullApdu[4] = (byte) valueLength;
+		System.arraycopy(valueHex, valueOffset, fullApdu, 5, valueLength);
+		payloadSent++;
+		return Dump.hex(fullApdu).replace(" ", "").toUpperCase();
 	}
 	
 	/**
@@ -1556,7 +1608,7 @@ public class DESFireEV1Service extends SimpleSCR {
 	}
 
 	private static byte[] calculateApduCRC32R(byte[] apdu, int length) {
-		
+		System.err.println(length);
 		byte[] data = new byte[length + 1];
 		System.arraycopy(apdu, 0, data, 0, length);// response code is at the end
 		return CRC32.get(data);
@@ -1693,28 +1745,6 @@ public class DESFireEV1Service extends SimpleSCR {
 		return true;
 	}
 
-	/* Support method for readData/readRecords. */
-	private String read(byte[] payload, int cmd) {
-
-		// record files: file settings could be cached,
-		// returning an erroneous number of current records
-		if (cmd == 0xBB && !updateFileSett(payload[0], true))
-			return null;
-		byte[] apdu = new byte[13];
-		apdu[0] = (byte) 0x90;
-		apdu[1] = (byte) cmd;
-		apdu[2] = 0x00;
-		apdu[3] = 0x00;
-		apdu[4] = 0x07;
-		System.arraycopy(payload, 0, apdu, 5, 7);
-		apdu[12] = 0x00;
-
-		preprocess(apdu, CommunicationSetting.PLAIN);
-		
-		return Dump.hex(apdu).replace(" ", "").toUpperCase();
-		
-	}
-
 	/* Support method for read(). Find length of just the data. Retrieved
 	 * APDU is likely to be longer due to encryption (e.g. CRC/padding).
 	 */
@@ -1814,36 +1844,10 @@ public class DESFireEV1Service extends SimpleSCR {
 		return Dump.hex(apdu).replace(" ", "").toUpperCase();
 	}
 	
-	private String write(byte[] payload, byte cmd) {
-
-		byte[] apdu;
-		byte[] fullApdu = new byte[6 + payload.length];
-		fullApdu[0] = (byte) 0x90;
-		fullApdu[1] = cmd;
-		fullApdu[4] = -1;
-		System.arraycopy(payload, 0, fullApdu, 5, payload.length);
-		int totalPayload = fullApdu.length - 6 - payloadSent;
-
-			int sendThisFrame = totalPayload - payloadSent > 52 ? 52
-					: totalPayload - payloadSent;
-
-			//System.out.println(String.format("totalPaylod=%d, payloadSent=%d, sendThisFrame=%d",
-			//		totalPayload, payloadSent, sendThisFrame));
-
-			apdu = new byte[6 + sendThisFrame];
-			apdu[0] = fullApdu[0];
-			apdu[1] = payloadSent == 0 ? fullApdu[1] : (byte) Command.MORE.getCode();
-			apdu[4] = (byte) sendThisFrame;
-			System.arraycopy(fullApdu, 5 + payloadSent, apdu, 5, sendThisFrame);
-			payloadSent += sendThisFrame;
-		
-		if(!(totalPayload - payloadSent > 0)) {
-			payloadSent = 0;
-		}
-
-		return Dump.hex(apdu).replace(" ", "").toUpperCase();
+	public void setPayloadSent(int value){
+		payloadSent = 0;
 	}
-
+	
 	// IV sent is the global one but it is better to be explicit about it: can be null for DES/3DES
 	// if IV is null, then it is set to zeros
 	// Sending data that needs encryption.
@@ -2556,8 +2560,8 @@ public class DESFireEV1Service extends SimpleSCR {
 	}
 
 
-	public static String swapPairs(byte[] tagId) {
-		String s = new StringBuilder(byteArrayToHexString(tagId)).reverse().toString();
+	public static String swapPairs(byte[] byteArray) {
+		String s = new StringBuilder(byteArrayToHexString(byteArray)).reverse().toString();
 		String even = "";
 		String odd = "";
 		int length = s.length();
@@ -2574,9 +2578,9 @@ public class DESFireEV1Service extends SimpleSCR {
 		}
 	}
 	
-	public static byte[] swapPairsByte(byte[] tagId) {
-		String aidString = swapPairs(tagId);
-		return hexStringToByteArray(aidString);
+	public static byte[] swapPairsByte(byte[] byteArray) {
+		String swapString = swapPairs(byteArray);
+		return hexStringToByteArray(swapString);
 	}
 
 }
