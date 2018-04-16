@@ -173,7 +173,7 @@ public class DeviceController {
 			) {
 		List<String> json = new ArrayList<String>();
 		try {
-			List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppn);
+			List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppn, false);
 			if (appLocations.isEmpty()) {
 				log.info(eppn + " don't have location to manage");
 				throw new AccessDeniedException(eppn + " don't have location to manage");

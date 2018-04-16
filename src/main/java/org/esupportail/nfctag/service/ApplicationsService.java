@@ -55,15 +55,14 @@ public class ApplicationsService {
 		return application;
 	}
 
-	public List<AppLocation> getAppsLocations4Eppn(String eppn) throws EsupNfcTagException {
+	public List<AppLocation> getAppsLocations4Eppn(String eppn, boolean checkActive) throws EsupNfcTagException {
 		List<AppLocation> appLocations = new ArrayList<AppLocation>();
 		for(Application appli: Application.findAllApplications()) {
-			log.info("Get apps locations of " + appli.getName() + " for " + eppn);
 			AppliExtApi appliExtApi = applisExtService.get(appli.getAppliExt());
 			AppLocation appLocation = new AppLocation(appli, true);
 			try {
 				List<String> locations = appliExtApi.getLocations4Eppn(eppn);
-				if(locations.size()>0 && appli.isActive()) { 
+				if(locations.size()>0 && (appli.isActive() || !checkActive)) { 
 					appLocation.setLocations(locations);
 				}
 			} catch(Exception e) {

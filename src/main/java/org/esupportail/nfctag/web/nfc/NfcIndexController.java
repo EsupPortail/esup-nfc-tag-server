@@ -161,7 +161,7 @@ public class NfcIndexController {
 		log.info("eppn init : " + eppn);
 		
 		try {
-			List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppn);
+			List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppn, true);
 			if (appLocations.isEmpty()) {
 				log.info(eppn + " don't have location to manage");
 				throw new AccessDeniedException(eppn + " don't have location to manage");
@@ -208,7 +208,7 @@ public class NfcIndexController {
 		Application application = Application.findApplication(applicationId);
 		
 		// check right access ...
-		List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppnInit);
+		List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppnInit, true);
 		Optional<AppLocation> appLocation = appLocations.stream().filter(appLoc -> appLoc.getApplication().getId().equals(applicationId)).findAny();
 		if(!appLocation.isPresent() || !appLocation.get().getLocations().contains(location)) {
 			log.warn(eppnInit + " can not register in this location " + location);

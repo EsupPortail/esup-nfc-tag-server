@@ -1608,7 +1608,6 @@ public class DESFireEV1Service extends SimpleSCR {
 	}
 
 	private static byte[] calculateApduCRC32R(byte[] apdu, int length) {
-		System.err.println(length);
 		byte[] data = new byte[length + 1];
 		System.arraycopy(apdu, 0, data, 0, length);// response code is at the end
 		return CRC32.get(data);

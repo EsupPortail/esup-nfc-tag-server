@@ -110,9 +110,7 @@ public class DesfireService {
 			case READ:
 				tempRead = "";
 				if(tempFileSize.equals("")){
-					System.err.println(result);
 					tempFileSize = result.substring(8, 14);
-					System.err.println(tempFileSize);
 				}
 				byte[] length = desFireEV1Service.hexStringToByteArray(tempFileSize);
 				authResultBean = this.authApp(aid, result, key, keyNo, KeyType.AES);
@@ -124,17 +122,13 @@ public class DesfireService {
 				}
 				break;
 			case MORE:
-				System.err.println(result);
 				if(result.endsWith("AF")){
 					tempRead += result.substring(0, result.length() - 4);
-					System.err.println("temp : " + tempRead);
 					authResultBean.setFullApdu(desFireEV1Service.readMore());
-					System.err.println(authResultBean.getFullApdu());
 					authResultBean.setSize(32);
 					desfireFlowStep.action = Action.MORE;
 				}else if(result.endsWith("9100")){
 					tempRead += result;
-					System.err.println("end : " + tempRead);
 					authResultBean.setFullApdu("END");
 				}
 				break;
@@ -219,6 +213,7 @@ public class DesfireService {
 		if(desfireFile.getFileSize() != null){
 			writePayload = desfireFile.getWriteFilePayload() + desfireFile.getFileSize();
 		} else{
+			//calcul automatique de la taille du fichier en fonction du contenu
 			int fileSize = desfireId.length() / 2;
 			String hexSize = leftPad(Integer.toHexString(fileSize), 6, "0".toCharArray()[0]);
 			writePayload = desfireFile.getWriteFilePayload() + desFireEV1Service.swapPairs(desFireEV1Service.hexStringToByteArray(hexSize));
@@ -251,6 +246,7 @@ public class DesfireService {
 					authResultBean.setFullApdu(desFireEV1Service.selectApplication(desFireEV1Service.hexStringToByteArray("000000")));
 					authResultBean.setSize(16);
 					desfireFlowStep.action = Action.CREATE_APP;
+					desfireFlowStep.authStep = 1;
 					break;
 				case CREATE_APP: 
 					log.debug("Write by " + eppnInit + " - Create app : " + aid);
@@ -298,8 +294,6 @@ public class DesfireService {
 					break;
 				case WRITE_FILE:	
 					if(authResultBean.getFullApdu() == null || desfireFlowStep.writeStep>0) {
-						System.err.println(desfireId);
-						System.err.println(desfireId.length());
 						if(desfireFlowStep.writeStep==0) {
 							desfireFlowStep.authStep = 1;
 							log.debug("Write by " + eppnInit + " - Write in file " + fileNo +" : " + desfireId);

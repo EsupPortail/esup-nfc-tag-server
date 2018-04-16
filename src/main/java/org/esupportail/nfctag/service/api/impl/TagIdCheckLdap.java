@@ -32,13 +32,16 @@ public class TagIdCheckLdap implements TagIdCheckApi {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	@Autowired
 	protected List<LdapService> ldapServices;
 
 	protected String desfireSuffix;
 	
 	protected String description;
 	
+	public void setLdapServices(List<LdapService> ldapServices) {
+		this.ldapServices = ldapServices;
+	}
+
 	public void setDesfireSuffix(String desfireSuffix) {
 		this.desfireSuffix = desfireSuffix;
 	}
