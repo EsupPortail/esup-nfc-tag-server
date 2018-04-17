@@ -20,38 +20,70 @@ public class DesfireTag implements Serializable {
 	/**
 	 * PICC master key == key 0
 	 */
-	private String key;
+	private String keyStart;
 	
-	private String keyVersion;
+	private String keyVersionStart;
 
 	/**
 	 * keyType : AES, DES
 	 */
-	private KeyType keyType;
+	private KeyType keyTypeStart;
+
+	private String keyFinish;
 	
-	public String getKey() {
-		return key;
-	}
+	private String keyVersionFinish;
 
-	public void setKey(String key) {
-		this.key = key;
-	}
+	/**
+	 * keyType : AES, DES
+	 */
+	private KeyType keyTypeFinish;
 	
-	public String getKeyVersion() {
-		return keyVersion;
+	public String getKeyStart() {
+		return keyStart;
 	}
 
-	public void setKeyVersion(String keyVersion) {
-		this.keyVersion = keyVersion;
+	public void setKeyStart(String keyStart) {
+		this.keyStart = keyStart;
 	}
 
-	
-	public KeyType getKeyType() {
-		return keyType;
+	public String getKeyVersionStart() {
+		return keyVersionStart;
 	}
 
-	public void setKeyType(KeyType keyType) {
-		this.keyType = keyType;
+	public void setKeyVersionStart(String keyVersionStart) {
+		this.keyVersionStart = keyVersionStart;
+	}
+
+	public KeyType getKeyTypeStart() {
+		return keyTypeStart;
+	}
+
+	public void setKeyTypeStart(KeyType keyTypeStart) {
+		this.keyTypeStart = keyTypeStart;
+	}
+
+	public String getKeyFinish() {
+		return keyFinish;
+	}
+
+	public void setKeyFinish(String keyFinish) {
+		this.keyFinish = keyFinish;
+	}
+
+	public String getKeyVersionFinish() {
+		return keyVersionFinish;
+	}
+
+	public void setKeyVersionFinish(String keyVersionFinish) {
+		this.keyVersionFinish = keyVersionFinish;
+	}
+
+	public KeyType getKeyTypeFinish() {
+		return keyTypeFinish;
+	}
+
+	public void setKeyTypeFinish(KeyType keyTypeFinish) {
+		this.keyTypeFinish = keyTypeFinish;
 	}
 
 	public List<DesfireApplication> getApplications() {
