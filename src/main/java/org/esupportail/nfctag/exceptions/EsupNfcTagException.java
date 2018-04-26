@@ -32,6 +32,7 @@ public class EsupNfcTagException extends RuntimeException {
 	static public enum EsupNfcTagErrorMessage{
 		error_esupnfctagexception_serviceunavailable,
 		error_esupnfctagexception_unknowcard,
+		error_esupnfctagexception_nottagable,
 		error_esupnfctagexception_typenotsupported,
 		error_esupnfctagexception_unknowdevice,
 		error_esupnfctagexception_locationnotfound,

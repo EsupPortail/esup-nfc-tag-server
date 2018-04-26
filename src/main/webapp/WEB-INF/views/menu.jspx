@@ -3,14 +3,19 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <c:if test="${empty param.numeroId and empty numeroId}">
-        <sec:authorize access="hasRole('ROLE_ADMIN')">
             <menu:menu id="_menu" z="user-managed">
-                <menu:item id="c_accueil" messageCode="button_home" url="/" z="user-managed"/>
+        		<sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')">
+                	<menu:item id="c_accueil" messageCode="button_home" url="/" z="user-managed"/>
+				</sec:authorize>
+		        <sec:authorize access="hasRole('ROLE_ADMIN')">
                 <menu:item id="i_application_list" messageCode="menu_item_application_list_label" url="/manager/applications?page=1&amp;size=${empty param.size ? 10 : param.size}" z="user-managed"/>
                 <menu:item id="i_device_list" messageCode="menu_item_device_list_label" url="/manager/devices?page=1&amp;size=${empty param.size ? 10 : param.size}" z="user-managed"/>
+                </sec:authorize>
+                <sec:authorize access="hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')">
                 <menu:item id="i_logleoauth_list" label="Logs" url="/manager/taglogs?page=1&amp;size=${empty param.size ? 10 : param.size}" z="user-managed"/>
                 <menu:item id="i_stats" label="Stats" url="/manager/stats/" z="user-managed"/>
                 <menu:item id="i_downloads" label="Downloads" url="/downloads" z="user-managed"/>
+                </sec:authorize>
                 <menu:category render="false" id="c_application" z="user-managed">
                     <menu:item id="i_application_new" messageCode="global_menu_new" url="/manager/applications?form" z="user-managed"/>
                 </menu:category>
@@ -21,13 +26,5 @@
                     <menu:item id="i_taglog_list" messageCode="global_menu_list" url="/manager/taglogs?page=1&amp;size=${empty param.size ? 10 : param.size}" z="user-managed"/>
                 </menu:category>
             </menu:menu>
-        </sec:authorize>
-        <sec:authorize access="hasRole('ROLE_SUPERVISOR')">
-            <menu:menu id="_menu" z="user-managed">
-                <menu:item id="c_accueil" messageCode="button_home" url="/" z="user-managed"/>
-                <menu:item id="i_logleoauth_list" label="Logs" url="/manager/taglogs?page=1&amp;size=${empty param.size ? 10 : param.size}" z="user-managed"/>
-                <menu:item id="i_download_apk" label="APK" url="/nfc-index/download" z="user-managed"/>
-            </menu:menu>
-        </sec:authorize>
     </c:if>
 </div>

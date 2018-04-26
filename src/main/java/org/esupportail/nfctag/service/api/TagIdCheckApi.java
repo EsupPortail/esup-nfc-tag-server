@@ -26,8 +26,6 @@ public interface TagIdCheckApi {
 
 	TagLog getTagLogFromTagId(TagType tagType, String tagId, String appName) throws EsupNfcTagException;
 	
-	Boolean supportTagType(TagType tagType);
-	
 	String getDescription();
 	
 }

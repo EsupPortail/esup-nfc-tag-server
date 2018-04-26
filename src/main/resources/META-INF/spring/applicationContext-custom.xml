@@ -35,14 +35,32 @@
 
     
     <bean id="dummyExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtDummy"/>
-    
-    <bean id="tagIdCheckApiLdap" class="org.esupportail.nfctag.service.api.impl.TagIdCheckLdap">
-    	<property name="desfireSuffix" value="univ-ville.fr"/>
-	<property name="description" value="via LDAP"/>
-    </bean>
- 
+
     <bean id="tagIdCheckApiDummy" class="org.esupportail.nfctag.service.api.impl.TagIdCheckDummyWs">
-    	<property name="description" value="TagIdCheckDummy"/>
+        <property name="description" value="TagIdCheckDummy"/>
+    </bean>
+    
+    <bean id="tagIdCheckApiLdapWithCsn" class="org.esupportail.nfctag.service.api.impl.TagIdCheckLdap">
+    	<property name="searchFilter" value="supannRefId='{'ISO15693'}'{0}"/>
+		<property name="description" value="via LDAP ISO15693"/>
+		<property name="ldapServices">
+			<util:list>
+				<ref bean="ldapServiceUnivVille"/>
+			</util:list>
+		</property>
+    </bean>
+
+    <bean id="ldapExtApi" class="org.esupportail.nfctag.service.api.impl.AppliExtLdap">
+    	<property name="isTagableFilter" value="objectclass=person"/>
+    	<property name="displayAttribut" value="displayName"/>
+    	<property name="locationFilter" value="objectclass=person"/>
+    	<property name="locationName" value="Ldap getDisplayName"/>
+    	<property name="description" value="Ldap getDisplayname"/>
+		<property name="ldapServices">
+			<util:list>
+				<ref bean="ldapServiceUnivVille"/>
+			</util:list>
+		</property>
     </bean>
 
     <bean id="csnAuthConfig" class="org.esupportail.nfctag.service.api.impl.CsnAuthConfig">

@@ -85,17 +85,4 @@ public class TagIdCheckDummyWs implements TagIdCheckApi {
 
 		return tagLog;	
 	}
-	
-	@Override
-	public Boolean supportTagType(TagType tagType) {
-		switch (tagType) {
-			case CSN :
-				return true;
-			case DESFIRE :
-				return true;	
-			default:
-				return false;
-		}
-	}
-	
 }

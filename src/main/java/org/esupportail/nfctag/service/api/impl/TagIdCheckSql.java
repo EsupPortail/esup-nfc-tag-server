@@ -21,7 +21,6 @@ import javax.sql.DataSource;
 
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.service.api.TagIdCheckApi;
-import org.esupportail.nfctag.service.api.TagIdCheckApi.TagType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -83,18 +82,6 @@ public class TagIdCheckSql implements TagIdCheckApi {
 			log.info("Pas de résultat pour le tagId : " + tagId);
 		}
 		return tagLog;	
-	}
-
-	@Override
-	public Boolean supportTagType(TagType tagType) {
-		switch (tagType) {
-			case CSN :
-				return csnAuthSql != null && !csnAuthSql.isEmpty();
-			case DESFIRE :
-				return desfireAuthSql != null && !desfireAuthSql.isEmpty();
-			default:
-				return false;
-		}
 	}
 
 }
