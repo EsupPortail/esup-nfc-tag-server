@@ -120,8 +120,6 @@
 		<beans:property name="ldapTemplate" ref="ldapTemplate"/>
 		<beans:property name="groupSearchBase" value="ou=groups" />
 		<beans:property name="groupSearchFilter" value="member={0}"/>
-		<beans:property name="memberSearchBase" value="ou=people"/>
-		<beans:property name="memberSearchFilter" value="memberOf={0}"/>
 	</beans:bean>
 	
 	<util:map id="nfcMappingGroupesRoles">

@@ -18,10 +18,6 @@ public class LdapGroupService implements GroupService {
 	String groupSearchBase;
 	
 	String groupSearchFilter;
-	
-	String memberSearchBase;
-	
-	String memberSearchFilter;
 
 	public void setLdapTemplate(LdapTemplate ldapTemplate) {
 		this.ldapTemplate = ldapTemplate;
@@ -33,14 +29,6 @@ public class LdapGroupService implements GroupService {
 
 	public void setGroupSearchFilter(String groupSearchFilter) {
 		this.groupSearchFilter = groupSearchFilter;
-	}
-
-	public void setMemberSearchBase(String memberSearchBase) {
-		this.memberSearchBase = memberSearchBase;
-	}
-
-	public void setMemberSearchFilter(String memberSearchFilter) {
-		this.memberSearchFilter = memberSearchFilter;
 	}
 
 	/* (non-Javadoc)
@@ -85,26 +73,5 @@ public class LdapGroupService implements GroupService {
 		
 	}
 
-	/* (non-Javadoc)
-	 * @see org.esupportail.nfctag.security.GroupService#getMembers(java.lang.String)
-	 */
-	@Override
-	public List<String> getMembers(String groupName) {
-
-		String formattedFilter = MessageFormat.format(memberSearchFilter, new String[] {groupName});
-			
-		List<String> eppns = ldapTemplate.search(
-				memberSearchBase, formattedFilter,new ContextMapper<String>() {
-	
-						@Override
-						public String mapFromContext(Object ctx) throws NamingException {
-							DirContextAdapter searchResultContext = (DirContextAdapter)ctx;
-					        String eppn = searchResultContext.getStringAttribute("eduPersonPrincipalName");
-							return eppn;
-						}
-					});
-		
-		return eppns;
-	}
-	
 }
+
