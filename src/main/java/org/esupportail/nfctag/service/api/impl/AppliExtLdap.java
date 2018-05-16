@@ -118,7 +118,6 @@ public class AppliExtLdap implements AppliExtApi {
 				break;
 			}
 		}
-			 
 		return locations; 
 	}
 	

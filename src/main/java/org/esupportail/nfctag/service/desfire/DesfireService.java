@@ -258,9 +258,13 @@ public class DesfireService {
 					break;
 				case CREATE_APP: 
 					log.debug("Write by " + eppnInit + " - Create app : " + aid);
-					authResultBean.setFullApdu(desFireEV1Service.createApplication(desFireEV1Service.swapPairsByte(aid),amks, nok));
-					authResultBean.setSize(0);
-					desfireFlowStep.action = Action.CHANGE_APP_MASTER_KEY;
+					authResultBean = this.authApp(desFireEV1Service.hexStringToByteArray("000000"), result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
+					if(authResultBean.getFullApdu() == null) {
+						authResultBean.setFullApdu(desFireEV1Service.createApplication(desFireEV1Service.swapPairsByte(aid),amks, nok));
+						authResultBean.setSize(0);
+						desfireFlowStep.action = Action.CHANGE_APP_MASTER_KEY;
+						desfireFlowStep.authStep = 1;
+					}
 					break;
 				case CHANGE_APP_MASTER_KEY:
 					log.debug("Write by " + eppnInit + " - Change app key : " + desFireEV1Service.byteArrayToHexString(aid));

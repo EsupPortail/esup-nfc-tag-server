@@ -6,20 +6,23 @@
         <spring:message code="label_org_esupportail_nfctag_domain_device"/> : ${device.imei}</h1>
     <form:update cssClass="form-horizontal" id="fu_org_esupportail_nfctag_domain_Device" modelAttribute="device" path="/manager/devices" versionField="Version" z="user-managed">
         <field:input cssClass="form-control" field="numeroId" id="c_org_esupportail_nfctag_domain_Device_numeroId" z="user-managed"/>
-        <field:input cssClass="form-control" field="eppnInit" id="c_org_esupportail_nfctag_domain_Device_eppnInit" z="user-managed"/>
         <field:input cssClass="form-control" field="macAddress" id="c_org_esupportail_nfctag_domain_Device_macAddress" z="user-managed"/>
         <field:input cssClass="form-control" field="imei" id="c_org_esupportail_nfctag_domain_Device_imei" z="user-managed"/>
         <field:input cssClass="form-control" field="userAgent" id="c_org_esupportail_nfctag_domain_Device_userAgent" z="user-managed"/>
         <field:select checkboxes="true" field="application" id="c_org_esupportail_nfctag_domain_Device_application" itemLabel="name" itemValue="id" items="${applications}" path="/manager/applications" z="user-managed"/>
         <field:input cssClass="form-control" field="location" id="c_org_esupportail_nfctag_domain_Device_location" render="false" z="user-managed"/>
+        <field:input cssClass="form-control" field="eppnInit" id="c_org_esupportail_nfctag_domain_Device_eppnInit" z="user-managed"/>
         <div class="form-group" id="_c_org_esupportail_nfctag_domain_Device_location">
             <label class="col-lg-4  control-label control-label" for="location">
                 <strong>Salle</strong>
             </label>
-            <div class="col-lg-6">
+            <div class="col-lg-5">
                 <select class="form-control" id="location" name="location" type="text" value="">
                     <option value="${device.location}">${device.location}</option>
                 </select>
+            </div>
+            <div id="loading" class="col-lg-1" style="display: none;">
+            	<div  class="glyphicon glyphicon-refresh spinning" ><!--  --></div>
             </div>
         </div>
         <field:checkbox field="validateAuthWoConfirmation" id="c_org_esupportail_nfctag_domain_Device_validateAuthWoConfirmation" z="user-managed"/>

@@ -578,15 +578,6 @@ $(document).ready(function() {
 				eppnInit : {
 					required : true
 				},
-				imei : {
-					required : true
-				},
-				macAddress : {
-					required : true
-				},
-				userAgent : {
-					required : true
-				},
 				application : {
 					required : true
 				},
@@ -634,19 +625,28 @@ $(document).ready(function() {
 			    }
 			});
 			
-			$('#location').empty().append($('<option>').text("Loading...").attr('value', null));
-			 
 			if(eppn!=null && idApp!=null){
+				$('#location').empty().append($('<option>').text("").attr('value', null));
+				$("#loading").css("display", "block");
 				var url = '/manager/devices/locationsJson?eppn='+eppn+'&applicationId='+idApp;
 				$.ajax({
 				    url: url,
 				    type:'GET',
 				    dataType: 'json',
 				    success: function( json ) {
-				        $.each(json, function(i, value) {
-				            $('#location').empty().append($('<option>').text(value).attr('value', value));
-				        });
-				        $("#location").click();
+				    	$("#loading").css("display", "none");
+				    	var count = Object.keys(json).length;
+				    	if(count > 0) {
+				    		$('#location').empty()
+					        $.each(json, function(i, value) {
+					            $('#location').append($('<option>').text(value).attr('value', value));
+					        });
+					        $("#location").click();
+				    	}else{
+				    		$('#location').empty().append($('<option>').text("").attr('value', null));
+				    		$('#location').attr("title", "ERROR : no location found for this eppn / application");
+			    			$('#device').submit();
+				    	}
 				    }
 				});
 			}
