@@ -17,10 +17,10 @@
  */
 package org.esupportail.nfctag.service.api;
 
-import java.util.Date;
+import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 
 public interface TagWriteApi {
 
-	String getIdFromCsn(String csn);
+	String getIdFromCsn(String csn) throws EsupNfcTagException;
 
 }

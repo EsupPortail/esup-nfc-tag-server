@@ -3,9 +3,8 @@ package org.esupportail.nfctag.beans;
 import java.io.Serializable;
 import java.util.List;
 
-import org.esupportail.nfctag.service.api.TagUpdateApi;
 import org.esupportail.nfctag.service.api.TagWriteApi;
-import org.esupportail.nfctag.service.api.impl.TagUpdateNone;
+import org.esupportail.nfctag.service.api.impl.TagLastUpdateRestWs;
 import org.esupportail.nfctag.service.api.impl.TagWriteNone;
 
 public class DesfireApplication implements Serializable {
@@ -39,22 +38,22 @@ public class DesfireApplication implements Serializable {
 	
 	TagWriteApi tagWriteApi = new TagWriteNone();
 	
-	TagUpdateApi tagUpdateApi = new TagUpdateNone();
+	TagLastUpdateRestWs tagLastUpdateRestWs;
 	
+	public TagLastUpdateRestWs getTagLastUpdateRestWs() {
+		return tagLastUpdateRestWs;
+	}
+
+	public void setTagLastUpdateRestWs(TagLastUpdateRestWs tagLastUpdateRestWs) {
+		this.tagLastUpdateRestWs = tagLastUpdateRestWs;
+	}
+
 	public TagWriteApi getTagWriteApi() {
 		return tagWriteApi;
 	}
 
 	public void setTagWriteApi(TagWriteApi tagWriteApi) {
 		this.tagWriteApi = tagWriteApi;
-	}
-
-	public void setTagUpdateApi(TagUpdateApi tagUpdateApi) {
-		this.tagUpdateApi = tagUpdateApi;
-	}
-	
-	public TagUpdateApi getTagUpdateApi() {
-		return tagUpdateApi;
 	}
 	
 	public String getUpdateDate() {

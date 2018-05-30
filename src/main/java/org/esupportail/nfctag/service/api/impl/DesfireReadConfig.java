@@ -38,10 +38,6 @@ public class DesfireReadConfig extends NfcAuthConfig {
 	
 	private String desfireFileSize;
 	
-	public String getReadFilePayload() {
-		return desfireFileNumber + desfireFileOffset + desfireFileSize;
-	}
-	
 	@Override
 	public AuthType getAuthType() {
 		return AuthType.DESFIRE;
@@ -93,13 +89,5 @@ public class DesfireReadConfig extends NfcAuthConfig {
 
 	public void setDesfireFileOffset(String desfireFileOffset) {
 		this.desfireFileOffset = desfireFileOffset;
-	}
-
-	public String getDesfireFileSize() {
-		return desfireFileSize;
-	}
-
-	public void setDesfireFileSize(String desfireFileSize) {
-		this.desfireFileSize = desfireFileSize;
 	}
 }

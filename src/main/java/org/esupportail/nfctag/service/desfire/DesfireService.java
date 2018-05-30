@@ -36,7 +36,6 @@ import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.ApplicationsService;
 import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
-import org.esupportail.nfctag.service.api.TagUpdateApi;
 import org.esupportail.nfctag.service.api.TagWriteApi;
 import org.esupportail.nfctag.service.api.impl.DesfireReadConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireUpdateConfig;
@@ -50,6 +49,8 @@ public class DesfireService {
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
     
     private DesfireFlowStep desfireFlowStep = new DesfireFlowStep();
+    
+	private String desfireId = "";
     
 	private DesfireAuthSession desfireAuthSession;
 	
@@ -82,6 +83,10 @@ public class DesfireService {
 		return desfireFlowStep.action;
 	}
 
+	public int getAuthStep() {
+		return desfireFlowStep.authStep;
+	}
+	
 	public NfcResultBean readDesfireId(String result){
 		if(result.length()==0){
 			reset();
@@ -95,7 +100,6 @@ public class DesfireService {
 		byte[] key = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getDesfireKey());
 		byte fileNo = desFireEV1Service.hexStringToByte(desfireReadConfig.getDesfireFileNumber());
 		byte[] offset = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getDesfireFileOffset());
-		byte[] payload = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getReadFilePayload());
 		
 		switch(desfireFlowStep.action){
 			case GET_FILE_SETTINGS:
@@ -132,6 +136,8 @@ public class DesfireService {
 					authResultBean.setFullApdu("END");
 				}
 				break;
+		default:
+			break;
 		}
 		return authResultBean;
 	}
@@ -146,84 +152,12 @@ public class DesfireService {
 		return desfireUpdateConfig.getDesfireTag();
 	}
 	
-	public NfcResultBean writeCard(String result, String eppnInit, String csn){
+	public NfcResultBean writeCard(String result, String eppnInit, String csn) throws EsupNfcTagException {
 		NfcResultBean authResultBean = new NfcResultBean();
 		authResultBean.setAction(NfcResultBean.Action.none);
 		authResultBean.setCode(CODE.OK);
 		
-		byte[] defaultKey;
 		DesfireTag desfireTag =  getDesfireTagToWrite();
-		if(desfireTag.getApplications() == null){
-			if(result.length()==0){
-				desfireFlowStep.action = Action.SELECT_ROOT;
-			}
-			switch(desfireFlowStep.action){
-				case SELECT_ROOT:
-					log.debug("Nothing  by " + eppnInit + " - Select root");
-					authResultBean.setFullApdu(desFireEV1Service.selectApplication(desFireEV1Service.hexStringToByteArray("000000")));
-					authResultBean.setSize(16);
-					desfireFlowStep.action = Action.END;
-					break;
-				case END:
-					authResultBean.setFullApdu("END");
-					authResultBean.setAction(NfcResultBean.Action.write);
-					break;
-			}
-			return authResultBean;
-		}
-		
-		byte[] piccKeyStart = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyStart());
-		KeyType piccKeyTypeStart = desfireTag.getKeyTypeStart();
-		byte piccKeyVerStart = desFireEV1Service.hexStringToByte(desfireTag.getKeyVersionStart());
-		
-		byte[] piccKeyFinish = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyFinish());
-		KeyType piccKeyTypeFinish = desfireTag.getKeyTypeFinish();
-		byte piccKeyVerFinish = desFireEV1Service.hexStringToByte(desfireTag.getKeyVersionFinish());
-		
-		DesfireApplication desfireApp = desfireTag.getApplications().get(desfireFlowStep.currentApp);
-		byte[] aid = desFireEV1Service.hexStringToByteArray(desfireApp.getDesfireAppId());
-		byte amks= desFireEV1Service.hexStringToByte(desfireApp.getAmks());
-		byte nok = desFireEV1Service.hexStringToByte(desfireApp.getNok());
-		
-		DesfireKey desfireAppKey = desfireApp.getKeys().get(0);
-		byte[] appKey = desFireEV1Service.hexStringToByteArray(desfireAppKey.getKey());
-		byte appKeyNo = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyNo());
-		byte appKeyVer = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyVer());
-		KeyType appKeyType = desfireAppKey.getType();
-		KeyType appDefaultKeyType;
-		if(desfireApp.getNok().substring(0, 1).equals("8")){
-			appDefaultKeyType = KeyType.AES;
-			defaultKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
-		}else{
-			appDefaultKeyType = KeyType.DES;
-			defaultKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
-		}
-		
-		
-		DesfireKey desfireKey = desfireApp.getKeys().get(desfireFlowStep.currentKey);
-		byte keyNo = desFireEV1Service.hexStringToByte(desfireKey.getKeyNo());
-		byte[] key = desFireEV1Service.hexStringToByteArray(desfireKey.getKey());
-		byte keyVer = desFireEV1Service.hexStringToByte(desfireKey.getKeyVer());
-		KeyType keyKeyType = desfireKey.getType();
-		
-		DesfireFile desfireFile = desfireApp.getFiles().get(desfireFlowStep.currentFile);
-		byte[] accessRights = desFireEV1Service.hexStringToByteArray(desfireFile.getAccessRights());
-		byte cms = desFireEV1Service.hexStringToByte(desfireFile.getCommunicationSettings());
-		byte fileNo = desFireEV1Service.hexStringToByte(desfireFile.getFileNumber());
-		
-		TagWriteApi tagWriteApi = desfireFile.getTagWriteApi();
-		String desfireId = tagWriteApi.getIdFromCsn(csn);
-		String writePayload;
-		if(desfireFile.getFileSize() != null){
-			writePayload = desfireFile.getWriteFilePayload() + desfireFile.getFileSize();
-		} else{
-			//calcul automatique de la taille du fichier en fonction du contenu
-			int fileSize = desfireId.length() / 2;
-			String hexSize = leftPad(Integer.toHexString(fileSize), 6, "0".toCharArray()[0]);
-			writePayload = desfireFile.getWriteFilePayload() + desFireEV1Service.swapPairs(desFireEV1Service.hexStringToByteArray(hexSize));
-			
-		}
-		byte[] byteWritePayload = desFireEV1Service.hexStringToByteArray(writePayload);
 		
 		if(result.length()==0){
 			reset();
@@ -233,76 +167,201 @@ public class DesfireService {
 				desfireFlowStep.action = Action.SELECT_ROOT;
 			}
 		}
+		byte[] defaultKey = null;
+		
+		byte[] piccAid = desFireEV1Service.hexStringToByteArray("000000");
+		byte[] piccKeyStart = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyStart());
+		KeyType piccKeyTypeStart = desfireTag.getKeyTypeStart();
+		
+		byte[] piccKeyFinish = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyFinish());
+		KeyType piccKeyTypeFinish = desfireTag.getKeyTypeFinish();
+		byte piccKeyVerFinish = desFireEV1Service.hexStringToByte(desfireTag.getKeyVersionFinish());
+		
+		DesfireApplication desfireApp = null;
+		byte[] aid = null;
+		byte amks = 0;
+		byte nok = 0;
+		
+		byte[] appKey = null;
+		byte appKeyNo = 0;
+		byte appKeyVer = 0; 
+		KeyType appKeyType = null;
+		KeyType appDefaultKeyType = null;
+		
+		byte keyNo = 0;
+		byte[] key = null;
+		byte keyVer = 0;
+		KeyType keyKeyType = null;
+		
+		byte[] byteWritePayload = null;
+		byte[] accessRights = null;
+		byte cms = 0;
+		byte fileNo = 0;
+		
+		if(desfireTag.getApplications() != null && desfireTag.getApplications().size() >  desfireFlowStep.currentApp){
+			desfireApp = desfireTag.getApplications().get(desfireFlowStep.currentApp);
+			aid = desFireEV1Service.hexStringToByteArray(desfireApp.getDesfireAppId());
+			amks= desFireEV1Service.hexStringToByte(desfireApp.getAmks());
+			nok = desFireEV1Service.hexStringToByte(desfireApp.getNok());
+			
+			if(desfireApp.getNok().substring(0, 1).equals("8")){
+				defaultKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
+				appDefaultKeyType = KeyType.AES;
+				appKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
+				appKeyNo = desFireEV1Service.hexStringToByte("00");
+				appKeyVer = desFireEV1Service.hexStringToByte("00");
+				keyKeyType = appKeyType = KeyType.AES;
+			}else{
+				defaultKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
+				appDefaultKeyType = KeyType.DES;				
+				appKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
+				appKeyNo = desFireEV1Service.hexStringToByte("00");
+				appKeyVer = desFireEV1Service.hexStringToByte("00");
+				keyKeyType = appKeyType = KeyType.DES;
+			}
+
+			if(desfireApp.getKeys() != null && desfireApp.getKeys().size() > 0) {
+				DesfireKey desfireAppKey = desfireApp.getKeys().get(0);
+				appKey = desFireEV1Service.hexStringToByteArray(desfireAppKey.getKey());
+				appKeyNo = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyNo());
+				appKeyVer = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyVer());
+				if(desfireApp.getKeys().size() >  desfireFlowStep.currentKey) {
+					DesfireKey desfireKey = desfireApp.getKeys().get(desfireFlowStep.currentKey);
+					keyNo = desFireEV1Service.hexStringToByte(desfireKey.getKeyNo());
+					key = desFireEV1Service.hexStringToByteArray(desfireKey.getKey());
+					keyVer = desFireEV1Service.hexStringToByte(desfireKey.getKeyVer());
+				}
+			}
+			
+			if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
+				DesfireFile desfireFile = desfireApp.getFiles().get(desfireFlowStep.currentFile);
+				accessRights = desFireEV1Service.hexStringToByteArray(desfireFile.getAccessRights());
+				cms = desFireEV1Service.hexStringToByte(desfireFile.getCommunicationSettings());
+				fileNo = desFireEV1Service.hexStringToByte(desfireFile.getFileNumber());
+				TagWriteApi tagWriteApi = desfireFile.getTagWriteApi();
+				desfireId = tagWriteApi.getIdFromCsn(csn);
+				String writePayload;
+				if(desfireFile.getFileSize() != null){
+					writePayload = desfireFile.getWriteFilePayload() + desfireFile.getFileSize();
+				} else{
+					//calcul automatique de la taille du fichier en fonction du contenu
+					int fileSize = desfireId.length() / 2;
+					String hexSize = leftPad(Integer.toHexString(fileSize), 6, '0');
+					writePayload = desfireFile.getWriteFilePayload() + desFireEV1Service.swapPairs(desFireEV1Service.hexStringToByteArray(hexSize));
+				}
+				byteWritePayload = desFireEV1Service.hexStringToByteArray(writePayload);
+			}
+		}
+
 		switch(desfireFlowStep.action){
 				case FORMAT:
-					log.debug("Write by " + eppnInit + " - Format card");
-					authResultBean = this.authApp(desFireEV1Service.hexStringToByteArray("000000"), result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
+					log.debug("Write by " + eppnInit + " - Step : Format card");
+					authResultBean = this.authApp(piccAid, result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
 					if(authResultBean.getFullApdu() == null) {
+						desfireFlowStep.authStep = 1;
 						authResultBean.setFullApdu(desFireEV1Service.formatPICC());
 						authResultBean.setSize(16);					
-						log.trace(eppnInit + " - Format card");
-						desfireFlowStep.action = Action.CREATE_APP;
-						desfireFlowStep.authStep = 1;
+						if(desfireTag.getApplications() != null &&  desfireTag.getApplications().size() > desfireFlowStep.currentApp){
+							desfireFlowStep.action = Action.CREATE_APP;
+						} else {
+							desfireFlowStep.currentApp = 0;
+							desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+						}
 					}
 					break;
 				case SELECT_ROOT:
-					log.debug("Write by " + eppnInit + " - Select root");
-					authResultBean = this.authApp(desFireEV1Service.hexStringToByteArray("000000"), result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
+					log.debug("Write by " + eppnInit + " - Step : Select root");
+					authResultBean = this.authApp(piccAid, result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
 					if(authResultBean.getFullApdu() == null) {
-						authResultBean.setFullApdu(desFireEV1Service.selectApplication(desFireEV1Service.hexStringToByteArray("000000")));
-						authResultBean.setSize(16);
-						log.trace(eppnInit + " - Select ROOT APP");
-						desfireFlowStep.action = Action.CREATE_APP;
 						desfireFlowStep.authStep = 1;
+						authResultBean.setFullApdu(desFireEV1Service.selectApplication(piccAid));
+						authResultBean.setSize(16);
+						if(desfireTag.getApplications() != null &&  desfireTag.getApplications().size() > desfireFlowStep.currentApp){
+							desfireFlowStep.action = Action.CREATE_APP;
+						} else {
+							desfireFlowStep.currentApp = 0;
+							desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+						}
 					}
 					break;
-				case CREATE_APP: 
-					log.debug("Write by " + eppnInit + " - Create app : " + aid);
-					authResultBean = this.authApp(desFireEV1Service.hexStringToByteArray("000000"), result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
+				case CREATE_APP:
+					log.debug("Write by " + eppnInit + " - Step : Create app : " + desFireEV1Service.byteArrayToHexString(aid));
+					authResultBean = this.authApp(piccAid, result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
 					if(authResultBean.getFullApdu() == null) {
+						desfireFlowStep.authStep = 1;
 						authResultBean.setFullApdu(desFireEV1Service.createApplication(desFireEV1Service.swapPairsByte(aid),amks, nok));
 						authResultBean.setSize(0);
-						desfireFlowStep.action = Action.CHANGE_APP_MASTER_KEY;
-						desfireFlowStep.authStep = 1;
-					}
-					break;
-				case CHANGE_APP_MASTER_KEY:
-					log.debug("Write by " + eppnInit + " - Change app key : " + desFireEV1Service.byteArrayToHexString(aid));
-					authResultBean = this.authApp(aid, result, defaultKey, appKeyNo, appDefaultKeyType);
-					if(authResultBean.getFullApdu() == null) {
-						authResultBean.setFullApdu(desFireEV1Service.changeKey(appKeyNo, appKeyVer, appKeyType, appKey, defaultKey));
-						authResultBean.setSize(16);					
-						log.trace("change key part");
-						desfireFlowStep.action = Action.CHANGE_KEYS;
-						desfireFlowStep.authStep = 1;
-					}
-					break;
-				case CHANGE_KEYS:
-					log.debug("Write by " + eppnInit + " - Change app key : " + keyNo + " for " + desFireEV1Service.byteArrayToHexString(aid));
-					authResultBean = this.authApp(aid, result, appKey, appKeyNo, appDefaultKeyType);
-					if(authResultBean.getFullApdu() == null) {
-						authResultBean.setFullApdu(desFireEV1Service.changeKey(keyNo, keyVer, keyKeyType, key, defaultKey));
-						authResultBean.setSize(16);					
-						log.trace("change key part");
-						desfireFlowStep.authStep = 1;				
-						if(desfireFlowStep.currentKey+1<desfireApp.getKeys().size()) {
-							desfireFlowStep.currentKey++;
-						} else {
+						if(appKey != null){
+							desfireFlowStep.action = Action.CHANGE_APP_MASTER_KEY;
+						}else{
 							desfireFlowStep.action = Action.CREATE_FILE;
 							desfireFlowStep.currentKey = 1;
 						}
 					}
 					break;
-				case CREATE_FILE:	
+				case CHANGE_APP_MASTER_KEY:
+					log.debug("Write by " + eppnInit + " - Step : Change app key : " + desFireEV1Service.byteArrayToHexString(aid));
+					authResultBean = this.authApp(aid, result, defaultKey, appKeyNo, appDefaultKeyType);
 					if(authResultBean.getFullApdu() == null) {
-						log.debug("Write by " + eppnInit + " - Create file in " + desFireEV1Service.byteArrayToHexString(aid) +" : " + fileNo);
+						desfireFlowStep.authStep = 1;
+						authResultBean.setFullApdu(desFireEV1Service.changeKey(appKeyNo, appKeyVer, appKeyType, appKey, defaultKey));
+						authResultBean.setSize(16);			
+						if(desfireApp.getKeys() != null && desfireApp.getKeys().size() >  1) {
+							desfireFlowStep.currentKey = 1;
+							desfireFlowStep.action = Action.CHANGE_KEYS;
+						} else if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
+							desfireFlowStep.action = Action.CREATE_FILE;
+							desfireFlowStep.currentKey = 1;
+						} else {
+							desfireFlowStep.currentFile = 0;
+							desfireFlowStep.currentApp++;
+							if(desfireTag.getApplications().size() > desfireFlowStep.currentApp){
+								desfireFlowStep.action = Action.CREATE_APP;
+							} else {
+								desfireFlowStep.currentApp = 0;
+								desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+							}
+						}
+					}
+					break;
+				case CHANGE_KEYS:
+					log.debug("Write by " + eppnInit + " - Step : Change app key : " + keyNo + " for " + desFireEV1Service.byteArrayToHexString(aid));
+					authResultBean = this.authApp(aid, result, appKey, appKeyNo, appDefaultKeyType);
+					if(authResultBean.getFullApdu() == null) {
+						desfireFlowStep.authStep = 1;
+						authResultBean.setFullApdu(desFireEV1Service.changeKey(keyNo, keyVer, keyKeyType, key, defaultKey));
+						authResultBean.setSize(16);					
+						log.trace("change key part");
+						if(desfireApp.getKeys().size() >  desfireFlowStep.currentKey + 1){
+							desfireFlowStep.currentKey++;
+							desfireFlowStep.action = Action.CHANGE_KEYS;
+						} else {
+							if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
+								desfireFlowStep.action = Action.CREATE_FILE;
+								desfireFlowStep.currentKey = 1;
+							} else {
+								desfireFlowStep.currentFile = 0;
+								desfireFlowStep.currentApp++;
+								if(desfireTag.getApplications().size() > desfireFlowStep.currentApp){
+									desfireFlowStep.action = Action.CREATE_APP;
+								} else {
+									desfireFlowStep.currentApp = 0;
+									desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+								}
+							}
+						}
+					}
+					break;
+				case CREATE_FILE:
+					log.debug("Write by " + eppnInit + " - Step : Create file in " + desFireEV1Service.byteArrayToHexString(aid) +" : " + fileNo);
+					authResultBean = this.authApp(aid, result, appKey, appKeyNo, appDefaultKeyType);
+					if(authResultBean.getFullApdu() == null) {
 						desfireFlowStep.authStep = 1;
 						authResultBean.setFullApdu(desFireEV1Service.createStdDataFile(byteWritePayload));
 						authResultBean.setSize(16);					
+						desfireFlowStep.writeStep = 0;
 						desfireFlowStep.action = Action.WRITE_FILE;
-						desfireFlowStep.authStep = 1;
 					} 
-					desfireFlowStep.writeStep = 0;
 					break;
 				case WRITE_FILE:	
 					if(authResultBean.getFullApdu() == null || desfireFlowStep.writeStep>0) {
@@ -322,129 +381,162 @@ public class DesfireService {
 						} 
 					} 
 					break;
-				case CHANGE_FILE_KEY_SET:	
-					log.debug("Write by " + eppnInit + " - Change key settings " + fileNo +" : " + cms + ", " + accessRights[1] +", "+accessRights[0]);
+				case CHANGE_FILE_KEY_SET:
+					log.debug("Write by " + eppnInit + " - Step : Change key settings " + fileNo +" : " + cms + ", " + accessRights[1] +", "+accessRights[0]);
 					authResultBean.setFullApdu(desFireEV1Service.changeFileSettings(fileNo, cms, accessRights[1], accessRights[0]));
-					authResultBean.setSize(16);					
-					if(desfireFlowStep.currentFile+1<desfireApp.getFiles().size()) {
+					authResultBean.setSize(16);
+					if(desfireApp.getFiles().size() >  desfireFlowStep.currentFile + 1){
 						desfireFlowStep.currentFile++;
 						desfireFlowStep.action = Action.CREATE_FILE;
-					} else {
+					}else{
 						desfireFlowStep.currentFile = 0;
-						if(desfireFlowStep.currentApp+1<desfireTag.getApplications().size()) {
-							desfireFlowStep.currentApp++;
-							desfireFlowStep.action = Action.SELECT_ROOT;
+						desfireFlowStep.currentApp++;
+						if(desfireTag.getApplications().size() > desfireFlowStep.currentApp){
+							desfireFlowStep.action = Action.CREATE_APP;
 						} else {
-							desfireFlowStep.currentApp = 0;                                         
-						    desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+							desfireFlowStep.currentApp = 0;
+							desfireFlowStep.action = Action.CHANGE_PICC_KEY;
 						}
 					}
 					break;
 				case CHANGE_PICC_KEY:
-					log.debug("Write by " + eppnInit + " - PICC master key");
-					authResultBean = this.authApp(desFireEV1Service.hexStringToByteArray("000000"), result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
+					log.debug("Write by " + eppnInit + " - Step : PICC master key");
+					authResultBean = this.authApp(piccAid, result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
 					if(authResultBean.getFullApdu() == null) {
+						desfireFlowStep.authStep = 1;
 						authResultBean.setFullApdu(desFireEV1Service.changeKey((byte) 0x00, piccKeyVerFinish, piccKeyTypeFinish, piccKeyFinish, piccKeyStart));
 						authResultBean.setSize(16);					
-						desfireFlowStep.authStep = 1;				
 						desfireFlowStep.action = Action.END;
-						desfireFlowStep.currentKey = 0;
 					}
 					break;
 				case END:
 					authResultBean.setAction(NfcResultBean.Action.write);
 					authResultBean.setFullApdu("END");
 					break;
+		default:
+			break;
 			}
 		return authResultBean;
 	}
 
-	public NfcResultBean updateCard(String result, String cardId){
+	public NfcResultBean updateCard(String result, String eppnInit, String csn) throws EsupNfcTagException {
 		NfcResultBean authResultBean = new NfcResultBean();
 		authResultBean.setAction(NfcResultBean.Action.none);
 		authResultBean.setCode(CODE.OK);
 		
-		DesfireTag desfireTag = getDesfireTagToUpdate();
-
-		if(desfireTag.getApplications() == null){
-			if(result.length()==0){
-				desfireFlowStep.action = Action.SELECT_ROOT;
-			}
-			switch(desfireFlowStep.action){
-				case SELECT_ROOT:
-					log.debug("Nothing  by " + cardId + " - Select root");
-					authResultBean.setFullApdu(desFireEV1Service.selectApplication(desFireEV1Service.hexStringToByteArray("000000")));
-					authResultBean.setSize(16);
-					desfireFlowStep.action = Action.END;
-					break;
-				case END:
-					authResultBean.setFullApdu("END");
-					authResultBean.setAction(NfcResultBean.Action.none);
-					break;
-			}
-			return authResultBean;
-		}
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+		Date schemaDate = null;
 		
+		byte[] defaultKey = null;
+		DesfireTag desfireTag =  getDesfireTagToUpdate();
+		
+		if(result.length()==0){
+			reset();
+			if(desfireTag.getFormatBeforeWrite()){
+				desfireFlowStep.action = Action.FORMAT;
+			}else{
+				desfireFlowStep.action = Action.GET_APPS;
+			}
+		}
+		byte[] piccAid = desFireEV1Service.hexStringToByteArray("000000");
 		byte[] piccKeyStart = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyStart());
 		KeyType piccKeyTypeStart = desfireTag.getKeyTypeStart();
-		byte piccKeyVerStart = desFireEV1Service.hexStringToByte(desfireTag.getKeyVersionStart());
-
+		
 		byte[] piccKeyFinish = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyFinish());
 		KeyType piccKeyTypeFinish = desfireTag.getKeyTypeFinish();
 		byte piccKeyVerFinish = desFireEV1Service.hexStringToByte(desfireTag.getKeyVersionFinish());
 		
-		DesfireApplication desfireApp = desfireTag.getApplications().get(desfireFlowStep.currentApp);
-		byte[] aid = desFireEV1Service.hexStringToByteArray(desfireApp.getDesfireAppId());
-		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-		Date schemaDate = null;
-		try {
-			schemaDate = formatter.parse(desfireApp.getUpdateDate());
-		} catch (ParseException e) {
-			log.error(e.getMessage());
+		DesfireApplication desfireApp = null;
+		byte[] aid = null;
+		byte amks = 0;
+		byte nok = 0;
+		
+		byte[] appKey = null;
+		byte appKeyNo = 0;
+		byte appKeyVer = 0; 
+		KeyType appKeyType = null;
+		KeyType appDefaultKeyType = null;
+		
+		byte keyNo = 0;
+		byte[] key = null;
+		byte keyVer = 0;
+		KeyType keyKeyType = null;
+		
+		byte[] byteWritePayload = null;
+		byte[] accessRights = null;
+		byte cms = 0;
+		byte fileNo = 0;
+		
+		DesfireFile desfireFile = null;
+		
+		String writePayload = null;
+		
+		if(desfireTag.getApplications() != null && desfireTag.getApplications().size() >  desfireFlowStep.currentApp){
+			desfireApp = desfireTag.getApplications().get(desfireFlowStep.currentApp);
+			aid = desFireEV1Service.hexStringToByteArray(desfireApp.getDesfireAppId());
+			amks= desFireEV1Service.hexStringToByte(desfireApp.getAmks());
+			nok = desFireEV1Service.hexStringToByte(desfireApp.getNok());
+			
+			if(desfireApp.getNok().substring(0, 1).equals("8")){
+				defaultKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
+				appDefaultKeyType = KeyType.AES;
+				appKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
+				appKeyNo = desFireEV1Service.hexStringToByte("00");
+				appKeyVer = desFireEV1Service.hexStringToByte("00");
+				keyKeyType = appKeyType = KeyType.AES;
+			}else{
+				defaultKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
+				appDefaultKeyType = KeyType.DES;				
+				appKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
+				appKeyNo = desFireEV1Service.hexStringToByte("00");
+				appKeyVer = desFireEV1Service.hexStringToByte("00");
+				keyKeyType = appKeyType = KeyType.DES;
+			}
+
+			try {
+				schemaDate = formatter.parse(desfireApp.getUpdateDate());
+			} catch (ParseException e) {
+				log.error(e.getMessage());
+			}
+			
+			if(desfireApp.getKeys() != null && desfireApp.getKeys().size() > 0) {
+				DesfireKey desfireAppKey = desfireApp.getKeys().get(0);
+				appKey = desFireEV1Service.hexStringToByteArray(desfireAppKey.getKey());
+				appKeyNo = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyNo());
+				appKeyVer = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyVer());
+				if(desfireApp.getKeys().size() >  desfireFlowStep.currentKey) {
+					DesfireKey desfireKey = desfireApp.getKeys().get(desfireFlowStep.currentKey);
+					keyNo = desFireEV1Service.hexStringToByte(desfireKey.getKeyNo());
+					key = desFireEV1Service.hexStringToByteArray(desfireKey.getKey());
+					keyVer = desFireEV1Service.hexStringToByte(desfireKey.getKeyVer());
+				}
+			}
+			
+			if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
+				desfireFile = desfireApp.getFiles().get(desfireFlowStep.currentFile);
+				accessRights = desFireEV1Service.hexStringToByteArray(desfireFile.getAccessRights());
+				cms = desFireEV1Service.hexStringToByte(desfireFile.getCommunicationSettings());
+				fileNo = desFireEV1Service.hexStringToByte(desfireFile.getFileNumber());
+				TagWriteApi tagWriteApi = desfireFile.getTagWriteApi();
+				desfireId = tagWriteApi.getIdFromCsn(csn);
+
+				if(desfireFile.getFileSize() != null){
+					writePayload = desfireFile.getWriteFilePayload() + desfireFile.getFileSize();
+				} else{
+					//calcul automatique de la taille du fichier en fonction du contenu
+					int fileSize = desfireId.length() / 2;
+					String hexSize = leftPad(Integer.toHexString(fileSize), 6, '0');
+					writePayload = desfireFile.getWriteFilePayload() + desFireEV1Service.swapPairs(desFireEV1Service.hexStringToByteArray(hexSize));
+				}
+				byteWritePayload = desFireEV1Service.hexStringToByteArray(writePayload);
+			}
 		}
+
 		
-		byte amks= desFireEV1Service.hexStringToByte(desfireApp.getAmks());
-		byte nok = desFireEV1Service.hexStringToByte(desfireApp.getNok());
-		
-		DesfireKey desfireKey = desfireApp.getKeys().get(desfireFlowStep.currentKey);
-		byte keyNo = desFireEV1Service.hexStringToByte(desfireKey.getKeyNo());
-		byte[] defaultKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
-		byte[] key = desFireEV1Service.hexStringToByteArray(desfireKey.getKey());
-		byte keyVer = desFireEV1Service.hexStringToByte(desfireKey.getKeyVer());
-		
-		DesfireKey desfireAppKey = desfireApp.getKeys().get(0);
-		byte[] appKey = desFireEV1Service.hexStringToByteArray(desfireAppKey.getKey());
-		byte appKeyVer = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyVer());
-		KeyType appKeyType = desfireAppKey.getType();
-		KeyType appDefaultKeyType;
-		if(desfireApp.getNok().substring(0, 1).equals("8")){
-			appDefaultKeyType = KeyType.AES;
-			defaultKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
-		}else{
-			appDefaultKeyType = KeyType.DES;
-			defaultKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
-		}
-		
-		DesfireFile desfireFile = desfireApp.getFiles().get(desfireFlowStep.currentFile);
-		byte[] writepayload = desFireEV1Service.hexStringToByteArray(desfireFile.getWriteFilePayload());
-		byte[] accessRights = desFireEV1Service.hexStringToByteArray(desfireFile.getAccessRights());
-		byte cms = desFireEV1Service.hexStringToByte(desfireFile.getCommunicationSettings());
-		byte fileNo = desFireEV1Service.hexStringToByte(desfireFile.getFileNumber());
-		
-		if(result.length()==0){
-			reset();
-			desfireFlowStep.action = Action.SELECT_ROOT;
-		}
 		switch(desfireFlowStep.action){
-				case SELECT_ROOT:
-					log.debug("Update " + cardId + " - Select root");
-					authResultBean.setFullApdu(desFireEV1Service.selectApplication(desFireEV1Service.hexStringToByteArray("000000")));
-					authResultBean.setSize(16);
-					desfireFlowStep.action = Action.GET_APPS;
-					break;
 				case GET_APPS:
-					log.debug("Update " + cardId + " - Get Apps");
-					authResultBean = this.authApp(desFireEV1Service.hexStringToByteArray("000000"), result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
+					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Get Apps");
+					authResultBean = this.authApp(piccAid, result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
  					if(authResultBean.getFullApdu() == null) {
 						desfireFlowStep.authStep = 1;
 						authResultBean.setFullApdu(desFireEV1Service.getApplicationsIds1());
@@ -453,18 +545,15 @@ public class DesfireService {
  					}
 					break;
 				case CHECK_APP: 
-					log.debug("Update " + cardId + " - Check Apps");
+					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Check Apps");
 					authResultBean.setFullApdu(desFireEV1Service.selectApplication(desFireEV1Service.hexStringToByteArray("000000")));
 					authResultBean.setSize(16);
 					String appsString = result.substring(0, result.length()-4);
 					// split result : app id on 6 chars (3 bytes) 
 					List<String> apps = Arrays.asList(appsString.split("(?<=\\G.{6})"));
-					
-					TagUpdateApi appTagUpdateApi = desfireApp.getTagUpdateApi();
-					Date lastUpdate = appTagUpdateApi.getLastUpdateDateFromCsn(cardId);
+					Date lastUpdate = desfireApp.getTagLastUpdateRestWs().getLastUpdateDateFromCsn(csn);
 					if(desfireFlowStep.currentApp < desfireTag.getApplications().size()) {
-						log.trace("schemaDate : " + schemaDate);
-						log.trace("lastUpdate : " + lastUpdate);
+						log.debug("Check app dates : schemaDate = " + schemaDate + ", lastUpdate : " + lastUpdate);
 						if(schemaDate!=null && lastUpdate.before(schemaDate)){
 							authResultBean.setAction(NfcResultBean.Action.update);
 							if(!apps.contains(desFireEV1Service.byteArrayToHexString(desFireEV1Service.swapPairsByte(aid)))) {
@@ -475,7 +564,7 @@ public class DesfireService {
 						}else{
 							if(desfireFlowStep.currentApp + 1 < desfireTag.getApplications().size()) {
 								desfireFlowStep.currentApp++;
-								desfireFlowStep.action = Action.SELECT_ROOT;
+								desfireFlowStep.action = Action.GET_APPS;
 							}else{
 								desfireFlowStep.currentApp = 0;
 								desfireFlowStep.action = Action.END;
@@ -484,7 +573,7 @@ public class DesfireService {
 					}
 					break;	
 				case DELETE_APP: 
-					log.debug("Update " + cardId + " - Delete App");
+					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Delete App");
 					authResultBean = this.authApp(aid, result, appKey, (byte) 0x00, KeyType.AES);
 					if(authResultBean.getFullApdu() == null) {
 						desfireFlowStep.authStep = 1;
@@ -494,43 +583,70 @@ public class DesfireService {
 					}
 					break;
 				case CREATE_APP: 
-					log.debug("Update " + cardId + " - Create app : " + desFireEV1Service.byteArrayToHexString(aid));
+					log.debug("Update by " + eppnInit + "with csn : " + csn + " - Step : Create app : " + desFireEV1Service.byteArrayToHexString(aid));
 					authResultBean.setFullApdu(desFireEV1Service.createApplication(desFireEV1Service.swapPairsByte(aid),amks, nok));
 					authResultBean.setSize(0);
 					desfireFlowStep.action = Action.CHANGE_APP_MASTER_KEY;
 					break;
 				case CHANGE_APP_MASTER_KEY:
-					log.debug("Update " + cardId + " - Change Master key app : " + desFireEV1Service.byteArrayToHexString(aid));
-					authResultBean = this.authApp(aid, result, defaultKey, (byte) 0x00, KeyType.AES);
+					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change app key : " + desFireEV1Service.byteArrayToHexString(aid));
+					authResultBean = this.authApp(aid, result, defaultKey, appKeyNo, appDefaultKeyType);
 					if(authResultBean.getFullApdu() == null) {
-						authResultBean.setFullApdu(desFireEV1Service.changeKey((byte) 0x00, (byte) 0x00, DESFireEV1Service.KeyType.AES, appKey, defaultKey));
-						authResultBean.setSize(16);					
-						log.trace("change key part");
-						desfireFlowStep.action = Action.CHANGE_KEYS;
 						desfireFlowStep.authStep = 1;
-					}
-					break;
-				case CHANGE_KEYS:	
-					log.debug("Update " + cardId + " - Change key app : " + keyNo + " for " + desFireEV1Service.byteArrayToHexString(aid));
-					authResultBean = this.authApp(aid, result, appKey, (byte) 0x00, KeyType.AES);
-					if(authResultBean.getFullApdu() == null) {
-						authResultBean.setFullApdu(desFireEV1Service.changeKey(keyNo, keyVer, DESFireEV1Service.KeyType.AES, key, defaultKey));
-						authResultBean.setSize(16);					
-						log.trace("change key part");
-						desfireFlowStep.authStep = 1;				
-						if(desfireFlowStep.currentKey + 1 < desfireApp.getKeys().size()) {
-							desfireFlowStep.currentKey++;
-						} else {
+						authResultBean.setFullApdu(desFireEV1Service.changeKey(appKeyNo, appKeyVer, appKeyType, appKey, defaultKey));
+						authResultBean.setSize(16);			
+						if(desfireApp.getKeys() != null && desfireApp.getKeys().size() >  1) {
+							desfireFlowStep.currentKey = 1;
+							desfireFlowStep.action = Action.CHANGE_KEYS;
+						} else if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
 							desfireFlowStep.action = Action.CREATE_FILE;
 							desfireFlowStep.currentKey = 1;
+						} else {
+							desfireFlowStep.currentFile = 0;
+							desfireFlowStep.currentApp++;
+							if(desfireTag.getApplications().size() > desfireFlowStep.currentApp){
+								desfireFlowStep.action = Action.CREATE_APP;
+							} else {
+								desfireFlowStep.currentApp = 0;
+								desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+							}
 						}
 					}
 					break;
+				case CHANGE_KEYS:
+					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change app key : " + keyNo + " for " + desFireEV1Service.byteArrayToHexString(aid));
+					authResultBean = this.authApp(aid, result, appKey, appKeyNo, appDefaultKeyType);
+					if(authResultBean.getFullApdu() == null) {
+						desfireFlowStep.authStep = 1;
+						authResultBean.setFullApdu(desFireEV1Service.changeKey(keyNo, keyVer, keyKeyType, key, defaultKey));
+						authResultBean.setSize(16);					
+						log.trace("change key part");
+						if(desfireApp.getKeys().size() >  desfireFlowStep.currentKey + 1){
+							desfireFlowStep.currentKey++;
+							desfireFlowStep.action = Action.CHANGE_KEYS;
+						} else {
+							if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
+								desfireFlowStep.action = Action.CREATE_FILE;
+								desfireFlowStep.currentKey = 1;
+							} else {
+								desfireFlowStep.currentFile = 0;
+								desfireFlowStep.currentApp++;
+								if(desfireTag.getApplications().size() > desfireFlowStep.currentApp){
+									desfireFlowStep.action = Action.CREATE_APP;
+								} else {
+									desfireFlowStep.currentApp = 0;
+									desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+								}
+							}
+						}
+					}
+
+					break;
 				case CREATE_FILE:	
 					if(authResultBean.getFullApdu() == null) {
-						log.debug("Update " + cardId + " - Create file in " + desFireEV1Service.byteArrayToHexString(aid) +" : " + fileNo);
+						log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Create file in " + desFireEV1Service.byteArrayToHexString(aid) +" : " + fileNo);
 						desfireFlowStep.authStep = 1;
-						authResultBean.setFullApdu(desFireEV1Service.createStdDataFile(writepayload));
+						authResultBean.setFullApdu(desFireEV1Service.createStdDataFile(byteWritePayload));
 						authResultBean.setSize(16);					
 						desfireFlowStep.action = Action.WRITE_FILE;
 						desfireFlowStep.authStep = 1;
@@ -541,9 +657,9 @@ public class DesfireService {
 					if(authResultBean.getFullApdu() == null || desfireFlowStep.writeStep>0) {
 						if(desfireFlowStep.writeStep==0 || result.endsWith("AF")) {
 							desfireFlowStep.authStep = 1;
-							TagUpdateApi fileTagUpdateApi = desfireFile.getTagUpdateApi();
-							String desfireId = fileTagUpdateApi.getIdFromCsn(cardId);
-							log.debug("Update " + cardId + " - Write in file " + fileNo +" : " + desfireId);
+							TagWriteApi fileTagWriteApi = desfireFile.getTagWriteApi();
+							String desfireId = fileTagWriteApi.getIdFromCsn(csn);
+							log.debug("Update " + csn + " - Write in file " + fileNo +" : " + desfireId);
 							authResultBean.setFullApdu(desFireEV1Service.writeData(fileNo, desfireId));
 							authResultBean.setSize(16);						
 							log.trace("write part");
@@ -551,12 +667,12 @@ public class DesfireService {
 						} else {
 							desfireFlowStep.writeStep = 0;
 							desfireFlowStep.action = Action.CHANGE_FILE_KEY_SET;
-							authResultBean = updateCard(result, cardId);
+							authResultBean = updateCard(result, csn, csn);
 						} 
 					} 
 					break;
 				case CHANGE_FILE_KEY_SET:	
-					log.debug("Update " + cardId + " - Change key settings " + fileNo +" : " + cms + ", " + accessRights[1] +", "+accessRights[0]);
+					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change key settings " + fileNo +" : " + cms + ", " + accessRights[1] +", "+accessRights[0]);
 					authResultBean.setFullApdu(desFireEV1Service.changeFileSettings(fileNo, cms, accessRights[1], accessRights[0]));
 					authResultBean.setSize(16);					
 					log.trace("change key set part");
@@ -567,7 +683,7 @@ public class DesfireService {
 						desfireFlowStep.currentFile = 0;
 						if(desfireFlowStep.currentApp + 1 < desfireTag.getApplications().size()) {
 							desfireFlowStep.currentApp++;
-							desfireFlowStep.action = Action.SELECT_ROOT;
+							desfireFlowStep.action = Action.GET_APPS;
 						} else {
 							desfireFlowStep.currentApp = 0;                                         
 						    desfireFlowStep.action = Action.END;
@@ -575,7 +691,7 @@ public class DesfireService {
 					}
 					break;
 				case CHANGE_PICC_KEY:
-					log.debug("change " + cardId + " - PICC master key");
+					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : PICC master key");
 					authResultBean = this.authApp(desFireEV1Service.hexStringToByteArray("000000"), result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
 					if(authResultBean.getFullApdu() == null) {
 						authResultBean.setFullApdu(desFireEV1Service.changeKey((byte) 0x00, piccKeyVerFinish, piccKeyTypeFinish, piccKeyFinish, piccKeyStart));
@@ -588,6 +704,8 @@ public class DesfireService {
 				case END:	
 					authResultBean.setFullApdu("END");
 					break;
+		default:
+			break;
 			}
 		return authResultBean;
 	}
@@ -651,72 +769,16 @@ public class DesfireService {
 
 	public void reset() {
 		desfireFlowStep = new DesfireFlowStep();
+		desfireId = "";
 	}
-    
 	
-	public NfcResultBean unBrick(String result){
-
-		NfcResultBean authResultBean = new NfcResultBean();
-		authResultBean.setCode(CODE.OK);
-		
-		if(result.length()==0){
-			desfireFlowStep.action = Action.UNBRICK;
+	public static String leftPad(String originalString, int length,
+		char padCharacter) {
+		String paddedString = originalString;
+		while (paddedString.length() < length) {
+			paddedString = padCharacter + paddedString;
 		}
-		switch(desfireFlowStep.action){
-				case UNBRICK:	
-					authResultBean = this.authApp(desFireEV1Service.hexStringToByteArray("000000"), result, desFireEV1Service.hexStringToByteArray("0123456789ABCDEF0123456789ABCDEF"), (byte) 0x00, KeyType.AES);
-					if(authResultBean.getFullApdu() == null) {
-						log.trace("change key part");						
-						authResultBean.setFullApdu(desFireEV1Service.changeKey((byte) 0x00, (byte) 0x00, DESFireEV1Service.KeyType.DES, desFireEV1Service.hexStringToByteArray("0000000000000000"), desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000")));
-						authResultBean.setSize(16);					
-						desfireFlowStep.authStep = 1;				
-							desfireFlowStep.action = Action.END;
-							desfireFlowStep.currentKey = 0;
-					}
-					break;
-				case END:	
-					authResultBean.setFullApdu("END");
-					break;
-			}
-		return authResultBean;
+		return paddedString;
 	}
-	
-	public NfcResultBean switchToAES(String result){
-
-		NfcResultBean authResultBean = new NfcResultBean();
-		authResultBean.setCode(CODE.OK);
-		
-		if(result.length()==0){
-			desfireFlowStep.action = Action.SWITCH_TO_AES;
-		}
-		switch(desfireFlowStep.action){
-				case SWITCH_TO_AES:	
-					authResultBean = this.authApp(desFireEV1Service.hexStringToByteArray("000000"), result, desFireEV1Service.hexStringToByteArray("0000000000000000"), (byte) 0x00, KeyType.DES);
-					if(authResultBean.getFullApdu() == null) {
-						log.trace("change key part");						
-						authResultBean.setFullApdu(desFireEV1Service.changeKey((byte) 0x00, (byte) 0x01, DESFireEV1Service.KeyType.AES, desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000"), desFireEV1Service.hexStringToByteArray("0000000000000000")));
-						log.trace(authResultBean.getFullApdu());
-						authResultBean.setSize(16);					
-		
-						desfireFlowStep.authStep = 1;				
-						desfireFlowStep.action = Action.END;
-						desfireFlowStep.currentKey = 0;
-					}
-					break;
-				case END:	
-					authResultBean.setFullApdu("END");
-					break;
-			}
-		return authResultBean;
-	}
-	
-	   public static String leftPad(String originalString, int length,
-		         char padCharacter) {
-		      String paddedString = originalString;
-		      while (paddedString.length() < length) {
-		         paddedString = padCharacter + paddedString;
-		      }
-		      return paddedString;
-		   }
 	   
 }

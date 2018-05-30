@@ -4,11 +4,13 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+
+import javax.annotation.Resource;
 
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import org.esupportail.nfctag.service.DeviceService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -26,6 +28,8 @@ public class WsRestController {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
 	
+    @Resource
+    private DeviceService deviceService;
 	/**
 	 * Example : 
 	 * curl -v -X POST -H "Content-Type: application/json" -d '{"eppnInit":"esup@univ-ville.fr","userAgent":"arduino-prototype","applicationName":"SGC","location":"Ecriture"}' http://localhost:8080/wsrest/register
@@ -50,8 +54,7 @@ public class WsRestController {
 		String numeroId = null;
 		
 		if (Device.countFindDevicesByLocationAndEppnInit(location, eppnInit)==0) {
-			Long numeroRandom = Math.abs(new Random().nextLong());
-			numeroId = numeroRandom.toString();
+			numeroId = deviceService.generateNumeroId();
 			Device device = new Device();
 			device.setNumeroId(numeroId);
 			device.setEppnInit(eppnInit);

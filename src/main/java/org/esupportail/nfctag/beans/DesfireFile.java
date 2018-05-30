@@ -2,9 +2,7 @@ package org.esupportail.nfctag.beans;
 
 import java.io.Serializable;
 
-import org.esupportail.nfctag.service.api.TagUpdateApi;
 import org.esupportail.nfctag.service.api.TagWriteApi;
-import org.esupportail.nfctag.service.api.impl.TagUpdateNone;
 import org.esupportail.nfctag.service.api.impl.TagWriteNone;
 
 public class DesfireFile implements Serializable {
@@ -20,8 +18,6 @@ public class DesfireFile implements Serializable {
 	String fileSize;
 	
 	TagWriteApi tagWriteApi = new TagWriteNone();
-	
-	TagUpdateApi tagUpdateApi = new TagUpdateNone();
 	
 	public String getWriteFilePayload() {
 		// accessRights is setting after write command here
@@ -67,14 +63,6 @@ public class DesfireFile implements Serializable {
 
 	public void setTagWriteApi(TagWriteApi tagWriteApi) {
 		this.tagWriteApi = tagWriteApi;
-	}
-
-	public void setTagUpdateApi(TagUpdateApi tagUpdateApi) {
-		this.tagUpdateApi = tagUpdateApi;
-	}
-	
-	public TagUpdateApi getTagUpdateApi() {
-		return tagUpdateApi;
 	}
 
 	@Override

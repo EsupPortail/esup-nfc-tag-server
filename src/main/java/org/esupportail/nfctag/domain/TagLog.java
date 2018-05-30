@@ -32,7 +32,23 @@ import org.springframework.roo.addon.tostring.RooToString;
 
 @RooJavaBean
 @RooToString
-@RooJpaActiveRecord(finders = { "findTagLogsByCsnEquals", "findTagLogsByDesfireIdEquals", "findTagLogsByNumeroIdEquals", "findTagLogsByNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals", "findTagLogsByEppnInitLike", "findTagLogsByCsnEquals", "findTagLogsByLocationEquals", "findTagLogsByEppnEquals", "findTagLogsByApplicationNameEquals", "findTagLogsByAuthDateBetween", "findTagLogsByAuthDateGreaterThan", "findTagLogsByAuthDateGreaterThanAndNumeroIdEquals", "findTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals" })
+@RooJpaActiveRecord(finders = { 
+		"findTagLogsByCsnEquals", 
+		"findTagLogsByDesfireIdEquals", 
+		"findTagLogsByNumeroIdEquals",
+		"findTagLogsByIdAndNumeroIdEquals",
+		"findTagLogsByNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals", 
+		"findTagLogsByEppnInitLike", 
+		"findTagLogsByCsnEquals", 
+		"findTagLogsByLocationEquals", 
+		"findTagLogsByEppnEquals", 
+		"findTagLogsByApplicationNameEquals", 
+		"findTagLogsByAuthDateBetween", 
+		"findTagLogsByAuthDateGreaterThan", 
+		"findTagLogsByAuthDateGreaterThanAndNumeroIdEquals", 
+		"findTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals" 
+		})
+
 public class TagLog {
 
     public enum Status {
@@ -59,10 +75,13 @@ public class TagLog {
     private String applicationName;
 
     private String location;
-
+    
     @Enumerated(EnumType.STRING)
     private Status status;
 
+    @Enumerated(EnumType.STRING)
+    private Status liveStatus;
+    
     @DateTimeFormat(style = "MM")
     private Date authDate;
 
@@ -76,6 +95,15 @@ public class TagLog {
 
     public void setStatus(Status status) {
         this.status = status;
+    }
+
+    
+    public Status getLiveStatus() {
+        return this.liveStatus;
+    }
+    
+    public void setLiveStatus(Status liveStatus) {
+        this.liveStatus = liveStatus;
     }
     
     public static List<String> findYears() {

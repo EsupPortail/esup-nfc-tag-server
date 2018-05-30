@@ -115,7 +115,23 @@
 		<property name="defaultLocale" value="fr" />
 	</bean>
 
-                        
+	<bean id="restTemplate"
+		class="org.springframework.web.client.RestTemplate">
+		<property name="requestFactory">
+			<bean class="org.springframework.http.client.SimpleClientHttpRequestFactory">
+				<property name="readTimeout" value="5000" />
+			</bean>	
+		</property>
+		<property name="messageConverters">
+			<list>
+				<bean class="org.springframework.http.converter.StringHttpMessageConverter">
+					<constructor-arg value="UTF-8"/>
+				</bean>
+				<bean class="org.springframework.http.converter.json.MappingJackson2HttpMessageConverter" />
+			</list>
+		</property>
+	</bean>
+		
 	<bean id="messageSource"
 	    class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
 	    <property name="basenames" value="WEB-INF/i18n/messages,WEB-INF/i18n/application" />

@@ -53,24 +53,29 @@ public class NfcWsController {
 	
 	@Resource
 	TagAuthService tagAuthService;
+
+	@RequestMapping(value="/dismiss")
+	@ResponseBody
+	public Boolean dismissTag(@RequestParam(required = true) long id, @RequestParam(required = true) String numeroId, Model uiModel) throws IOException {
+		return tagAuthService.dismissTag(id, numeroId);
+	}
 	
-	@RequestMapping(value="/validate",params = {"id"})
+	@RequestMapping(value="/validate")
 	@ResponseBody
-	public Boolean validateTag(long id, Model uiModel) throws IOException {
-		return tagAuthService.validateTag(id);
+	public Boolean validateTag(@RequestParam(required = true) long id, @RequestParam(required = true) String numeroId, Model uiModel) throws IOException {
+		return tagAuthService.validateTag(id, numeroId);
 	}
 
-	@RequestMapping(value="/cancel",params = {"id"})
+	@RequestMapping(value="/cancel")
 	@ResponseBody
-	public Boolean cancelTag(long id, Model uiModel) throws IOException {
-		return tagAuthService.cancelTag(id);
+	public Boolean cancelTag(@RequestParam(required = true) long id, @RequestParam(required = true) String numeroId, Model uiModel) throws IOException {
+		return tagAuthService.cancelTag(id, numeroId);
 	}
 
-	@RequestMapping(value="/display",params = {"id"})
+	@RequestMapping(value="/display")
 	@ResponseBody
-	public String getDisplay(long id, Model uiModel) throws IOException {
-		log.info("get display");
-		return tagAuthService.getDisplay(id);
+	public String getDisplay(@RequestParam(required = true) long id, @RequestParam(required = true) String numeroId, Model uiModel) throws IOException {
+		return tagAuthService.getDisplay(id, numeroId);
 	}
 	
 	@RequestMapping(value="/location", produces = "application/json")

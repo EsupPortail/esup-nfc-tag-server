@@ -2527,7 +2527,7 @@ public class DESFireEV1Service extends SimpleSCR {
 
 	}
 	
-	public static byte[] hexStringToByteArray(String s) {
+	public byte[] hexStringToByteArray(String s) {
 		s = s.replace(" ", "");
 	    int len = s.length();
 	    byte[] data = new byte[len / 2];
@@ -2538,14 +2538,14 @@ public class DESFireEV1Service extends SimpleSCR {
 	    return data;
 	}
 
-	public static byte hexStringToByte(String s) {
+	public byte hexStringToByte(String s) {
 		return (byte) Integer.parseInt(s, 16);
 	}
 	
 	
 	final protected static char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
 
-	public static String byteArrayToHexString(byte[] bytes) {
+	public String byteArrayToHexString(byte[] bytes) {
 		char[] hexChars = new char[bytes.length*2];
 		int v;
 
@@ -2559,7 +2559,7 @@ public class DESFireEV1Service extends SimpleSCR {
 	}
 
 
-	public static String swapPairs(byte[] byteArray) {
+	public String swapPairs(byte[] byteArray) {
 		String s = new StringBuilder(byteArrayToHexString(byteArray)).reverse().toString();
 		String even = "";
 		String odd = "";
@@ -2577,7 +2577,7 @@ public class DESFireEV1Service extends SimpleSCR {
 		}
 	}
 	
-	public static byte[] swapPairsByte(byte[] byteArray) {
+	public byte[] swapPairsByte(byte[] byteArray) {
 		String swapString = swapPairs(byteArray);
 		return hexStringToByteArray(swapString);
 	}

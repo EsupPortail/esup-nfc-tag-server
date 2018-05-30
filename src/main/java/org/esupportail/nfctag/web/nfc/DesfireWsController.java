@@ -20,7 +20,6 @@ package org.esupportail.nfctag.web.nfc;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpSession;
 
-import org.esupportail.nfctag.beans.DesfireTag;
 import org.esupportail.nfctag.beans.NfcResultBean;
 import org.esupportail.nfctag.beans.NfcResultBean.Action;
 import org.esupportail.nfctag.beans.NfcResultBean.CODE;
@@ -46,8 +45,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
 
 @Controller
 @RequestMapping("/desfire-ws")
@@ -75,31 +72,29 @@ public class DesfireWsController {
     String eppnInit;
     Boolean update = false;
     Boolean write = false;
-
+    String function;
+    
 	@RequestMapping(produces = "application/json")
 	@ResponseBody
 	public NfcResultBean process(@RequestParam String numeroId, @RequestParam String cardId, @RequestParam String result, HttpSession session) {
 		if(desfireService.getStep()==null) {
+			update = false;
+			write = false;
 			eppnInit = tagAuthService.getEppnInit(TagType.DESFIRE, numeroId);
+			desfireService.setNumeroId(numeroId);
+			if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireReadConfig){
+				function = "READ";
+			}else if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireWriteConfig){
+				function = "WRITE";
+			}else if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireUpdateConfig){
+				function = "UPDATE";
+			}
+			log.debug("INIT " + function + " on cardId : " + cardId + " by " + eppnInit);
+		}else{
+	
 		}
 
-		
-		log.trace("result for step " + desfireService.getStep() + " was : " + result );
-		
-		
 		NfcResultBean nfcResultBean = new NfcResultBean();
-				
-		desfireService.setNumeroId(numeroId);
-	
-		String function = "READ";
-		
-		if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireReadConfig){
-			function = "READ";
-		}else if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireWriteConfig){
-			function = "WRITE";
-		}else if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireUpdateConfig){
-			function = "UPDATE";
-		}
 		
 		if("ERROR".equals(result)) {
 			desfireService.reset();
@@ -108,11 +103,12 @@ public class DesfireWsController {
 			nfcResultBean.setCode(CODE.ERROR);
 			return nfcResultBean;			
 		}
+		DESFireEV1Service.Response response = DESFireEV1Service.Response.UNKNOWN_CODE;
 		
-		if(result.length()==4){
-			String msg = result.substring(2);
-			DESFireEV1Service.Response response = DESFireEV1Service.Response.getResponse(Integer.parseInt(msg, 16));
-			log.debug("Desfire Response is " + response.toString());
+		if(result.length() > 2 ){
+			String msg = result.substring(result.length() - 2);
+			response = DESFireEV1Service.Response.getResponse(Integer.parseInt(msg, 16));
+			log.debug("return is : " + result + " with Desfire Response : " + response.toString());
 			if(!response.equals(DESFireEV1Service.Response.OPERATION_OK) && !response.equals(DESFireEV1Service.Response.ADDITIONAL_FRAME)) {
 				desfireService.reset();
 				TagError tagError = new TagError();
@@ -121,32 +117,38 @@ public class DesfireWsController {
 				return nfcResultBean;
 			}
 		}
-			
-		if("READ".equals(function)) {
-			log.trace("READ");
-			nfcResultBean = desfireService.readDesfireId(result);
-		} else if("WRITE".equals(function)) {
-			nfcResultBean = desfireService.writeCard(result, eppnInit, cardId);
-			if(nfcResultBean.getAction().equals(Action.write)){
-				write = true;
+		
+		try{	
+			if("READ".equals(function)) {
+				log.trace("READ");
+				nfcResultBean = desfireService.readDesfireId(result);
+			} else if("WRITE".equals(function)) {
+				nfcResultBean = desfireService.writeCard(result, eppnInit, cardId);
+				if(nfcResultBean.getAction().equals(Action.write)){
+					write = true;
+				}
+			} else if("UPDATE".equals(function)) {
+				nfcResultBean = desfireService.updateCard(result, eppnInit, cardId);
+				if(nfcResultBean.getAction().equals(Action.update)){
+					update = true;
+				}
 			}
-		} else if("UPDATE".equals(function)) {
-			nfcResultBean = desfireService.updateCard(result, cardId);
-			if(nfcResultBean.getAction().equals(Action.update)){
-				update = true;
-			}
+		} catch (EsupNfcTagException e) {
+			desfireService.reset();
+			TagError tagError = new TagError();
+			errorLongPoolController.handleError(tagError);
+			nfcResultBean.setCode(CODE.ERROR);
+			return nfcResultBean;	
 		}
 		
-		log.debug("next command for step " + desfireService.getStep() + " must be : " + nfcResultBean.getFullApdu());
-		
 		if("END".equals(nfcResultBean.getFullApdu())) {
+			
 			nfcResultBean.setCode(CODE.END);
 			nfcResultBean.setCmd("");
 			nfcResultBean.setParam("");
 			nfcResultBean.setSize(0);
 			nfcResultBean.setAction(Action.none);
 			desfireService.reset();
-			DESFireEV1Service.Response response = DESFireEV1Service.Response.UNKNOWN_CODE;
 			if("READ".equals(function)){
 				result = desfireService.tempRead;
 			}
@@ -169,22 +171,25 @@ public class DesfireWsController {
 					log.debug("desfireId descrypted  : " + desfireId);
 					tagType = TagType.DESFIRE;
 				} else if ("WRITE".equals(function)) {
-					DesfireTag desfireTag =  desfireService.getDesfireTagToWrite();
-					if(write) nfcResultBean.setAction(Action.write);
+					if(write) {
+						nfcResultBean.setAction(Action.write);
+					}
 				} else if ("UPDATE".equals(function)) {
-					DesfireTag desfireTag =  desfireService.getDesfireTagToUpdate();
-					if(update) nfcResultBean.setAction(Action.update);
+					if(update) {
+						nfcResultBean.setAction(Action.update);
+					}
 				}
 				if(nfcResultBean.getAction().equals(Action.none)){
 					validate = false;
 				}
+				
 				try {
-				TagLog tagLog = tagAuthService.auth(tagType, desfireId, numeroId, cardId, appName, validate);
-				liveController.handleTagLog(tagLog);
-				nfcResultBean.setMsg(tagLog.getFirstname() + " " + tagLog.getLastname());
-				nfcResultBean.setTaglogId(tagLog.getId());
+					TagLog tagLog = tagAuthService.auth(tagType, desfireId, numeroId, cardId, appName, validate);
+					liveController.handleTagLog(tagLog);
+					nfcResultBean.setMsg(tagLog.getFirstname() + " " + tagLog.getLastname());
+					nfcResultBean.setTaglogId(tagLog.getId());
 				}catch (EsupNfcTagException e){
-					log.error("auth exception : " + e.getMessage(), e);
+					log.error("auth exception : " + e.getMessage());
 					TagError tagError = new TagError(e);
 					tagError.setNumeroId(numeroId);
 					errorLongPoolController.handleError(tagError);
@@ -209,6 +214,8 @@ public class DesfireWsController {
 
 		nfcResultBean.setjSessionId(session.getId());
 		log.trace(nfcResultBean.getMsg());
+		log.debug("command for card must be : " + nfcResultBean.getFullApdu());
+		log.debug("next step will be : " + desfireService.getStep() + " with auth step : " + desfireService.getAuthStep());
 		return nfcResultBean;
 	}
 	

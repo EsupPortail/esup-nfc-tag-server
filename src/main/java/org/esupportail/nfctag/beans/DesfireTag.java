@@ -3,10 +3,6 @@ package org.esupportail.nfctag.beans;
 import java.io.Serializable;
 import java.util.List;
 
-import org.esupportail.nfctag.service.api.TagUpdateApi;
-import org.esupportail.nfctag.service.api.TagWriteApi;
-import org.esupportail.nfctag.service.api.impl.TagUpdateNone;
-import org.esupportail.nfctag.service.api.impl.TagWriteNone;
 import org.esupportail.nfctag.service.desfire.DESFireEV1Service.KeyType;
 
 public class DesfireTag implements Serializable {
@@ -21,8 +17,6 @@ public class DesfireTag implements Serializable {
 	 * PICC master key == key 0
 	 */
 	private String keyStart;
-	
-	private String keyVersionStart;
 
 	/**
 	 * keyType : AES, DES
@@ -44,14 +38,6 @@ public class DesfireTag implements Serializable {
 
 	public void setKeyStart(String keyStart) {
 		this.keyStart = keyStart;
-	}
-
-	public String getKeyVersionStart() {
-		return keyVersionStart;
-	}
-
-	public void setKeyVersionStart(String keyVersionStart) {
-		this.keyVersionStart = keyVersionStart;
 	}
 
 	public KeyType getKeyTypeStart() {

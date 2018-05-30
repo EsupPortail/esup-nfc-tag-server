@@ -19,6 +19,8 @@ package org.esupportail.nfctag.service.api.impl;
 
 import java.net.URI;
 
+import javax.annotation.Resource;
+
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
@@ -33,6 +35,7 @@ public class TagIdCheckRestWs implements TagIdCheckApi {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
+	@Resource
     protected RestTemplate restTemplate;
 
     protected String tagIdCheckUrl;
@@ -57,10 +60,6 @@ public class TagIdCheckRestWs implements TagIdCheckApi {
 		this.idFromEppnInitUrl = idFromEppnInitUrl;
 	}
 
-	public TagIdCheckRestWs() {
-		restTemplate = new RestTemplate();
-	}
-	
 	@Override
 	public TagLog getTagLogFromTagId(TagType tagType, String tagId, String appName) throws EsupNfcTagException {
 		

@@ -22,7 +22,7 @@
     <definition extends="user" name="live/index">
         <put-attribute name="body" value="/WEB-INF/views/live/index.jspx"/>
     </definition>
-    <definition extends="user" name="live/mobil">
+    <definition extends="public" name="live/mobil">
         <put-attribute name="body" value="/WEB-INF/views/live/mobil.jspx"/>
     </definition>
 </tiles-definitions>

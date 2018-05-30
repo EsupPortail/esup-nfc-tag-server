@@ -22,8 +22,6 @@ import java.util.Date;
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
-import org.esupportail.nfctag.beans.NfcResultBean;
-import org.esupportail.nfctag.beans.NfcResultBean.Action;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.domain.TagLog;
@@ -78,6 +76,7 @@ public class TagAuthService {
 		tagLog.setNumeroId(device.getNumeroId());
 		tagLog.setEppnInit(device.getEppnInit());
 		tagLog.setStatus(TagLog.Status.none);
+		tagLog.setLiveStatus(TagLog.Status.none);
 		AppliExtApi extApi = applisExtService.get(application.getAppliExt());
 		if(extApi!=null){
 			extApi.isTagable(tagLog);
@@ -86,18 +85,27 @@ public class TagAuthService {
 		log.info("Enregitrement effectué : " + tagLog.getFirstname() + " " + tagLog.getLastname() + ", avec le terminal :" + numeroId);
 		
 		if(device.isValidateAuthWoConfirmation() && validate){
-			Boolean validateTagOK =  this.validateTag(tagLog.getId());
+			Boolean validateTagOK =  this.validateTag(tagLog.getId(), numeroId);
 			if(!validateTagOK){
 				log.warn(EsupNfcTagErrorMessage.error_esupnfctagexception_tagvalidationerror.toString());
 				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_tagvalidationerror);
 			}
 		}
+		
+		if(device.isValidateAuthWoConfirmation() && !validate){
+			Boolean cancelTagOK =  this.cancelTag(tagLog.getId(), numeroId);
+			if(!cancelTagOK){
+				log.warn(EsupNfcTagErrorMessage.error_esupnfctagexception_tagvalidationerror.toString());
+				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_tagvalidationerror);
+			}
+		}
+		
 		return tagLog;
 	}
 	
-	public Boolean validateTag(Long tagId) {
+	public Boolean validateTag(Long tagId, String numeroId) {
 		Boolean result = false;
-		TagLog tagLog = TagLog.findTagLog(tagId);
+		TagLog tagLog = TagLog.findTagLogsByIdAndNumeroIdEquals(tagId, numeroId).getSingleResult();
 		Application app = Application.findApplicationsByNameEquals(tagLog.getApplicationName()).getSingleResult();
 		AppliExtApi extApi = applisExtService.get(app.getAppliExt());
 		if(extApi!=null && tagLog.getStatus().equals(TagLog.Status.none)) {
@@ -113,9 +121,9 @@ public class TagAuthService {
 		return result;
 	}
 
-	public Boolean cancelTag(Long tagId) {
+	public Boolean cancelTag(Long tagId, String numeroId) {
 		Boolean cancelTagSuccess = false;
-		TagLog tagLog = TagLog.findTagLog(tagId);
+		TagLog tagLog = TagLog.findTagLogsByIdAndNumeroIdEquals(tagId, numeroId).getSingleResult();
 		Application app = Application.findApplicationsByNameEquals(tagLog.getApplicationName()).getSingleResult();
 		AppliExtApi extApi = applisExtService.get(app.getAppliExt());
 		if(extApi!=null && tagLog.getStatus().equals(TagLog.Status.none)) {
@@ -130,7 +138,13 @@ public class TagAuthService {
 		}
 		return cancelTagSuccess;
 	}
-
+	
+	public Boolean dismissTag(Long tagId, String numeroId) {
+		TagLog tagLog = TagLog.findTagLogsByIdAndNumeroIdEquals(tagId, numeroId).getSingleResult();
+		tagLog.setLiveStatus(TagLog.Status.valid);
+		tagLog.merge();
+		return true;
+	}
 	
 	public String getEppnInit(TagType tagType, String numeroId) throws EsupNfcTagException {
 		Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
@@ -142,8 +156,8 @@ public class TagAuthService {
 		return device.getEppnInit();
 	}
 	
-	public String getDisplay(Long tagId) throws EsupNfcTagException {
-		TagLog tagLog = TagLog.findTagLog(tagId);
+	public String getDisplay(Long tagId, String numeroId) throws EsupNfcTagException {
+		TagLog tagLog = TagLog.findTagLogsByIdAndNumeroIdEquals(tagId, numeroId).getSingleResult();
 		Application app = Application.findApplicationsByNameEquals(tagLog.getApplicationName()).getSingleResult();
 		AppliExtApi extApi = applisExtService.get(app.getAppliExt());
 		return extApi.getDisplay(tagLog);

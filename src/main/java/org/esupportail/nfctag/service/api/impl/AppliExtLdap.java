@@ -20,6 +20,8 @@ package org.esupportail.nfctag.service.api.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
@@ -27,7 +29,6 @@ import org.esupportail.nfctag.service.LdapService;
 import org.esupportail.nfctag.service.api.AppliExtApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 public class AppliExtLdap implements AppliExtApi {
@@ -36,6 +37,7 @@ public class AppliExtLdap implements AppliExtApi {
 	
 	protected List<LdapService> ldapServices;
 	
+	@Resource
     protected RestTemplate restTemplate;
     
     protected String description;
@@ -102,11 +104,6 @@ public class AppliExtLdap implements AppliExtApi {
 
     public void setDisplayAttribut(String displayAttribut) {
 		this.displayAttribut = displayAttribut;
-	}
-	
-	public AppliExtLdap() {
-		restTemplate = new RestTemplate();
-		((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(5000);
 	}
 
 	@Override

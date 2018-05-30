@@ -2,15 +2,11 @@ package org.esupportail.nfctag.beans;
 
 import java.io.Serializable;
 
-import org.esupportail.nfctag.service.desfire.DESFireEV1Service.KeyType;
-
 public class DesfireKey implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 	
 	private String keyNo;
-	
-	private KeyType type;
 	
 	private String key;
 	
@@ -22,14 +18,6 @@ public class DesfireKey implements Serializable {
 
 	public void setKeyNo(String keyNo) {
 		this.keyNo = keyNo;
-	}
-
-	public KeyType getType() {
-		return type;
-	}
-
-	public void setType(KeyType type) {
-		this.type = type;
 	}
 
 	public String getKey() {
@@ -54,7 +42,6 @@ public class DesfireKey implements Serializable {
 		int result = 1;
 		result = prime * result + ((key == null) ? 0 : key.hashCode());
 		result = prime * result + ((keyNo == null) ? 0 : keyNo.hashCode());
-		result = prime * result + ((type == null) ? 0 : type.hashCode());
 		return result;
 	}
 
@@ -76,11 +63,6 @@ public class DesfireKey implements Serializable {
 			if (other.keyNo != null)
 				return false;
 		} else if (!keyNo.equals(other.keyNo))
-			return false;
-		if (type == null) {
-			if (other.type != null)
-				return false;
-		} else if (!type.equals(other.type))
 			return false;
 		return true;
 	}

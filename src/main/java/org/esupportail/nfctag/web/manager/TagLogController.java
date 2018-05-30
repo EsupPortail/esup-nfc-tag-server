@@ -17,15 +17,9 @@
  */
 package org.esupportail.nfctag.web.manager;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.CriteriaBuilder;

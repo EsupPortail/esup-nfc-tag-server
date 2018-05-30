@@ -12,8 +12,7 @@
 	<spring:url value="/resources/css/tabdrop.css" var="tabdrop_css_url" />
 	<spring:url value="/resources/css/esupnfctag.css" var="esupnfctag_css_url" />
 	
-	<spring:url value="/resources/js/jquery-2.1.3.min.js" var="jquery_url" />
-	<spring:url value="/resources/js/jquery-ui.js" var="jquery_ui_url" />
+	<spring:url value="/resources/js/jquery-2.2.4.min.js" var="jquery_url" />
 	<spring:url value="/resources/js/bootstrap.min.js" var="bootstrap_js__url" />
     <spring:url value="/resources/js/bootstrap-select.min.js" var="select_js__url" />
 	<spring:url value="/resources/js/bootstrap-datepicker.min.js" var="datepicker_js__url" />
@@ -49,7 +48,6 @@
 	<link rel="SHORTCUT ICON" href="${favicon}" />
 
 	<script src="${jquery_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
-	<script src="${jquery_ui_url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 	<script src="${bootstrap_js__url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
     <script src="${select_js__url}" type="text/javascript"><!-- required for FF3 and Opera --></script>
 	<script src="${datepicker_js__url}" type="text/javascript"><!-- required for FF3 and Opera --></script>

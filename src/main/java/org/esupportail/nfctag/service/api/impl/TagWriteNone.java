@@ -17,11 +17,15 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
+import javax.annotation.Resource;
+
+import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.api.TagWriteApi;
 import org.springframework.web.client.RestTemplate;
 
 public class TagWriteNone implements TagWriteApi {
-
+	
+	@Resource
     protected RestTemplate restTemplate;
     
     protected String idFromCsnUrlTemplate;
@@ -30,12 +34,8 @@ public class TagWriteNone implements TagWriteApi {
 		this.idFromCsnUrlTemplate = idFromCsnUrlTemplate;
 	}
 
-	public TagWriteNone() {
-		restTemplate = new RestTemplate();
-	}
-
 	@Override
-	public String getIdFromCsn(String csn) {
+	public String getIdFromCsn(String csn) throws EsupNfcTagException {
 		return "00";
 	}
 	

@@ -16,19 +16,16 @@ public class BatchMain {
 					"Voici les possibilités : \n" +
 					"\t* mvn exec:java -Dexec.args=\"dbupgrade\"\n" +
 					"#####");
-			return;
-		}
-
-		if("dbupgrade".equals(args[0])) {
-			DbToolService dbToolService = springContext.getBean("dbToolService", DbToolService.class);
-			dbToolService.upgrade();					
 		} else {
-			System.err.println("Commande non trouvée.");
+			if("dbupgrade".equals(args[0])) {
+				DbToolService dbToolService = springContext.getBean("dbToolService", DbToolService.class);
+				dbToolService.upgrade();					
+			} else {
+				System.err.println("Commande non trouvée.");
+			}
+			
+			springContext.close();
 		}
-		
-		springContext.close();
 	}
-
-
 
 }

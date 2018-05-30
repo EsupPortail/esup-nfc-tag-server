@@ -30,7 +30,7 @@ import org.esupportail.nfctag.domain.TagError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -52,7 +52,7 @@ public class ErrorLongPoolController {
 	@ResponseBody
 	public DeferredResult<List<TagError>> tagError(@RequestParam Long errorDateTimestamp, @RequestParam(required=false) String numeroId) {
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-		if(numeroId==null && !auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN")) && !auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_SUPERVISOR"))) {
+		if(numeroId==null && !auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN")) && !auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_SUPERVISOR"))) {
 			return null;
 		}
 		LiveQuery liveQuery = new LiveQuery(errorDateTimestamp, numeroId);

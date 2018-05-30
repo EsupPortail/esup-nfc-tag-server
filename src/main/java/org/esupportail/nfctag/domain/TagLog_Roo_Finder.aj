@@ -99,6 +99,16 @@ privileged aspect TagLog_Roo_Finder {
         return ((Long) q.getSingleResult());
     }
     
+    public static Long TagLog.countFindTagLogsByIdAndNumeroIdEquals(Long id, String numeroId) {
+        if (id == null) throw new IllegalArgumentException("The id argument is required");
+        if (numeroId == null || numeroId.length() == 0) throw new IllegalArgumentException("The numeroId argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.id = :id AND o.numeroId = :numeroId", Long.class);
+        q.setParameter("id", id);
+        q.setParameter("numeroId", numeroId);
+        return ((Long) q.getSingleResult());
+    }
+    
     public static Long TagLog.countFindTagLogsByLocationEquals(String location) {
         if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
         EntityManager em = TagLog.entityManager();
@@ -365,6 +375,33 @@ privileged aspect TagLog_Roo_Finder {
         }
         TypedQuery<TagLog> q = em.createQuery(queryBuilder.toString(), TagLog.class);
         q.setParameter("eppnInit", eppnInit);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByIdAndNumeroIdEquals(Long id, String numeroId) {
+        if (id == null) throw new IllegalArgumentException("The id argument is required");
+        if (numeroId == null || numeroId.length() == 0) throw new IllegalArgumentException("The numeroId argument is required");
+        EntityManager em = TagLog.entityManager();
+        TypedQuery<TagLog> q = em.createQuery("SELECT o FROM TagLog AS o WHERE o.id = :id AND o.numeroId = :numeroId", TagLog.class);
+        q.setParameter("id", id);
+        q.setParameter("numeroId", numeroId);
+        return q;
+    }
+    
+    public static TypedQuery<TagLog> TagLog.findTagLogsByIdAndNumeroIdEquals(Long id, String numeroId, String sortFieldName, String sortOrder) {
+        if (id == null) throw new IllegalArgumentException("The id argument is required");
+        if (numeroId == null || numeroId.length() == 0) throw new IllegalArgumentException("The numeroId argument is required");
+        EntityManager em = TagLog.entityManager();
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM TagLog AS o WHERE o.id = :id AND o.numeroId = :numeroId");
+        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
+            queryBuilder.append(" ORDER BY ").append(sortFieldName);
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                queryBuilder.append(" ").append(sortOrder);
+            }
+        }
+        TypedQuery<TagLog> q = em.createQuery(queryBuilder.toString(), TagLog.class);
+        q.setParameter("id", id);
+        q.setParameter("numeroId", numeroId);
         return q;
     }
     

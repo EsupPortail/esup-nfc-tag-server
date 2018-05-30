@@ -19,6 +19,8 @@ package org.esupportail.nfctag.service.api.impl;
 
 import java.util.List;
 
+import javax.annotation.Resource;
+
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
@@ -29,7 +31,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
@@ -40,6 +41,7 @@ public class AppliExtRestWs implements AppliExtApi {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
+	@Resource
     protected RestTemplate restTemplate;
     
     protected String description;
@@ -56,7 +58,7 @@ public class AppliExtRestWs implements AppliExtApi {
     
     protected String displayUrl;
     
-	public String getHeader() {
+    public String getHeader() {
 		return header;
 	}
 
@@ -96,11 +98,6 @@ public class AppliExtRestWs implements AppliExtApi {
 		this.displayUrl = displayUrl;
 	}
 	
-	public AppliExtRestWs() {
-		restTemplate = new RestTemplate();
-		((SimpleClientHttpRequestFactory) restTemplate.getRequestFactory()).setReadTimeout(5000);
-	}
-
 	@Override
 	public List<String> getLocations4Eppn(String eppn) {
 		log.debug("getLocation for : " + eppn);

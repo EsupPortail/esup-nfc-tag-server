@@ -14,7 +14,7 @@ privileged aspect TagLog_Roo_Jpa_ActiveRecord {
     @PersistenceContext
     transient EntityManager TagLog.entityManager;
     
-    public static final List<String> TagLog.fieldNames4OrderClauseFilter = java.util.Arrays.asList("dateFormatter", "desfireId", "csn", "eppn", "firstname", "lastname", "numeroId", "eppnInit", "applicationName", "location", "status", "authDate");
+    public static final List<String> TagLog.fieldNames4OrderClauseFilter = java.util.Arrays.asList("dateFormatter", "desfireId", "csn", "eppn", "firstname", "lastname", "numeroId", "eppnInit", "applicationName", "location", "status", "liveStatus", "authDate");
     
     public static final EntityManager TagLog.entityManager() {
         EntityManager em = new TagLog().entityManager;

@@ -19,7 +19,6 @@ package org.esupportail.nfctag.web.live;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -46,7 +45,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
@@ -192,7 +191,6 @@ public class LiveLongPoolController {
 				tagLogs = TagLog.findTagLogEntries(firstResult, size, sortFieldName, sortOrder);
 			}
 		}
-		
 		return tagLogs;
 	}
 
@@ -214,7 +212,7 @@ public class LiveLongPoolController {
 	}
 	
 	private boolean isLiveLongPoolAuthorized(Authentication auth) {
-		return auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_ADMIN")) || auth.getAuthorities().contains(new GrantedAuthorityImpl("ROLE_SUPERVISOR")) || isIpCanBeUsed4LiveFullAnonymous(auth);
+		return auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN")) || auth.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_SUPERVISOR")) || isIpCanBeUsed4LiveFullAnonymous(auth);
 	}
 	
 	private Boolean isIpCanBeUsed4LiveFullAnonymous(Authentication auth) {

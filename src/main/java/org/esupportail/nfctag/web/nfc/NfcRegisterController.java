@@ -21,7 +21,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import java.util.Random;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
@@ -31,6 +30,7 @@ import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.ApplicationsService;
+import org.esupportail.nfctag.service.DeviceService;
 import org.esupportail.nfctag.service.VersionApkService;
 import org.esupportail.nfctag.service.VersionJarService;
 import org.slf4j.Logger;
@@ -58,6 +58,9 @@ public class NfcRegisterController {
 
 	@Resource
 	private VersionJarService versionJarService;
+	
+    @Resource
+    private DeviceService deviceService;
 	
 	@Autowired
 	private ApplicationsService applicationsService;
@@ -145,8 +148,7 @@ public class NfcRegisterController {
 		String numeroId;
 		
 		if (Device.countFindDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)==0) {
-			Long numeroRandom = Math.abs(new Random().nextLong());
-			numeroId = numeroRandom.toString();
+			numeroId = deviceService.generateNumeroId();
 			Device device = new Device();
 			device.setNumeroId(numeroId);
 			device.setEppnInit(eppnInit);
