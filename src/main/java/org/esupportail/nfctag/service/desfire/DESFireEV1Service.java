@@ -2528,6 +2528,7 @@ public class DESFireEV1Service extends SimpleSCR {
 	}
 	
 	public byte[] hexStringToByteArray(String s) {
+		if(s == null) return null;
 		s = s.replace(" ", "");
 	    int len = s.length();
 	    byte[] data = new byte[len / 2];

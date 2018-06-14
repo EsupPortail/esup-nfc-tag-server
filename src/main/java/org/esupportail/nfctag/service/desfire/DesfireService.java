@@ -173,9 +173,15 @@ public class DesfireService {
 		byte[] piccKeyStart = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyStart());
 		KeyType piccKeyTypeStart = desfireTag.getKeyTypeStart();
 		
-		byte[] piccKeyFinish = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyFinish());
-		KeyType piccKeyTypeFinish = desfireTag.getKeyTypeFinish();
-		byte piccKeyVerFinish = desFireEV1Service.hexStringToByte(desfireTag.getKeyVersionFinish());
+		byte[] piccKeyFinish = null;
+		KeyType piccKeyTypeFinish = null;
+		byte piccKeyVerFinish = 0;
+		
+		if(desfireTag.getKeyFinish() != null){
+			piccKeyFinish = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyFinish());
+			piccKeyTypeFinish = desfireTag.getKeyTypeFinish();
+			piccKeyVerFinish = desFireEV1Service.hexStringToByte(desfireTag.getKeyVersionFinish());
+		}
 		
 		DesfireApplication desfireApp = null;
 		byte[] aid = null;
@@ -278,9 +284,11 @@ public class DesfireService {
 						authResultBean.setSize(16);
 						if(desfireTag.getApplications() != null &&  desfireTag.getApplications().size() > desfireFlowStep.currentApp){
 							desfireFlowStep.action = Action.CREATE_APP;
-						} else {
+						} else if(piccKeyFinish != null){
 							desfireFlowStep.currentApp = 0;
 							desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+						} else {
+							desfireFlowStep.action = Action.END;
 						}
 					}
 					break;
@@ -317,9 +325,11 @@ public class DesfireService {
 							desfireFlowStep.currentApp++;
 							if(desfireTag.getApplications().size() > desfireFlowStep.currentApp){
 								desfireFlowStep.action = Action.CREATE_APP;
-							} else {
+							} else if(piccKeyFinish != null){
 								desfireFlowStep.currentApp = 0;
 								desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+							} else {
+								desfireFlowStep.action = Action.END;
 							}
 						}
 					}
@@ -344,9 +354,11 @@ public class DesfireService {
 								desfireFlowStep.currentApp++;
 								if(desfireTag.getApplications().size() > desfireFlowStep.currentApp){
 									desfireFlowStep.action = Action.CREATE_APP;
-								} else {
+								} else if(piccKeyFinish != null){
 									desfireFlowStep.currentApp = 0;
 									desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+								} else {
+									desfireFlowStep.action = Action.END;
 								}
 							}
 						}
@@ -393,9 +405,11 @@ public class DesfireService {
 						desfireFlowStep.currentApp++;
 						if(desfireTag.getApplications().size() > desfireFlowStep.currentApp){
 							desfireFlowStep.action = Action.CREATE_APP;
-						} else {
+						} else if(piccKeyFinish != null){
 							desfireFlowStep.currentApp = 0;
 							desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+						} else {
+							desfireFlowStep.action = Action.END;
 						}
 					}
 					break;
@@ -442,9 +456,15 @@ public class DesfireService {
 		byte[] piccKeyStart = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyStart());
 		KeyType piccKeyTypeStart = desfireTag.getKeyTypeStart();
 		
-		byte[] piccKeyFinish = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyFinish());
-		KeyType piccKeyTypeFinish = desfireTag.getKeyTypeFinish();
-		byte piccKeyVerFinish = desFireEV1Service.hexStringToByte(desfireTag.getKeyVersionFinish());
+		byte[] piccKeyFinish = null;
+		KeyType piccKeyTypeFinish = null;
+		byte piccKeyVerFinish = 0;
+		
+		if(desfireTag.getKeyFinish() != null){
+			piccKeyFinish = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyFinish());
+			piccKeyTypeFinish = desfireTag.getKeyTypeFinish();
+			piccKeyVerFinish = desFireEV1Service.hexStringToByte(desfireTag.getKeyVersionFinish());
+		}
 		
 		DesfireApplication desfireApp = null;
 		byte[] aid = null;
@@ -606,9 +626,11 @@ public class DesfireService {
 							desfireFlowStep.currentApp++;
 							if(desfireTag.getApplications().size() > desfireFlowStep.currentApp){
 								desfireFlowStep.action = Action.CREATE_APP;
-							} else {
+							} else if(piccKeyFinish != null){
 								desfireFlowStep.currentApp = 0;
 								desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+							} else {
+								desfireFlowStep.action = Action.END;
 							}
 						}
 					}
@@ -633,9 +655,11 @@ public class DesfireService {
 								desfireFlowStep.currentApp++;
 								if(desfireTag.getApplications().size() > desfireFlowStep.currentApp){
 									desfireFlowStep.action = Action.CREATE_APP;
-								} else {
+								} else if(piccKeyFinish != null){
 									desfireFlowStep.currentApp = 0;
 									desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+								} else {
+									desfireFlowStep.action = Action.END;
 								}
 							}
 						}

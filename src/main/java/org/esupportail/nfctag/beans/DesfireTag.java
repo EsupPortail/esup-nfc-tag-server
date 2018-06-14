@@ -16,12 +16,12 @@ public class DesfireTag implements Serializable {
 	/**
 	 * PICC master key == key 0
 	 */
-	private String keyStart;
+	private String keyStart = "0000000000000000";
 
 	/**
 	 * keyType : AES, DES
 	 */
-	private KeyType keyTypeStart;
+	private KeyType keyTypeStart = KeyType.DES;
 
 	private String keyFinish;
 	
