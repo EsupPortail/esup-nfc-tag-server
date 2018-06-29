@@ -90,4 +90,12 @@ public class DesfireReadConfig extends NfcAuthConfig {
 	public void setDesfireFileOffset(String desfireFileOffset) {
 		this.desfireFileOffset = desfireFileOffset;
 	}
+
+	public String getDesfireFileSize() {
+		return desfireFileSize;
+	}
+
+	public void setDesfireFileSize(String desfireFileSize) {
+		this.desfireFileSize = desfireFileSize;
+	}
 }

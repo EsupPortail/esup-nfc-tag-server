@@ -26,6 +26,7 @@ import org.esupportail.nfctag.beans.NfcResultBean.CODE;
 import org.esupportail.nfctag.domain.TagError;
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import org.esupportail.nfctag.service.ApplicationsService;
 import org.esupportail.nfctag.service.TagAuthService;
 import org.esupportail.nfctag.service.api.TagIdCheckApi.TagType;
 import org.esupportail.nfctag.service.api.impl.DesfireReadConfig;
@@ -68,6 +69,9 @@ public class DesfireWsController {
 	@Resource
 	DesfireAuthSession desfireAuthSession;
 	
+	@Resource
+	ApplicationsService applicationsService;
+	
     // session scope
     String eppnInit;
     Boolean update = false;
@@ -77,6 +81,16 @@ public class DesfireWsController {
 	@RequestMapping(produces = "application/json")
 	@ResponseBody
 	public NfcResultBean process(@RequestParam String numeroId, @RequestParam String cardId, @RequestParam String result, HttpSession session) {
+
+		NfcResultBean nfcResultBean = new NfcResultBean();
+		
+		if(!applicationsService.checkApplicationFromNumeroId(numeroId)){
+			nfcResultBean.setCode(CODE.ERROR);
+			nfcResultBean.setMsg("device config error");
+			log.error("device error for " + numeroId + " please check configuration");
+			return nfcResultBean;
+		}
+		
 		if(desfireService.getStep()==null) {
 			update = false;
 			write = false;
@@ -93,9 +107,7 @@ public class DesfireWsController {
 		}else{
 	
 		}
-
-		NfcResultBean nfcResultBean = new NfcResultBean();
-		
+	
 		if("ERROR".equals(result)) {
 			desfireService.reset();
 			TagError tagError = new TagError();

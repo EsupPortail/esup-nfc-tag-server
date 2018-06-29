@@ -28,6 +28,7 @@ import org.esupportail.nfctag.domain.NfcMessage;
 import org.esupportail.nfctag.domain.TagError;
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import org.esupportail.nfctag.service.ApplicationsService;
 import org.esupportail.nfctag.service.TagAuthService;
 import org.esupportail.nfctag.service.api.TagIdCheckApi.TagType;
 import org.esupportail.nfctag.web.live.ErrorLongPoolController;
@@ -58,10 +59,19 @@ public class CsnWsController {
 	
 	@Resource 
 	ErrorLongPoolController errorLongPoolController;
+	
+	@Resource
+	ApplicationsService applicationsService;
 
 	private NfcResultBean authCsn(String numeroId, String csn) {
 		NfcResultBean nfcResultBean = new NfcResultBean();
 		nfcResultBean.setFullApdu("");
+		if(!applicationsService.checkApplicationFromNumeroId(numeroId)){
+			nfcResultBean.setCode(CODE.ERROR);
+			nfcResultBean.setMsg("device config error");
+			log.error("device error for " + numeroId + " please check configuration");
+			return nfcResultBean;
+		}
 		try {
 			TagLog tagLog = tagAuthService.auth(TagType.CSN, csn, numeroId, csn, null, true);
 			liveController.handleTagLog(tagLog);

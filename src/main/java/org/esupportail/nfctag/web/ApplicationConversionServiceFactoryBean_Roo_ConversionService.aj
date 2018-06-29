@@ -5,6 +5,7 @@ package org.esupportail.nfctag.web;
 
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
+import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.web.ApplicationConversionServiceFactoryBean;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.core.convert.converter.Converter;
@@ -62,6 +63,30 @@ privileged aspect ApplicationConversionServiceFactoryBean_Roo_ConversionService 
         };
     }
     
+    public Converter<TagLog, String> ApplicationConversionServiceFactoryBean.getTagLogToStringConverter() {
+        return new org.springframework.core.convert.converter.Converter<org.esupportail.nfctag.domain.TagLog, java.lang.String>() {
+            public String convert(TagLog tagLog) {
+                return new StringBuilder().append(tagLog.getStatus()).append(' ').append(tagLog.getLiveStatus()).append(' ').append(tagLog.getDesfireId()).append(' ').append(tagLog.getCsn()).toString();
+            }
+        };
+    }
+    
+    public Converter<Long, TagLog> ApplicationConversionServiceFactoryBean.getIdToTagLogConverter() {
+        return new org.springframework.core.convert.converter.Converter<java.lang.Long, org.esupportail.nfctag.domain.TagLog>() {
+            public org.esupportail.nfctag.domain.TagLog convert(java.lang.Long id) {
+                return TagLog.findTagLog(id);
+            }
+        };
+    }
+    
+    public Converter<String, TagLog> ApplicationConversionServiceFactoryBean.getStringToTagLogConverter() {
+        return new org.springframework.core.convert.converter.Converter<java.lang.String, org.esupportail.nfctag.domain.TagLog>() {
+            public org.esupportail.nfctag.domain.TagLog convert(String id) {
+                return getObject().convert(getObject().convert(id, Long.class), TagLog.class);
+            }
+        };
+    }
+    
     public void ApplicationConversionServiceFactoryBean.installLabelConverters(FormatterRegistry registry) {
         registry.addConverter(getApplicationToStringConverter());
         registry.addConverter(getIdToApplicationConverter());
@@ -69,6 +94,9 @@ privileged aspect ApplicationConversionServiceFactoryBean_Roo_ConversionService 
         registry.addConverter(getDeviceToStringConverter());
         registry.addConverter(getIdToDeviceConverter());
         registry.addConverter(getStringToDeviceConverter());
+        registry.addConverter(getTagLogToStringConverter());
+        registry.addConverter(getIdToTagLogConverter());
+        registry.addConverter(getStringToTagLogConverter());
     }
     
     public void ApplicationConversionServiceFactoryBean.afterPropertiesSet() {

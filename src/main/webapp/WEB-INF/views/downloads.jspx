@@ -7,8 +7,12 @@
 	<div id="col-lg-12">
 		<spring:url value="/nfc-index/download-apk" var="apkDlUrl"/>
 		<spring:url value="/nfc-index/download-jar" var="jarDlUrl"/>
-		<h1>Android Client</h1>
-		<h1><u><a href="${apkDlUrl}">esupnfctagdroid.apk</a></u></h1>
+		<spring:url value="/nfc-index/download-keyb" var="keybDlUrl"/>
+		<h2>
+			<span style="background-image: url('/resources/images/esupnfctagdroid.svg');" class="glyphicon logoApps"><!--  --></span>
+			Client Android
+		</h2>
+		<h3><u><a href="${apkDlUrl}">esupnfctagdroid.apk</a></u></h3>
 		<br/>
 		<p><spring:message code="message_apk_warning" /></p>
 		<ol>
@@ -17,10 +21,19 @@
 		  <li><spring:message code="message_apk_desc_3" /></li>
 		</ol>
 		<hr/>
-		<h1>Java Client</h1>
-		<h1><u><a href="${jarDlUrl}">esupnfctagdesktop.jar</a></u></h1>
-		<br/>
+		<h2>
+			<span style="background-image: url('/resources/images/esupnfctagdesktop.svg');" class="glyphicon logoApps"><!--  --></span>
+			Client Java Desktop
+		</h2>
+		<h3><u><a href="${jarDlUrl}">esupnfctagdesktop.jar</a></u></h3>
 		<p><spring:message code="message_jar_warning" /></p>
+		<hr/>
+		<h2>
+			<span style="background-image: url('/resources/images/esupnfctagkeyboard.svg');" class="glyphicon logoApps"><!--  --></span>
+			Client Java Keyboard 
+		</h2>
+		<h3><u><a href="${keybDlUrl}">esupnfctagkeyboard.jar</a></u></h3>
+		<br/>
 
 	</div>
 </div>

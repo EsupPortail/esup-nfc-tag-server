@@ -8,15 +8,16 @@
         <dl class="dl-horizontal">
             <field:display field="status" id="s_org_esupportail_nfctag_domain_TagLog_status" object="${taglog}" z="user-managed"/>
             <field:display field="csn" id="s_org_esupportail_nfctag_domain_TagLog_csn" object="${taglog}" z="user-managed"/>
-        	<field:display field="desfireId" id="s_org_esupportail_nfctag_domain_TagLog_desfireId" object="${taglog}" z="user-managed"/>
+            <field:display field="desfireId" id="s_org_esupportail_nfctag_domain_TagLog_desfireId" object="${taglog}" z="user-managed"/>
             <field:display field="eppn" id="s_org_esupportail_nfctag_domain_TagLog_eppn" object="${taglog}" z="user-managed"/>
-        	<field:display field="firstname" id="s_org_esupportail_nfctag_domain_TagLog_firstname" object="${taglog}" z="user-managed"/>
-        	<field:display field="lastname" id="s_org_esupportail_nfctag_domain_TagLog_lastname" object="${taglog}" z="user-managed"/>
+            <field:display field="firstname" id="s_org_esupportail_nfctag_domain_TagLog_firstname" object="${taglog}" z="user-managed"/>
+            <field:display field="lastname" id="s_org_esupportail_nfctag_domain_TagLog_lastname" object="${taglog}" z="user-managed"/>
             <field:display date="true" dateTimePattern="${tagLog_authdate_date_format}" field="authDate" id="s_org_esupportail_nfctag_domain_TagLog_authDate" object="${taglog}" z="user-managed"/>
-        	<field:display field="eppnInit" id="s_org_esupportail_nfctag_domain_TagLog_eppnInit" object="${taglog}" z="user-managed"/>
+            <field:display field="eppnInit" id="s_org_esupportail_nfctag_domain_TagLog_eppnInit" object="${taglog}" z="user-managed"/>
             <field:display field="numeroId" id="s_org_esupportail_nfctag_domain_TagLog_numeroId" object="${taglog}" z="user-managed"/>
-        	<field:display field="applicationName" id="s_org_esupportail_nfctag_domain_TagLog_applicationName" object="${taglog}" z="user-managed"/>
+            <field:display field="applicationName" id="s_org_esupportail_nfctag_domain_TagLog_applicationName" object="${taglog}" z="user-managed"/>
             <field:display field="location" id="s_org_esupportail_nfctag_domain_TagLog_location" object="${taglog}" z="user-managed"/>
         </dl>
+        <field:display field="liveStatus" id="s_org_esupportail_nfctag_domain_TagLog_liveStatus" object="${taglog}" z="i25l7lsAXUtIq4IOIN55d28OtLY="/>
     </page:show>
 </div>

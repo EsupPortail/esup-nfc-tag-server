@@ -30,7 +30,8 @@ import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMess
 import org.esupportail.nfctag.service.api.TagWriteApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.client.RestClientException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -74,9 +75,14 @@ public class TagWriteRestWs implements TagWriteApi {
 			try {
 				id = restTemplate.getForObject(targetUrl, String.class);
 				cacheIdsMap.put(targetUrl, id);
-			} catch(RestClientException e){
+			} catch(HttpStatusCodeException e){
 				log.warn("tagIdCheck error : " + targetUrl);
-				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable);
+				HttpStatus status = e.getStatusCode();
+			    if (status != HttpStatus.NOT_FOUND) {
+			    	throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable);
+			    } else {
+			    	throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_unknowcard);
+			    }
 			}
 			log.trace("Got :  " + id);
 		} else {

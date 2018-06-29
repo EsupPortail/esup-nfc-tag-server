@@ -28,6 +28,8 @@ import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
 import org.esupportail.nfctag.service.api.AppliExtApi;
+import org.esupportail.nfctag.service.api.NfcAuthConfig;
+import org.esupportail.nfctag.service.api.TagIdCheckApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -40,6 +42,11 @@ public class ApplicationsService {
 	@Resource
 	ApplisExtService applisExtService;
     
+	@Resource
+	NfcAuthConfigService nfcAuthConfigService;
+	
+	@Resource
+	TagIdCheckService tagIdCheckService;
 
 	public Application getApplicationFromNumeroId(String numeroId) throws EsupNfcTagException {
 
@@ -92,4 +99,32 @@ public class ApplicationsService {
 		return appLocations;
 	}
 	
+	public boolean checkApplicationFromNumeroId(String numeroId) throws EsupNfcTagException {
+		boolean isDeviceValid = false;
+		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
+		if(!devices.isEmpty()) {
+			log.trace("device identify :" + numeroId);
+			Application application = devices.get(0).getApplication();
+			if(application != null) {
+				if(checkApplication(application.getId())){
+					isDeviceValid = true;
+				}
+			}
+		}
+		return isDeviceValid;
+	}
+	
+	public boolean checkApplication(long id) throws EsupNfcTagException {
+		boolean isApplicationValid = false;
+		Application application = Application.findApplication(id);
+		if(!application.getAppliExt().isEmpty() && !application.getTagIdCheck().isEmpty() && !application.getNfcConfig().isEmpty()){
+			AppliExtApi extApi = applisExtService.get(application.getAppliExt());
+			NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(application.getNfcConfig());
+			TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(application.getTagIdCheck());
+			if(extApi.getDescription() != null && nfcAuthConfig.getAuthType() != null && tagIdCheckApi.getDescription() != null) {
+				isApplicationValid = true;
+			}
+		}
+		return isApplicationValid;
+	}
 }
