@@ -17,6 +17,7 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,8 +27,23 @@ import org.esupportail.nfctag.service.api.AppliExtApi;
 
 public class AppliExtDummy implements AppliExtApi {
 
+	List<String> locationsNames = new ArrayList<String>();
+
+	protected String description;
+	
+	public void setLocationsNames(List<String> locationsNames) {
+		this.locationsNames = locationsNames;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+	
 	@Override
 	public String getDescription() {
+		if(description != null) {
+			return description;
+		}
 		return "Dummy !";
 	};
 
@@ -43,6 +59,9 @@ public class AppliExtDummy implements AppliExtApi {
 	
 	@Override
 	public List<String> getLocations4Eppn(String eppn) {
+		if(locationsNames.size() > 0 ){
+			return locationsNames;
+		}
 		return Arrays.asList("Dummy Location");
 	}
 
