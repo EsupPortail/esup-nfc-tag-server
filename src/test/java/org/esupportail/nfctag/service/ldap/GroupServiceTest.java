@@ -1,7 +1,5 @@
 package org.esupportail.nfctag.service.ldap;
 
-import static org.junit.Assert.fail;
-
 import java.util.List;
 import java.util.Map;
 
@@ -31,25 +29,7 @@ public class GroupServiceTest {
 	
 	@Test
 	public void testConsistenceGroup() {
-		
-		for(String groupName : nfcMappingGroupesRoles.keySet()) {
-			if(ROLE_TO_TEST.equals(nfcMappingGroupesRoles.get(groupName))) {
-				List<String> members = groupService.getMembers(groupName);
-				if(members.size()>0) {
-					String member = members.get(0);
-					List<String> groups = groupService.getGroups(member);
-					String testDetails = String.format("members of %s : %s \n"
-							+ "groups of %s : %s",
-							groupName, members, member, groups);
-					if(!groups.contains(groupName)) {
-						fail("groupService configurations inconsistent :\n"
-								+ testDetails);
-					} else {
-						log.info("Test OK : " + testDetails);
-					}
-				}
-			}
-		}
+		List<String> groups = groupService.getGroups("test");
 	}
 
 }

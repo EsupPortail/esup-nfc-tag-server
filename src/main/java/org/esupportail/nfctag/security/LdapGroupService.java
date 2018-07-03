@@ -84,25 +84,6 @@ public class LdapGroupService implements GroupService {
 		return groups;
 		
 	}
-	
-	@Override
-	public List<String> getMembers(String groupName) {
-
-		String formattedFilter = MessageFormat.format(memberSearchFilter, new String[] {groupName});
-			
-		List<String> eppns = ldapTemplate.search(
-				memberSearchBase, formattedFilter,new ContextMapper<String>() {
-	
-						@Override
-						public String mapFromContext(Object ctx) throws NamingException {
-							DirContextAdapter searchResultContext = (DirContextAdapter)ctx;
-					        String eppn = searchResultContext.getStringAttribute("eduPersonPrincipalName");
-							return eppn;
-						}
-					});
-		
-		return eppns;
-	}
 
 }
 

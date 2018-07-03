@@ -1,13 +1,9 @@
 package org.esupportail.nfctag.security;
 
-import static org.springframework.ldap.query.LdapQueryBuilder.query;
-
 import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.naming.NamingException;
 
@@ -65,30 +61,6 @@ public class LdapFilterGroupService implements GroupService {
 		
 		return groups;
 		
-	}
-	
-	@Override
-	public List<String> getMembers(String groupName) {
-
-		Set<String> eppns = new HashSet<String>();
-
-		for(String ldapFilter: ldapFiltersGroups.keySet()) {
-
-			if(ldapFiltersGroups.get(ldapFilter).equals(groupName)) {
-
-				eppns.addAll(ldapTemplate.search(query().filter(ldapFilter) ,new ContextMapper<String>() {
-
-					@Override
-					public String mapFromContext(Object ctx) throws NamingException {
-						DirContextAdapter searchResultContext = (DirContextAdapter)ctx;
-						String eppn = searchResultContext.getStringAttribute("eduPersonPrincipalName");
-						return eppn;
-					}
-				}));
-			}
-		}
-
-		return new ArrayList<String>(eppns);
 	}
 	
 }

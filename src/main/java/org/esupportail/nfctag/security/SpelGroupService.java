@@ -40,12 +40,6 @@ public class SpelGroupService implements GroupService {
 		return groups;
 		
 	}
-
-	@Override
-	public List<String> getMembers(String groupName) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 	
 }
 
