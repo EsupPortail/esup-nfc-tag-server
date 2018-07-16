@@ -12,6 +12,8 @@
 	&amp;nbsp;
 	<div id="debug" class="text-warning"><!--  --></div>
 	<script type="text/javascript">
+		var validateAuthWoConfirmation = true;
+		var isDisplay = false;
 		var numeroId = '${numeroId}';
 	</script>
 </div>
