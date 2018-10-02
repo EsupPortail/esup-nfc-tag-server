@@ -17,17 +17,8 @@
  */
 package org.esupportail.nfctag.web.manager;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
 
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.TagLog;
@@ -59,52 +50,21 @@ public class TagLogController {
     		sortFieldName = "authDate";
     		sortOrder = "DESC";
     	}
-
-        int sizeNo = size == null ? 10 : size.intValue();
-        final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
-    	List<TagLog> taglogs = TagLog.findTagLogEntries(firstResult, sizeNo, sortFieldName, sortOrder);
-
-    	EntityManager em = TagLog.entityManager();
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<TagLog> query = criteriaBuilder.createQuery(TagLog.class);
-        Root<TagLog> c = query.from(TagLog.class);
-        final List<Predicate> predicates = new ArrayList<Predicate>();
-        final List<Order> orders = new ArrayList<Order>();
-    	
-        if("DESC".equals(sortOrder.toUpperCase())){
-        	orders.add(criteriaBuilder.desc(c.get(sortFieldName)));
-        }else{
-        	orders.add(criteriaBuilder.asc(c.get(sortFieldName)));
+    	if(applicationFilter == null) {
+          	applicationFilter = "";
         }
-        
-        if(applicationFilter != null && applicationFilter != ""){
-        	predicates.add(criteriaBuilder.equal(c.get("applicationName"), applicationFilter));
-        }else{
-        	applicationFilter="";
-        }
-
-        if(statusFilter != null && statusFilter != ""){
-        	predicates.add(criteriaBuilder.equal(c.get("status"), TagLog.Status.valueOf(statusFilter)));
-        }else{
-        	statusFilter="";
-        }
-        
-        if(searchString!=null && searchString!=""){
-	        Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal("'"+searchString+"'"));
-	        Expression<Double> fullTestSearchRanking = criteriaBuilder.function("ts_rank", Double.class, criteriaBuilder.literal("'"+searchString+"'"));
-	        predicates.add(criteriaBuilder.isTrue(fullTestSearchExpression));
-	        orders.add(criteriaBuilder.desc(fullTestSearchRanking));
-        }else{
+        if(statusFilter == null) {
+        	statusFilter = "";
+        }       
+        if(searchString==null) {
         	searchString="";
         }
-        
-        orders.add(criteriaBuilder.desc(c.get(sortFieldName)));        
-        query.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
-        query.orderBy(orders);
-        query.select(c);
-        taglogs = em.createQuery(query).setFirstResult(firstResult).setMaxResults(sizeNo).getResultList();
-        
-        float nrOfPages = (float) em.createQuery(query).getResultList().size() / sizeNo;
+          
+        int sizeNo = size == null ? 10 : size.intValue();
+        final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
+      
+        List<TagLog> taglogs = TagLog.findTagLogs(searchString, statusFilter, applicationFilter, sortFieldName, sortOrder).setFirstResult(firstResult).setMaxResults(sizeNo).getResultList();     
+        float nrOfPages = (float) TagLog.countFindTagLogs(searchString, statusFilter, applicationFilter) / sizeNo;
         
         uiModel.addAttribute("maxPages", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));
         uiModel.addAttribute("applications", Application.findAllApplications());
