@@ -21,7 +21,7 @@ public class DbToolService {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	final static String currentEsupSgcVersion = "0.2.x";
+	final static String currentEsupSgcVersion = "2.1.x";
 		
 	@Resource
 	DataSource dataSource;
@@ -88,6 +88,21 @@ public class DbToolService {
 	    				"Base de données à jour 0.1.x" +
 	    				"\n#####\n");
 			}
+			
+			if ("0.2.x".equals(esupSgcVersion)) {
+	    		esupSgcVersion = "2.1.x";
+				log.warn("Mise à jour de numero de version : 2.1.x");
+			} else {
+				log.warn("\n\n#####\n\t" +
+	    				"Base de données à jour 0.2.x" +
+	    				"\n#####\n");
+			}
+			
+			if ("2.1.x".equals(esupSgcVersion)) {
+				log.warn("\n\n#####\n\t" +
+	    				"Base de données à jour 2.1.x" +
+	    				"\n#####\n");
+			} 
 			appliVersion.setEsupNfcTagVersion(currentEsupSgcVersion);
 			appliVersion.merge();
 		} catch(Exception e) {
