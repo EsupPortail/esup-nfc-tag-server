@@ -1,14 +1,22 @@
 package org.esupportail.nfctag.beans;
 
+import static org.junit.Assert.fail;
+
 import java.io.Serializable;
 import java.util.List;
+
+import javax.annotation.PostConstruct;
 
 import org.esupportail.nfctag.service.api.TagWriteApi;
 import org.esupportail.nfctag.service.api.impl.TagLastUpdateRestWs;
 import org.esupportail.nfctag.service.api.impl.TagWriteNone;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DesfireApplication implements Serializable {
 
+	private final Logger log = LoggerFactory.getLogger(getClass());
+	
 	private static final long serialVersionUID = 1L;
 	
 	/**
@@ -104,6 +112,17 @@ public class DesfireApplication implements Serializable {
 		this.files = files;
 	}
 
+	@PostConstruct
+	public void initDesfireAppicationConfig() throws Exception {
+		String hexNbKey = "0" + getNok().substring(1); 
+		int nbKey = Integer.parseInt(hexNbKey, 16 );
+		if(nbKey != getKeys().size()){
+			log.error("error on desfireTest, nb key not good for " + getDesfireAppId());
+			throw new Exception("error on desfireTest, nb key not good for " + getDesfireAppId());
+		}
+		
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

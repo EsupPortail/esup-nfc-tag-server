@@ -96,6 +96,11 @@
 	</bean>
 
 	<bean id="versionApkService" class="org.esupportail.nfctag.service.VersionApkService">
+		<property name="skipApkVersion" value="true" />
+	</bean>
+
+	<bean id="versionJarService" class="org.esupportail.nfctag.service.VersionJarService">
+		<property name="skipJarVersion" value="true" />
 	</bean>
 
     <!-- desfire service ... -->

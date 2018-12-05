@@ -37,29 +37,41 @@ public class VersionApkService {
 
     private String versionName = "unknow";
     
-    @PostConstruct
+    private boolean skipApkVersion = false;
+    
+    public boolean isSkipApkVersion() {
+		return skipApkVersion;
+	}
+
+	public void setSkipApkVersion(boolean skipApkVersion) {
+		this.skipApkVersion = skipApkVersion;
+	}
+
+	@PostConstruct
     protected void extractVersionApk() throws IOException {
-    	try {
-			InputStream apkFile = new ClassPathResource("apk/esupnfctagdroid.apk").getInputStream();
-			log.info("esupnfctagdroid.apk found");
-			ZipInputStream zin = new ZipInputStream(apkFile);
-			ZipEntry ze = zin.getNextEntry();
-			while (ze!=null && !"assets/versionApk.txt".equals(ze.getName())) {
-				log.trace("APK scan : " + ze.getName());
-			    zin.closeEntry();
-			    ze = zin.getNextEntry();
-			}
-			if(ze!=null && "assets/versionApk.txt".equals(ze.getName())) {
-				byte[] bytes = new byte[(int)ze.getSize()];
-				zin.read(bytes);
-				versionName = new String(bytes);
-			}
-			zin.closeEntry();
-			zin.close();
-			log.info("APK version is : " + versionName);
-    	} catch(FileNotFoundException fnfe) {
-    		log.warn("esupnfctagdroid.apk not found");
-    	}
+		if(!skipApkVersion) {
+	    	try {
+				InputStream apkFile = new ClassPathResource("apk/esupnfctagdroid.apk").getInputStream();
+				log.info("esupnfctagdroid.apk found");
+				ZipInputStream zin = new ZipInputStream(apkFile);
+				ZipEntry ze = zin.getNextEntry();
+				while (ze!=null && !"assets/versionApk.txt".equals(ze.getName())) {
+					log.trace("APK scan : " + ze.getName());
+				    zin.closeEntry();
+				    ze = zin.getNextEntry();
+				}
+				if(ze!=null && "assets/versionApk.txt".equals(ze.getName())) {
+					byte[] bytes = new byte[(int)ze.getSize()];
+					zin.read(bytes);
+					versionName = new String(bytes);
+				}
+				zin.closeEntry();
+				zin.close();
+				log.info("APK version is : " + versionName);
+	    	} catch(FileNotFoundException fnfe) {
+	    		log.warn("esupnfctagdroid.apk not found");
+	    	}
+		}
     }
     
 	public String getApkVersion() {
@@ -74,9 +86,9 @@ public class VersionApkService {
 		}
 		return false;
 	}
-
+	
 	public boolean isUserApkVersionUp2Date(String apkVersion) {
-		return isUserApkVersionDev(apkVersion) || versionName.equals(apkVersion);
+		return isUserApkVersionDev(apkVersion) || versionName.equals(apkVersion) || skipApkVersion;
 	}
 	
 }

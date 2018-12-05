@@ -37,28 +37,40 @@ public class VersionJarService {
 
     private String versionName = "unknow";
     
+    private boolean skipJarVersion = false;
+
+    public boolean isSkipJarVersion() {
+		return skipJarVersion;
+	}
+    
+	public void setSkipJarVersion(boolean skipJarVersion) {
+		this.skipJarVersion = skipJarVersion;
+	}
+    
     @PostConstruct
     protected void extractVersionJar() throws IOException {
-    	try {
-			InputStream jarFile = new ClassPathResource("jar/esupnfctagdesktop.jar").getInputStream();
-			log.info("esupnfctagdesktop.jar found");
-			ZipInputStream zin = new ZipInputStream(jarFile);
-			ZipEntry ze = zin.getNextEntry();
-			while (ze!=null && !"versionJar.txt".equals(ze.getName())) {
-				log.trace("JAR scan : " + ze.getName());
-			    zin.closeEntry();
-			    ze = zin.getNextEntry();
-			}
-			if(ze!=null && "versionJar.txt".equals(ze.getName())) {
-				byte[] bytes = new byte[(int)ze.getSize()];
-				zin.read(bytes);
-				versionName = new String(bytes);
-			}
-			zin.closeEntry();
-			zin.close();
-			log.info("JAR version is : " + versionName);
-    	} catch(FileNotFoundException fnfe) {
-    		log.warn("esupnfctagdesktop.jar not found");
+    	if(!skipJarVersion) {
+	    	try {
+				InputStream jarFile = new ClassPathResource("jar/esupnfctagdesktop.jar").getInputStream();
+				log.info("esupnfctagdesktop.jar found");
+				ZipInputStream zin = new ZipInputStream(jarFile);
+				ZipEntry ze = zin.getNextEntry();
+				while (ze!=null && !"versionJar.txt".equals(ze.getName())) {
+					log.trace("JAR scan : " + ze.getName());
+				    zin.closeEntry();
+				    ze = zin.getNextEntry();
+				}
+				if(ze!=null && "versionJar.txt".equals(ze.getName())) {
+					byte[] bytes = new byte[(int)ze.getSize()];
+					zin.read(bytes);
+					versionName = new String(bytes);
+				}
+				zin.closeEntry();
+				zin.close();
+				log.info("JAR version is : " + versionName);
+	    	} catch(FileNotFoundException fnfe) {
+	    		log.warn("esupnfctagdesktop.jar not found");
+	    	}
     	}
     }
     
@@ -77,7 +89,7 @@ public class VersionJarService {
 
 	public boolean isUserJarVersionUp2Date(String apkVersion) {
 		log.info("check version : client " + apkVersion + ", server " + versionName +".");
-		return isUserJarVersionDev(apkVersion) || versionName.equals(apkVersion);
+		return isUserJarVersionDev(apkVersion) || versionName.equals(apkVersion) || skipJarVersion;
 	}
 	
 }

@@ -64,9 +64,6 @@ public class LiveLongPoolController {
 	
 	@Resource
 	NfcAuthConfigService nfcAuthConfigService;
-	
-	@Resource
-	VersionApkService versionApkService;
 
 	@Resource
 	ApplisExtService applisExtService;

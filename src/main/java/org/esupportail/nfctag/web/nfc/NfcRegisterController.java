@@ -72,21 +72,24 @@ public class NfcRegisterController {
 			@RequestParam(required = false) String apkVersion,
 			@RequestParam(required = false) String jarVersion,
 			Model uiModel) {
-		if(imei.equals("appliJava")){
-			if(jarVersion != null){
+		if(apkVersion == null) {
+			apkVersion = "ok";
+		}
+		if(jarVersion == null) {
+			jarVersion = "ok";
+		}
+		
+		if(imei.equals("appliJava")) {
+			if(!versionJarService.isSkipJarVersion()) {
 				if(!versionJarService.isUserJarVersionUp2Date(jarVersion)){
 					return "redirect:/nfc-index/download?jarVersion=" + versionJarService.getJarVersion();
 				}
-			}else{
-				return "redirect:/nfc-index/download?jarVersion=" + versionJarService.getJarVersion();
 			}
 		}else{
-			if(apkVersion != null){
-				if(!versionApkService.isUserApkVersionUp2Date(apkVersion)){
+			if(!versionApkService.isSkipApkVersion()) {
+				if(!versionApkService.isUserApkVersionUp2Date(apkVersion)) {
 					return "redirect:/nfc-index/download?apkVersion=" + versionApkService.getApkVersion();
 				}
-			}else{
-				return "redirect:/nfc-index/download?apkVersion=" + versionApkService.getApkVersion();
 			}
 		}
 		

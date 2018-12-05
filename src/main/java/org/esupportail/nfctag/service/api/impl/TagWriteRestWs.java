@@ -78,7 +78,7 @@ public class TagWriteRestWs implements TagWriteApi {
 			} catch(HttpStatusCodeException e){
 				log.warn("tagIdCheck error : " + targetUrl);
 				HttpStatus status = e.getStatusCode();
-			    if (status != HttpStatus.NOT_FOUND) {
+			    if (!HttpStatus.NOT_FOUND.equals(status)) {
 			    	throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable);
 			    } else {
 			    	throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_unknowcard);

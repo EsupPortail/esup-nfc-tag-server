@@ -4,8 +4,6 @@ import static org.junit.Assert.fail;
 
 import java.util.List;
 
-import javax.annotation.Resource;
-
 import org.esupportail.nfctag.beans.DesfireApplication;
 import org.esupportail.nfctag.beans.DesfireFile;
 import org.esupportail.nfctag.beans.DesfireTag;
@@ -17,10 +15,10 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.client.RestTemplate;
 
 
 
@@ -31,41 +29,46 @@ public class DesfireServiceTest {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	@Resource
-    protected RestTemplate restTemplate;
-	
-	@Autowired
-	DesfireService desfireService;
-	
 	@Autowired
 	DesfireTag desfireComueTagEsupSgc;
 	
-	@Resource
-	DesfireAuthSession desfireAuthSession;
+	@Value("${test.desfire.csn:}") 
+	String csnFromConfig; 
 	
 	@Test
-	public void testParseDesfireConfiguration() throws Exception {
-		
-		for(DesfireApplication desApp : desfireComueTagEsupSgc.getApplications()){
-			String hexNbKey = "0" + desApp.getNok().substring(1); 
-			int nbKey = Integer.parseInt(hexNbKey, 16 );
-			if(nbKey != desApp.getKeys().size()){
-				fail("error on desfireTest, nb key not good for " + desApp.getDesfireAppId());
-			}
+	public void testWithFistCsnFind() throws Exception {
+		Long nbTagLog = TagLog.countTagLogs();
+		if(nbTagLog > 0) {
+			List<TagLog> tagLogs = TagLog.findTagLogEntries(nbTagLog.intValue() - 1, 1);
+			log.info("test with " + tagLogs.get(0).getCsn());
+			testParseDesfireConfiguration(tagLogs.get(0).getCsn());
+		}
+	}
+	
+	@Test
+	public void testWithConfigCsn() throws Exception {
+		log.info("test with " + csnFromConfig);
+		testParseDesfireConfiguration(csnFromConfig);
+	}
+	
+	public void testParseDesfireConfiguration(String csn) throws Exception {
+		if(desfireComueTagEsupSgc.getApplications() != null){
+		for(DesfireApplication desApp : desfireComueTagEsupSgc.getApplications()) {
 			for(DesfireFile desFile : desApp.getFiles()){
 				try {
-					List<TagLog> tagLogs = TagLog.findAllTagLogs();
-					if(tagLogs.size() > 0 ) {
-						desFile.getTagWriteApi().getIdFromCsn(tagLogs.get(tagLogs.size()-1).getCsn());
-					}
-				} catch (EsupNfcTagException e){
-					if(e.getMessage().equals(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable)){
+					desFile.getTagWriteApi().getIdFromCsn(csn);
+				} catch (EsupNfcTagException e) {
+					log.warn("sgc ws error : " + e.getMessage());
+					if(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable.toString().equals(e.getMessage())) {
+						log.error("sgc ws not responding");
 						fail("error on tagWriteApi for " +  desApp.getDesfireAppId());
+					} else {
+						log.warn("sgc ws ok but not card fount with csn = " + csn);
 					}
 				}
 			}
 			
 		}
-
+		}
 	}
 }
