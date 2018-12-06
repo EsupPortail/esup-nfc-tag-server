@@ -133,7 +133,7 @@ public class NfcRegisterController {
 			@RequestParam(required = true) String location, 
 			@RequestParam(required = true) Long applicationId,
 			@RequestParam(required = true) String imei,
-			@RequestParam(required = true) String macAddress, Model uiModel) throws IOException, EsupNfcTagException {
+			@RequestParam(required = false) String macAddress, Model uiModel) throws IOException, EsupNfcTagException {
 		
 		Application application = Application.findApplication(applicationId);
 
@@ -158,7 +158,7 @@ public class NfcRegisterController {
 			device.setLocation(location);
 			device.setApplication(application);
 			device.setImei(imei);
-			device.setMacAddress(macAddress);
+			if(macAddress != null) device.setMacAddress(macAddress);
 			device.setUserAgent(userAgent);
 			if(application.getValidateAuthWoConfirmationDefault() != null){
 				device.setValidateAuthWoConfirmation(application.getValidateAuthWoConfirmationDefault());

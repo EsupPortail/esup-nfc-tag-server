@@ -211,7 +211,7 @@ public class NfcIndexController {
 			@RequestParam(required = true) String location, 
 			@RequestParam(required = true) Long applicationId,
 			@RequestParam(required = true) String imei,
-			@RequestParam(required = true) String macAddress,
+			@RequestParam(required = false) String macAddress,
 			Model uiModel, HttpServletRequest httpServletRequest) throws IOException, EsupNfcTagException {
 		
 		log.info(numeroId + "access to /nfc-index/locations");
@@ -236,7 +236,7 @@ public class NfcIndexController {
 
 		device.setLocation(location);
 		device.setApplication(application);
-		device.setMacAddress(macAddress);
+		if(macAddress != null) device.setMacAddress(macAddress);
 		if(application.getValidateAuthWoConfirmationDefault() != null){
 			device.setValidateAuthWoConfirmation(application.getValidateAuthWoConfirmationDefault());
 		} else{
