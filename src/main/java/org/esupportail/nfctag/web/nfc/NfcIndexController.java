@@ -73,6 +73,11 @@ public class NfcIndexController {
 			@RequestParam(required=false) String apkVersion,
 			@RequestParam(required=false) String jarVersion) {
 
+		if(imei.equals("esupSgcClient") && (numeroId == null || numeroId.equals(""))) {
+			
+			return "redirect:/nfc/register-sgc?userAgent=esup-sgc-client&imei=" + imei + "&macAddress=" + macAddress;
+		}
+		
 		if(apkVersion == null) {
 			apkVersion = "ok";
 		}
@@ -98,7 +103,7 @@ public class NfcIndexController {
 		} else {
 			return "redirect:/live?apkVersion=" + versionApkService.getApkVersion() + "&jarVersion=" + versionJarService.getJarVersion() + "&numeroId=" + numeroId;
 		}
-		
+
 	}
 	
 	@RequestMapping(value = "/download")

@@ -24,17 +24,27 @@ import java.util.List;
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.api.AppliExtApi;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class AppliExtDummy implements AppliExtApi {
 
+	private final Logger log = LoggerFactory.getLogger(getClass());
+
 	List<String> locationsNames = new ArrayList<String>();
 
+	private String eppnFilter = ".*";
+	
 	protected String description;
 	
 	public void setLocationsNames(List<String> locationsNames) {
 		this.locationsNames = locationsNames;
 	}
 
+	public void setEppnFilter(String eppnFilter) {
+		this.eppnFilter = eppnFilter;
+	}
+	
 	public void setDescription(String description) {
 		this.description = description;
 	}
@@ -59,10 +69,14 @@ public class AppliExtDummy implements AppliExtApi {
 	
 	@Override
 	public List<String> getLocations4Eppn(String eppn) {
-		if(locationsNames.size() > 0 ){
-			return locationsNames;
+		if(eppn.matches(eppnFilter)) {
+			if(locationsNames.size() > 0 ){
+				return locationsNames;
+			}
+			return Arrays.asList("Dummy Location");
 		}
-		return Arrays.asList("Dummy Location");
+		log.error(eppn + " not autorized to access this app");
+		return null;
 	}
 
 	@Override
