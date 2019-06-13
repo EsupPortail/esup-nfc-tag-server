@@ -167,10 +167,12 @@ public class DesfireService {
 				desfireFlowStep.action = Action.SELECT_ROOT;
 			}
 		}
+
+		byte[] piccKeyStart = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyStart());
+		
 		byte[] defaultKey = null;
 		
 		byte[] piccAid = desFireEV1Service.hexStringToByteArray("000000");
-		byte[] piccKeyStart = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyStart());
 		KeyType piccKeyTypeStart = desfireTag.getKeyTypeStart();
 		
 		byte[] piccKeyFinish = null;
@@ -204,58 +206,66 @@ public class DesfireService {
 		byte cms = 0;
 		byte fileNo = 0;
 		
-		if(desfireTag.getApplications() != null && desfireTag.getApplications().size() >  desfireFlowStep.currentApp){
-			desfireApp = desfireTag.getApplications().get(desfireFlowStep.currentApp);
-			aid = desFireEV1Service.hexStringToByteArray(desfireApp.getDesfireAppId());
-			amks= desFireEV1Service.hexStringToByte(desfireApp.getAmks());
-			nok = desFireEV1Service.hexStringToByte(desfireApp.getNok());
+		if(desfireTag.getApplications() != null) { 
+			if(desfireTag.getApplications().size() >  desfireFlowStep.currentApp) {
 			
-			if(desfireApp.getNok().substring(0, 1).equals("8")){
-				defaultKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
-				appDefaultKeyType = KeyType.AES;
-				appKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
-				appKeyNo = desFireEV1Service.hexStringToByte("00");
-				appKeyVer = desFireEV1Service.hexStringToByte("00");
-				keyKeyType = appKeyType = KeyType.AES;
-			}else{
-				defaultKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
-				appDefaultKeyType = KeyType.DES;				
-				appKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
-				appKeyNo = desFireEV1Service.hexStringToByte("00");
-				appKeyVer = desFireEV1Service.hexStringToByte("00");
-				keyKeyType = appKeyType = KeyType.DES;
-			}
-
-			if(desfireApp.getKeys() != null && desfireApp.getKeys().size() > 0) {
-				DesfireKey desfireAppKey = desfireApp.getKeys().get(0);
-				appKey = desFireEV1Service.hexStringToByteArray(desfireAppKey.getKey());
-				appKeyNo = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyNo());
-				appKeyVer = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyVer());
-				if(desfireApp.getKeys().size() >  desfireFlowStep.currentKey) {
-					DesfireKey desfireKey = desfireApp.getKeys().get(desfireFlowStep.currentKey);
-					keyNo = desFireEV1Service.hexStringToByte(desfireKey.getKeyNo());
-					key = desFireEV1Service.hexStringToByteArray(desfireKey.getKey());
-					keyVer = desFireEV1Service.hexStringToByte(desfireKey.getKeyVer());
+				desfireApp = desfireTag.getApplications().get(desfireFlowStep.currentApp);
+				aid = desFireEV1Service.hexStringToByteArray(desfireApp.getDesfireAppId());
+				amks= desFireEV1Service.hexStringToByte(desfireApp.getAmks());
+				nok = desFireEV1Service.hexStringToByte(desfireApp.getNok());
+				
+				if(desfireApp.getNok().substring(0, 1).equals("8")){
+					defaultKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
+					appDefaultKeyType = KeyType.AES;
+					appKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
+					appKeyNo = desFireEV1Service.hexStringToByte("00");
+					appKeyVer = desFireEV1Service.hexStringToByte("00");
+					keyKeyType = appKeyType = KeyType.AES;
+				}else{
+					defaultKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
+					appDefaultKeyType = KeyType.DES;				
+					appKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
+					appKeyNo = desFireEV1Service.hexStringToByte("00");
+					appKeyVer = desFireEV1Service.hexStringToByte("00");
+					keyKeyType = appKeyType = KeyType.DES;
 				}
-			}
-			
-			if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
-				DesfireFile desfireFile = desfireApp.getFiles().get(desfireFlowStep.currentFile);
-				accessRights = desFireEV1Service.hexStringToByteArray(desfireFile.getAccessRights());
-				cms = desFireEV1Service.hexStringToByte(desfireFile.getCommunicationSettings());
-				fileNo = desFireEV1Service.hexStringToByte(desfireFile.getFileNumber());
-				TagWriteApi tagWriteApi = desfireFile.getTagWriteApi();
-				desfireId = tagWriteApi.getIdFromCsn(csn);
-				String writePayload;
-				if(desfireFile.getFileSize() != null){
-					writePayload = desfireFile.getWriteFilePayload() + desfireFile.getFileSize();
-				} else{
-					//calcul automatique de la taille du fichier en fonction du contenu
-					int fileSize = desfireId.length() / 2;
-					String hexSize = leftPad(Integer.toHexString(fileSize), 6, '0');
-					writePayload = desfireFile.getWriteFilePayload() + desFireEV1Service.swapPairs(desFireEV1Service.hexStringToByteArray(hexSize));
+	
+				if(desfireApp.getKeys() != null && desfireApp.getKeys().size() > 0) {
+					DesfireKey desfireAppKey = desfireApp.getKeys().get(0);
+					appKey = desFireEV1Service.hexStringToByteArray(desfireAppKey.getKey());
+					appKeyNo = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyNo());
+					appKeyVer = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyVer());
+					if(desfireApp.getKeys().size() >  desfireFlowStep.currentKey) {
+						DesfireKey desfireKey = desfireApp.getKeys().get(desfireFlowStep.currentKey);
+						keyNo = desFireEV1Service.hexStringToByte(desfireKey.getKeyNo());
+						key = desFireEV1Service.hexStringToByteArray(desfireKey.getKey());
+						keyVer = desFireEV1Service.hexStringToByte(desfireKey.getKeyVer());
+					}
 				}
-				byteWritePayload = desFireEV1Service.hexStringToByteArray(writePayload);
+				
+				if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
+					DesfireFile desfireFile = desfireApp.getFiles().get(desfireFlowStep.currentFile);
+					accessRights = desFireEV1Service.hexStringToByteArray(desfireFile.getAccessRights());
+					cms = desFireEV1Service.hexStringToByte(desfireFile.getCommunicationSettings());
+					fileNo = desFireEV1Service.hexStringToByte(desfireFile.getFileNumber());
+					TagWriteApi tagWriteApi = desfireFile.getTagWriteApi();
+					desfireId = tagWriteApi.getIdFromCsn(csn);
+					String writePayload;
+					if(desfireFile.getFileSize() != null){
+						writePayload = desfireFile.getWriteFilePayload() + desfireFile.getFileSize();
+					} else{
+						//calcul automatique de la taille du fichier en fonction du contenu
+						int fileSize = desfireId.length() / 2;
+						String hexSize = leftPad(Integer.toHexString(fileSize), 6, '0');
+						writePayload = desfireFile.getWriteFilePayload() + desFireEV1Service.swapPairs(desFireEV1Service.hexStringToByteArray(hexSize));
+					}
+					byteWritePayload = desFireEV1Service.hexStringToByteArray(writePayload);
+				}
+			} else {
+				//Si pas d'application ni master key on valide l'encodage pour affectation de la carte
+				if(desfireTag.getApplications().size() == 0 && piccKeyStart == null) {
+					desfireFlowStep.action = Action.END;
+				}
 			}
 		}
 
