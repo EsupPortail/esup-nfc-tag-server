@@ -156,7 +156,7 @@
 		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.1-901-1.jdbc4</version>
+			<version>42.1.4</version>
 		</dependency>
 		<dependency>
 			<groupId>org.hibernate</groupId>
@@ -584,7 +584,7 @@
 					<dependency>
 						<groupId>postgresql</groupId>
 						<artifactId>postgresql</artifactId>
-						<version>9.0-801.jdbc3</version>
+						<version>9.4-1206-jdbc41</version>
 					</dependency>
 				</dependencies>
 			</plugin>
