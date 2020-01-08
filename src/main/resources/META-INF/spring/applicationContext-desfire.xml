@@ -32,7 +32,10 @@
                    http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.2.xsd                                                                                          
                    http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.2.xsd                                                                                             
                    http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
-    
+
+    <bean id="esupSgcAuthTokenService" class="org.esupportail.nfctag.service.EsupSgcAuthTokenService">
+        <property name="esupSgcUrl" value="https://esup-sgc-test.univ-ville.fr"/>
+    </bean>
     
     <bean id="idp2sTagWriteEsupSgc" class="org.esupportail.nfctag.service.api.impl.TagWriteRestWs">
 	<property name="idFromCsnUrlTemplate" value="https://esup-sgc-test.univ-ville.fr/wsrest/nfc/idFromCsn?csn={0}&amp;appName=access-control"/>
