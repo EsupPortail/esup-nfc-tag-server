@@ -41,6 +41,7 @@
 	<div id="debug" class="text-warning"><!--  --></div>
 	<script type="text/javascript">
 		var numeroId = '${numeroId}';
+		var sgcAuthToken = '${sgcAuthToken}';
 		var serviceUrl = '${serviceUrl}';
 		var authType = '${authType}';
 		var eppnInit = '${eppnInit}';

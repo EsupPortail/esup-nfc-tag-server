@@ -30,6 +30,8 @@ import org.esupportail.nfctag.service.ApplicationsService;
 import org.esupportail.nfctag.service.TagAuthService;
 import org.esupportail.nfctag.service.api.TagIdCheckApi.TagType;
 import org.esupportail.nfctag.service.api.impl.DesfireReadConfig;
+import org.esupportail.nfctag.service.api.impl.DesfireReadUidConfig;
+import org.esupportail.nfctag.service.api.impl.DesfireReadUidWithAuthConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireUpdateConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireWriteConfig;
 import org.esupportail.nfctag.service.desfire.DESFireEV1Service;
@@ -96,7 +98,11 @@ public class DesfireWsController {
 			write = false;
 			eppnInit = tagAuthService.getEppnInit(TagType.DESFIRE, numeroId);
 			desfireService.setNumeroId(numeroId);
-			if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireReadConfig){
+			if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireReadUidConfig){
+				function = "READUID";
+			}else if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireReadUidWithAuthConfig) {
+				function = "READUIDWITHAUTH";
+			}else if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireReadConfig){
 				function = "READ";
 			}else if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireWriteConfig){
 				function = "WRITE";
@@ -131,7 +137,13 @@ public class DesfireWsController {
 		}
 		
 		try{	
-			if("READ".equals(function)) {
+			if("READUID".equals(function)) {
+				log.trace("READUID");
+				nfcResultBean = desfireService.readUid(result);
+			} else if("READUIDWITHAUTH".equals(function)) {
+				log.trace("READUIDWITHAUTH");
+				nfcResultBean = desfireService.readUidWithAuth(result);
+			} else if("READ".equals(function)) {
 				log.trace("READ");
 				nfcResultBean = desfireService.readDesfireId(result);
 			} else if("WRITE".equals(function)) {
@@ -161,7 +173,7 @@ public class DesfireWsController {
 			nfcResultBean.setSize(0);
 			nfcResultBean.setAction(Action.none);
 			desfireService.reset();
-			if("READ".equals(function)){
+			if("READ".equals(function) || "READUID".equals(function)) {
 				result = desfireService.tempRead;
 			}
 			if(result != ""){
@@ -173,8 +185,23 @@ public class DesfireWsController {
 				String desfireId = "";
 				String appName = "";
 				boolean validate = true;
-				
-				if("READ".equals(function)) {
+				if("READUID".equals(function)){
+					DesfireReadUidConfig desfireReadConfig = (DesfireReadUidConfig) desfireAuthSession.getDesfireAuthConfig();
+					appName = desfireReadConfig.getDesfireAppName();
+					nfcResultBean.setAction(Action.read);
+					log.debug("UID  : " + result);
+					desfireId = result.substring(28, 28 + 14);
+					log.debug("UID descrypted  : " + desfireId);
+					tagType = TagType.CSN;
+				} else if("READUIDWITHAUTH".equals(function)){
+					DesfireReadUidWithAuthConfig desfireReadConfig = (DesfireReadUidWithAuthConfig) desfireAuthSession.getDesfireAuthConfig();
+					appName = desfireReadConfig.getDesfireAppName();
+					nfcResultBean.setAction(Action.read);
+					log.debug("UID  : " + result);
+					desfireId = desfireService.decriptUid(result);
+					log.debug("UID descrypted  : " + desfireId);
+					tagType = TagType.CSN;
+				} else if("READ".equals(function)) {
 					DesfireReadConfig desfireReadConfig = (DesfireReadConfig) desfireAuthSession.getDesfireAuthConfig();
 					appName = desfireReadConfig.getDesfireAppName();
 					nfcResultBean.setAction(Action.read);

@@ -65,7 +65,7 @@ public class NfcIndexController {
 	
 	@Autowired
 	private ApplicationsService applicationsService;
-	
+
 	@RequestMapping
 	public String index(@RequestParam(required=false) String numeroId, 
 			@RequestParam(required=false) String imei,
@@ -76,6 +76,7 @@ public class NfcIndexController {
 		if(imei.equals("esupSgcClient") && (numeroId == null || numeroId.equals(""))) {
 			
 			return "redirect:/nfc/register-sgc?userAgent=esup-sgc-client&imei=" + imei + "&macAddress=" + macAddress;
+
 		}
 		
 		if(apkVersion == null) {
@@ -97,7 +98,7 @@ public class NfcIndexController {
 				}
 			}
 		}
-		
+		log.info("try to connect with numeroId :" + numeroId);
 		if(numeroId==null || numeroId.isEmpty() || Device.findDevicesByNumeroIdEquals(numeroId).getResultList().isEmpty()) {
 			return "redirect:/nfc/locations?imei=" + imei + "&macAddress=" + macAddress + "&apkVersion=" + versionApkService.getApkVersion() + "&jarVersion=" + versionJarService.getJarVersion();
 		} else {

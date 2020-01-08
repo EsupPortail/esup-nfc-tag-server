@@ -38,6 +38,8 @@ import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
 import org.esupportail.nfctag.service.api.TagWriteApi;
 import org.esupportail.nfctag.service.api.impl.DesfireReadConfig;
+import org.esupportail.nfctag.service.api.impl.DesfireReadUidConfig;
+import org.esupportail.nfctag.service.api.impl.DesfireReadUidWithAuthConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireUpdateConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireWriteConfig;
 import org.esupportail.nfctag.service.desfire.DESFireEV1Service.KeyType;
@@ -85,6 +87,78 @@ public class DesfireService {
 
 	public int getAuthStep() {
 		return desfireFlowStep.authStep;
+	}
+
+public NfcResultBean readUid(String result){
+		
+		if(result.length()==0){
+			reset();
+			desfireFlowStep.action = Action.READ;
+		}
+		
+		NfcResultBean authResultBean = new NfcResultBean();
+		authResultBean.setCode(CODE.OK);
+		DesfireReadUidConfig desfireReadConfig = (DesfireReadUidConfig) desfireAuthSession.getDesfireAuthConfig();
+		
+		switch(desfireFlowStep.action){
+			case READ:
+				tempRead = "";
+				desfireFlowStep.authStep = 1;
+				authResultBean.setFullApdu(desFireEV1Service.getVersion1());
+				desfireFlowStep.action = Action.MORE;
+			case MORE:
+				if(result.endsWith("AF")){
+					tempRead += result.substring(0, result.length() - 4);
+					authResultBean.setFullApdu(desFireEV1Service.readMore());
+					authResultBean.setSize(32);
+					desfireFlowStep.action = Action.MORE;
+				}else if(result.endsWith("9100")){
+					tempRead += result;
+					authResultBean.setFullApdu("END");
+				}
+				break;
+			case END:
+				authResultBean.setAction(NfcResultBean.Action.read);
+				authResultBean.setFullApdu("END");
+				break;
+			default:
+				break;
+		}
+		return authResultBean;
+	}
+
+	
+	public NfcResultBean readUidWithAuth(String result){
+		
+		if(result.length()==0){
+			reset();
+			desfireFlowStep.action = Action.SELECT_ROOT;
+		}
+		
+		NfcResultBean authResultBean = new NfcResultBean();
+		authResultBean.setCode(CODE.OK);
+		DesfireReadUidWithAuthConfig desfireReadConfig = (DesfireReadUidWithAuthConfig) desfireAuthSession.getDesfireAuthConfig();
+		byte[] aid = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getDesfireAppId());
+		byte[] key = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getDesfireKey());
+		
+		switch(desfireFlowStep.action){
+			case SELECT_ROOT:
+				log.debug("ReadUid - Step : Select root");
+				authResultBean = this.authApp(aid, result, key, (byte) 0x00, KeyType.AES);
+				if(authResultBean.getFullApdu() == null) {
+					desfireFlowStep.authStep = 1;
+					authResultBean.setFullApdu(desFireEV1Service.getCardUID());
+					desfireFlowStep.action = Action.END;
+				}
+				break;
+			case END:
+				authResultBean.setAction(NfcResultBean.Action.read);
+				authResultBean.setFullApdu("END");
+				break;
+			default:
+				break;
+		}
+		return authResultBean;
 	}
 	
 	public NfcResultBean readDesfireId(String result){
@@ -136,8 +210,8 @@ public class DesfireService {
 					authResultBean.setFullApdu("END");
 				}
 				break;
-		default:
-			break;
+			default:
+				break;
 		}
 		return authResultBean;
 	}
@@ -785,7 +859,17 @@ public class DesfireService {
 		log.info("En hexa : " + hexaResult.substring(0, length));
 		return hexaResult;
 	}
-	
+
+	public String decriptUid(String apdu){
+		log.debug("APDU to decript : " + apdu);
+		byte[] resultByte = desFireEV1Service.hexStringToByteArray(apdu);
+		int length = 14;
+		byte[] resultDecript = desFireEV1Service.preprocess(resultByte, DESFireEV1Service.CommunicationSetting.ENCIPHERED);
+		String hexaResult =  desFireEV1Service.byteArrayToHexString(resultDecript);
+		log.info("En hexa : " + hexaResult);
+		log.info("En hexa : " + hexaResult.substring(0, length));
+		return hexaResult;
+	}
 
 	public String asBytesString(String desfireId) {		
 		int size = (int)(desfireId.length()/16)+1;

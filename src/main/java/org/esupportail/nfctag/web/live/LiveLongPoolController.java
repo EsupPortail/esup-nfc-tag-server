@@ -40,6 +40,7 @@ import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.VersionApkService;
 import org.esupportail.nfctag.service.api.AppliExtApi;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
+import org.esupportail.nfctag.service.EsupSgcAuthTokenService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,6 +68,9 @@ public class LiveLongPoolController {
 
 	@Resource
 	ApplisExtService applisExtService;
+
+        @Resource
+        private EsupSgcAuthTokenService esupSgcAuthTokenService;
 	
 	private Map<DeferredResult<List<TagLog>>, LiveQuery> suspendedLeoAuthsRequests = new ConcurrentHashMap<DeferredResult<List<TagLog>>, LiveQuery>();
 
@@ -111,6 +115,11 @@ public class LiveLongPoolController {
 				uiModel.addAttribute("eppnInit", device.getEppnInit());
 				uiModel.addAttribute("jarVersion", jarVersion);
 				uiModel.addAttribute("apkVersion", apkVersion);
+				if(esupSgcAuthTokenService != null) {
+		                        String sgcAuthToken = esupSgcAuthTokenService.getAuthToken(device.getEppnInit());
+		                        uiModel.addAttribute("sgcAuthToken", sgcAuthToken);
+		                }
+
 				return "live/mobil";
 			}
 		} else {		

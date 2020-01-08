@@ -31,6 +31,7 @@ import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.ApplicationsService;
 import org.esupportail.nfctag.service.DeviceService;
+import org.esupportail.nfctag.service.EsupSgcAuthTokenService;
 import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.VersionApkService;
 import org.esupportail.nfctag.service.VersionJarService;
@@ -70,6 +71,9 @@ public class NfcRegisterController {
 	
 	@Autowired
 	private ApplicationsService applicationsService;
+	
+	@Autowired
+	private EsupSgcAuthTokenService esupSgcAuthTokenService;
 
 	@RequestMapping("/locations")
 	public String selectedLocationForm(
@@ -192,7 +196,7 @@ public class NfcRegisterController {
 			@RequestHeader(value="User-Agent") String userAgent, 
 			@RequestParam(required = true) String imei,
 			@RequestParam(required = false) String macAddress, Model uiModel) throws IOException, EsupNfcTagException {
-
+		log.info("start register sgc");
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String eppnInit = auth.getName();
 		List<Application> applications = Application.findAllApplications();
@@ -245,11 +249,10 @@ public class NfcRegisterController {
 					.getSingleResult();
 			numeroId = tel.getNumeroId();
 		}
-		uiModel.addAttribute("imei", imei);
-		uiModel.addAttribute("macAddress", macAddress);
-		uiModel.addAttribute("numeroId", numeroId);
-		uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
-		uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
-		return "nfc/register";
+
+		String redir = "redirect:/nfc-index?numeroId=" + numeroId + "&imei=" + imei + "&macAddress=" + macAddress + "&apkVersion=" + versionApkService.getApkVersion() +
+                 "&jarVersion=" + versionJarService.getJarVersion();
+ 		log.info("register done : " + redir);
+		return redir;
 	}
 }
