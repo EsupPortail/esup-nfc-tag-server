@@ -37,6 +37,7 @@ import org.esupportail.nfctag.service.api.impl.DesfireWriteConfig;
 import org.esupportail.nfctag.service.desfire.DESFireEV1Service;
 import org.esupportail.nfctag.service.desfire.DesfireAuthSession;
 import org.esupportail.nfctag.service.desfire.DesfireService;
+import org.esupportail.nfctag.service.desfire.DesfireUtils;
 //import org.esupportail.nfctag.service.desfire.DesfireService;
 import org.esupportail.nfctag.web.live.ErrorLongPoolController;
 import org.esupportail.nfctag.web.live.LiveLongPoolController;
@@ -247,7 +248,7 @@ public class DesfireWsController {
 		} else {
 			String cmd = nfcResultBean.getFullApdu().substring(2, 4);
 			nfcResultBean.setCmd(cmd);
-			int nbParam = desfireService.desFireEV1Service.hexStringToByte(nfcResultBean.getFullApdu().substring(8, 10));
+			int nbParam = DesfireUtils.hexStringToByte(nfcResultBean.getFullApdu().substring(8, 10));
 			nfcResultBean.setParam(nfcResultBean.getFullApdu().substring(10,10+(nbParam*2)));
 		}
 

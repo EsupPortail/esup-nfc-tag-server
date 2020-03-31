@@ -61,7 +61,7 @@ public class DesfireServiceTest {
 					log.warn("sgc ws error : " + e.getMessage());
 					if(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable.toString().equals(e.getMessage())) {
 						log.error("sgc ws not responding");
-						fail("error on tagWriteApi for " +  desApp.getDesfireAppId());
+						fail("error on tagWriteApi for " +  desApp.getDesfireAppId() + " sgc ws not responding");
 					} else {
 						log.warn("sgc ws ok but not card fount with csn = " + csn);
 					}

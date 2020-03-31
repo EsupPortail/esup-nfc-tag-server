@@ -1036,7 +1036,7 @@ public class DESFireEV1Service extends SimpleSCR {
 	public String writeData(byte fileNo, String value) {
 		// 47 : max length for the first sent = (60 - 6 - 7) (max apdu size - cmd - prepayload)
 		payloadSent = 0;
-		byte[] valueHex = hexStringToByteArray(value);
+		byte[] valueHex = DesfireUtils.hexStringToByteArray(value);
 		int valueHexSize = valueHex.length;
 		if(valueHexSize > 47) {
 			valueHexSize = 47;
@@ -1061,7 +1061,7 @@ public class DESFireEV1Service extends SimpleSCR {
 
 	public String writeMore(String value) {
 		// 54 : max length for the next sent = (60 - 6) (max apdu size - cmd)
-		byte[] valueHex = hexStringToByteArray(value);
+		byte[] valueHex = DesfireUtils.hexStringToByteArray(value);
 		int valueOffset = 47 + (54 * payloadSent);
 		int valueLength = valueHex.length - valueOffset;
 		if(valueLength > 54){
@@ -1729,7 +1729,7 @@ public class DESFireEV1Service extends SimpleSCR {
 	 */
 	private boolean updateFileSett(byte fileNo, boolean forceUpdate) {
 		if (this.fileNo != fileNo || forceUpdate) {
-			byte[] tmp = hexStringToByteArray(getFileSettings(fileNo));
+			byte[] tmp = DesfireUtils.hexStringToByteArray(getFileSettings(fileNo));
 			
 			if (tmp != null) {
 				this.fileNo = fileNo;
@@ -2525,62 +2525,6 @@ public class DESFireEV1Service extends SimpleSCR {
 			return generateSessionKey(randA, randB, type);
 		}
 
-	}
-	
-	public byte[] hexStringToByteArray(String s) {
-		if(s == null) return null;
-		s = s.replace(" ", "");
-	    int len = s.length();
-	    byte[] data = new byte[len / 2];
-	    for (int i = 0; i < len; i += 2) {
-	        data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
-	                             + Character.digit(s.charAt(i+1), 16));
-	    }
-	    return data;
-	}
-
-	public byte hexStringToByte(String s) {
-		return (byte) Integer.parseInt(s, 16);
-	}
-	
-	
-	final protected static char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-
-	public String byteArrayToHexString(byte[] bytes) {
-		char[] hexChars = new char[bytes.length*2];
-		int v;
-
-		for(int j=0; j < bytes.length; j++) {
-			v = bytes[j] & 0xFF;
-			hexChars[j*2] = hexArray[v>>>4];
-			hexChars[j*2 + 1] = hexArray[v & 0x0F];
-		}
-
-		return new String(hexChars);
-	}
-
-
-	public String swapPairs(byte[] byteArray) {
-		String s = new StringBuilder(byteArrayToHexString(byteArray)).reverse().toString();
-		String even = "";
-		String odd = "";
-		int length = s.length();
-
-		for (int i = 0; i <= length-2; i+=2) {
-			even += s.charAt(i+1) + "" + s.charAt(i);
-		}
-
-		if (length % 2 != 0) {
-			odd = even + s.charAt(length-1);
-			return odd;
-		} else {
-			return even;
-		}
-	}
-	
-	public byte[] swapPairsByte(byte[] byteArray) {
-		String swapString = swapPairs(byteArray);
-		return hexStringToByteArray(swapString);
 	}
 
 }

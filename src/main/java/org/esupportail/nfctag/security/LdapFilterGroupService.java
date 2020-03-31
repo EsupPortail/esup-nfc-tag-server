@@ -7,12 +7,16 @@ import java.util.Map;
 
 import javax.naming.NamingException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQueryBuilder;
 
 public class LdapFilterGroupService implements GroupService {
+	
+	private final Logger log = LoggerFactory.getLogger(getClass());
 	
 	LdapTemplate ldapTemplate;
 	
@@ -54,7 +58,11 @@ public class LdapFilterGroupService implements GroupService {
 			});
 			
 			if(!dns.isEmpty()) {
+				log.debug(String.format("%s match with ldap filter %s", eppn, ldapFilter));
 				groups.add(ldapFiltersGroups.get(ldapFilter));
+				log.debug(String.format("%s -> %s", eppn, ldapFiltersGroups.get(ldapFilter)));
+			} else if(log.isTraceEnabled()) {
+				log.trace(String.format("%s does not match with ldap filter %s", eppn, ldapFilter));
 			}
 		
 		}

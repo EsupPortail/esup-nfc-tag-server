@@ -1,7 +1,5 @@
 package org.esupportail.nfctag.beans;
 
-import static org.junit.Assert.fail;
-
 import java.io.Serializable;
 import java.util.List;
 

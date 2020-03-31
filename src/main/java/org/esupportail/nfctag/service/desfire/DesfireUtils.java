@@ -24,10 +24,17 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.commons.codec.binary.Hex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class AesService {
-	
-	public String decryptHex(String secretKey, String encrypted, String iv) throws Exception {
+public class DesfireUtils {
+
+	protected final static Logger logger = LoggerFactory.getLogger(DesfireUtils.class);
+
+	/* TODO : Not USED
+	 * 
+	 *
+	public static String decryptHex(String secretKey, String encrypted, String iv) throws Exception {
 		Key KEY = new SecretKeySpec(Hex.decodeHex(secretKey.toCharArray()), "AES");
 		// -aes-128-ecb
 		Cipher c = Cipher.getInstance("AES/CBC/NoPadding");
@@ -37,8 +44,12 @@ public class AesService {
 		String decryptedValue = Hex.encodeHexString(decValue);
 		return decryptedValue;
 	}
-
-	public String encryptHex(String secretKey, String decrypted, String iv) throws Exception  {
+	*/
+	
+	/* TODO : Not USED
+	 * 
+	 *
+	public static String encryptHex(String secretKey, String decrypted, String iv) throws Exception  {
 		Key KEY = new SecretKeySpec(Hex.decodeHex(secretKey.toCharArray()), "AES");
 		Cipher c = Cipher.getInstance("AES/CBC/NoPadding");
 		c.init(Cipher.ENCRYPT_MODE, KEY, new IvParameterSpec(Hex.decodeHex(iv.toCharArray())));
@@ -47,16 +58,61 @@ public class AesService {
 		String encryptedValue = Hex.encodeHexString(encValue);
 		return encryptedValue;
 	}
+	*/
 	
-	public  byte[] decrypt( byte[] key,  byte[] encrypted,  byte[] iv) throws Exception {
-		try {
-			Key KEY = new SecretKeySpec(key, "AES");
-			Cipher c = Cipher.getInstance("AES/CBC/NoPadding");
-			c.init(Cipher.DECRYPT_MODE, KEY, new IvParameterSpec(iv));
-			return c.doFinal(encrypted);
-		} catch(Exception e) {
-			e.printStackTrace();
-			throw e;
+	public static byte[] hexStringToByteArray(String s) {
+		if(s == null) return null;
+		s = s.replace(" ", "");
+		int len = s.length();
+		byte[] data = new byte[len / 2];
+		for (int i = 0; i < len; i += 2) {
+			data[i / 2] = (byte) ((Character.digit(s.charAt(i), 16) << 4)
+					+ Character.digit(s.charAt(i+1), 16));
+		}
+		return data;
+	}
+
+	public static byte hexStringToByte(String s) {
+		return (byte) Integer.parseInt(s, 16);
+	}
+
+
+	final protected static char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+
+	public static String byteArrayToHexString(byte[] bytes) {
+		char[] hexChars = new char[bytes.length*2];
+		int v;
+
+		for(int j=0; j < bytes.length; j++) {
+			v = bytes[j] & 0xFF;
+			hexChars[j*2] = hexArray[v>>>4];
+			hexChars[j*2 + 1] = hexArray[v & 0x0F];
+		}
+
+		return new String(hexChars);
+	}
+
+	public static String swapPairs(byte[] byteArray) {
+		String s = new StringBuilder(byteArrayToHexString(byteArray)).reverse().toString();
+		String even = "";
+		String odd = "";
+		int length = s.length();
+
+		for (int i = 0; i <= length-2; i+=2) {
+			even += s.charAt(i+1) + "" + s.charAt(i);
+		}
+
+		if (length % 2 != 0) {
+			odd = even + s.charAt(length-1);
+			return odd;
+		} else {
+			return even;
 		}
 	}
+
+	public static byte[] swapPairsByte(byte[] byteArray) {
+		String swapString = swapPairs(byteArray);
+		return hexStringToByteArray(swapString);
+	}
+
 }

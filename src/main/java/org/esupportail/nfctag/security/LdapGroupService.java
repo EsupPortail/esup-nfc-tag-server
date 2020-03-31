@@ -6,12 +6,17 @@ import java.util.List;
 
 import javax.naming.NamingException;
 
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQueryBuilder;
 
 public class LdapGroupService implements GroupService {
+	
+	private final Logger log = LoggerFactory.getLogger(getClass());
 	
 	LdapTemplate ldapTemplate;
 	
@@ -80,6 +85,8 @@ public class LdapGroupService implements GroupService {
 						}
 					});
 		} 
+		
+		log.debug(String.format("%s is in groups : %s", eppn, StringUtils.join(groups, ", ")));
 		
 		return groups;
 		

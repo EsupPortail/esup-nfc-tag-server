@@ -138,8 +138,8 @@ public NfcResultBean readUid(String result){
 		NfcResultBean authResultBean = new NfcResultBean();
 		authResultBean.setCode(CODE.OK);
 		DesfireReadUidWithAuthConfig desfireReadConfig = (DesfireReadUidWithAuthConfig) desfireAuthSession.getDesfireAuthConfig();
-		byte[] aid = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getDesfireAppId());
-		byte[] key = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getDesfireKey());
+		byte[] aid = DesfireUtils.hexStringToByteArray(desfireReadConfig.getDesfireAppId());
+		byte[] key = DesfireUtils.hexStringToByteArray(desfireReadConfig.getDesfireKey());
 		
 		switch(desfireFlowStep.action){
 			case SELECT_ROOT:
@@ -169,11 +169,11 @@ public NfcResultBean readUid(String result){
 		NfcResultBean authResultBean = new NfcResultBean();
 		authResultBean.setCode(CODE.OK);
 		DesfireReadConfig desfireReadConfig = (DesfireReadConfig) desfireAuthSession.getDesfireAuthConfig();
-		byte[] aid = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getDesfireAppId());
-		byte keyNo = desFireEV1Service.hexStringToByte(desfireReadConfig.getDesfireKeyNumber());
-		byte[] key = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getDesfireKey());
-		byte fileNo = desFireEV1Service.hexStringToByte(desfireReadConfig.getDesfireFileNumber());
-		byte[] offset = desFireEV1Service.hexStringToByteArray(desfireReadConfig.getDesfireFileOffset());
+		byte[] aid = DesfireUtils.hexStringToByteArray(desfireReadConfig.getDesfireAppId());
+		byte keyNo = DesfireUtils.hexStringToByte(desfireReadConfig.getDesfireKeyNumber());
+		byte[] key = DesfireUtils.hexStringToByteArray(desfireReadConfig.getDesfireKey());
+		byte fileNo = DesfireUtils.hexStringToByte(desfireReadConfig.getDesfireFileNumber());
+		byte[] offset = DesfireUtils.hexStringToByteArray(desfireReadConfig.getDesfireFileOffset());
 		
 		switch(desfireFlowStep.action){
 			case GET_FILE_SETTINGS:
@@ -190,7 +190,7 @@ public NfcResultBean readUid(String result){
 				if(tempFileSize.equals("")){
 					tempFileSize = result.substring(8, 14);
 				}
-				byte[] length = desFireEV1Service.hexStringToByteArray(tempFileSize);
+				byte[] length = DesfireUtils.hexStringToByteArray(tempFileSize);
 				authResultBean = this.authApp(aid, result, key, keyNo, KeyType.AES);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
@@ -242,11 +242,11 @@ public NfcResultBean readUid(String result){
 			}
 		}
 
-		byte[] piccKeyStart = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyStart());
+		byte[] piccKeyStart = DesfireUtils.hexStringToByteArray(desfireTag.getKeyStart());
 		
 		byte[] defaultKey = null;
 		
-		byte[] piccAid = desFireEV1Service.hexStringToByteArray("000000");
+		byte[] piccAid = DesfireUtils.hexStringToByteArray("000000");
 		KeyType piccKeyTypeStart = desfireTag.getKeyTypeStart();
 		
 		byte[] piccKeyFinish = null;
@@ -254,9 +254,9 @@ public NfcResultBean readUid(String result){
 		byte piccKeyVerFinish = 0;
 		
 		if(desfireTag.getKeyFinish() != null){
-			piccKeyFinish = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyFinish());
+			piccKeyFinish = DesfireUtils.hexStringToByteArray(desfireTag.getKeyFinish());
 			piccKeyTypeFinish = desfireTag.getKeyTypeFinish();
-			piccKeyVerFinish = desFireEV1Service.hexStringToByte(desfireTag.getKeyVersionFinish());
+			piccKeyVerFinish = DesfireUtils.hexStringToByte(desfireTag.getKeyVersionFinish());
 		}
 		
 		DesfireApplication desfireApp = null;
@@ -284,44 +284,44 @@ public NfcResultBean readUid(String result){
 			if(desfireTag.getApplications().size() >  desfireFlowStep.currentApp) {
 			
 				desfireApp = desfireTag.getApplications().get(desfireFlowStep.currentApp);
-				aid = desFireEV1Service.hexStringToByteArray(desfireApp.getDesfireAppId());
-				amks= desFireEV1Service.hexStringToByte(desfireApp.getAmks());
-				nok = desFireEV1Service.hexStringToByte(desfireApp.getNok());
+				aid = DesfireUtils.hexStringToByteArray(desfireApp.getDesfireAppId());
+				amks= DesfireUtils.hexStringToByte(desfireApp.getAmks());
+				nok = DesfireUtils.hexStringToByte(desfireApp.getNok());
 				
 				if(desfireApp.getNok().substring(0, 1).equals("8")){
-					defaultKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
+					defaultKey = DesfireUtils.hexStringToByteArray("00000000000000000000000000000000");
 					appDefaultKeyType = KeyType.AES;
-					appKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
-					appKeyNo = desFireEV1Service.hexStringToByte("00");
-					appKeyVer = desFireEV1Service.hexStringToByte("00");
+					appKey = DesfireUtils.hexStringToByteArray("00000000000000000000000000000000");
+					appKeyNo = DesfireUtils.hexStringToByte("00");
+					appKeyVer = DesfireUtils.hexStringToByte("00");
 					keyKeyType = appKeyType = KeyType.AES;
 				}else{
-					defaultKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
+					defaultKey = DesfireUtils.hexStringToByteArray("0000000000000000");
 					appDefaultKeyType = KeyType.DES;				
-					appKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
-					appKeyNo = desFireEV1Service.hexStringToByte("00");
-					appKeyVer = desFireEV1Service.hexStringToByte("00");
+					appKey = DesfireUtils.hexStringToByteArray("0000000000000000");
+					appKeyNo = DesfireUtils.hexStringToByte("00");
+					appKeyVer = DesfireUtils.hexStringToByte("00");
 					keyKeyType = appKeyType = KeyType.DES;
 				}
 	
 				if(desfireApp.getKeys() != null && desfireApp.getKeys().size() > 0) {
 					DesfireKey desfireAppKey = desfireApp.getKeys().get(0);
-					appKey = desFireEV1Service.hexStringToByteArray(desfireAppKey.getKey());
-					appKeyNo = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyNo());
-					appKeyVer = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyVer());
+					appKey = DesfireUtils.hexStringToByteArray(desfireAppKey.getKey());
+					appKeyNo = DesfireUtils.hexStringToByte(desfireAppKey.getKeyNo());
+					appKeyVer = DesfireUtils.hexStringToByte(desfireAppKey.getKeyVer());
 					if(desfireApp.getKeys().size() >  desfireFlowStep.currentKey) {
 						DesfireKey desfireKey = desfireApp.getKeys().get(desfireFlowStep.currentKey);
-						keyNo = desFireEV1Service.hexStringToByte(desfireKey.getKeyNo());
-						key = desFireEV1Service.hexStringToByteArray(desfireKey.getKey());
-						keyVer = desFireEV1Service.hexStringToByte(desfireKey.getKeyVer());
+						keyNo = DesfireUtils.hexStringToByte(desfireKey.getKeyNo());
+						key = DesfireUtils.hexStringToByteArray(desfireKey.getKey());
+						keyVer = DesfireUtils.hexStringToByte(desfireKey.getKeyVer());
 					}
 				}
 				
 				if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
 					DesfireFile desfireFile = desfireApp.getFiles().get(desfireFlowStep.currentFile);
-					accessRights = desFireEV1Service.hexStringToByteArray(desfireFile.getAccessRights());
-					cms = desFireEV1Service.hexStringToByte(desfireFile.getCommunicationSettings());
-					fileNo = desFireEV1Service.hexStringToByte(desfireFile.getFileNumber());
+					accessRights = DesfireUtils.hexStringToByteArray(desfireFile.getAccessRights());
+					cms = DesfireUtils.hexStringToByte(desfireFile.getCommunicationSettings());
+					fileNo = DesfireUtils.hexStringToByte(desfireFile.getFileNumber());
 					TagWriteApi tagWriteApi = desfireFile.getTagWriteApi();
 					desfireId = tagWriteApi.getIdFromCsn(csn);
 					String writePayload;
@@ -331,9 +331,9 @@ public NfcResultBean readUid(String result){
 						//calcul automatique de la taille du fichier en fonction du contenu
 						int fileSize = desfireId.length() / 2;
 						String hexSize = leftPad(Integer.toHexString(fileSize), 6, '0');
-						writePayload = desfireFile.getWriteFilePayload() + desFireEV1Service.swapPairs(desFireEV1Service.hexStringToByteArray(hexSize));
+						writePayload = desfireFile.getWriteFilePayload() + DesfireUtils.swapPairs(DesfireUtils.hexStringToByteArray(hexSize));
 					}
-					byteWritePayload = desFireEV1Service.hexStringToByteArray(writePayload);
+					byteWritePayload = DesfireUtils.hexStringToByteArray(writePayload);
 				}
 			} else {
 				//Si pas d'application ni master key on valide l'encodage pour affectation de la carte
@@ -377,11 +377,11 @@ public NfcResultBean readUid(String result){
 					}
 					break;
 				case CREATE_APP:
-					log.debug("Write by " + eppnInit + " - Step : Create app : " + desFireEV1Service.byteArrayToHexString(aid));
+					log.debug("Write by " + eppnInit + " - Step : Create app : " + DesfireUtils.byteArrayToHexString(aid));
 					authResultBean = this.authApp(piccAid, result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
 					if(authResultBean.getFullApdu() == null) {
 						desfireFlowStep.authStep = 1;
-						authResultBean.setFullApdu(desFireEV1Service.createApplication(desFireEV1Service.swapPairsByte(aid),amks, nok));
+						authResultBean.setFullApdu(desFireEV1Service.createApplication(DesfireUtils.swapPairsByte(aid),amks, nok));
 						authResultBean.setSize(0);
 						if(appKey != null){
 							desfireFlowStep.action = Action.CHANGE_APP_MASTER_KEY;
@@ -392,7 +392,7 @@ public NfcResultBean readUid(String result){
 					}
 					break;
 				case CHANGE_APP_MASTER_KEY:
-					log.debug("Write by " + eppnInit + " - Step : Change app key : " + desFireEV1Service.byteArrayToHexString(aid));
+					log.debug("Write by " + eppnInit + " - Step : Change app key : " + DesfireUtils.byteArrayToHexString(aid));
 					authResultBean = this.authApp(aid, result, defaultKey, appKeyNo, appDefaultKeyType);
 					if(authResultBean.getFullApdu() == null) {
 						desfireFlowStep.authStep = 1;
@@ -419,7 +419,7 @@ public NfcResultBean readUid(String result){
 					}
 					break;
 				case CHANGE_KEYS:
-					log.debug("Write by " + eppnInit + " - Step : Change app key : " + keyNo + " for " + desFireEV1Service.byteArrayToHexString(aid));
+					log.debug("Write by " + eppnInit + " - Step : Change app key : " + keyNo + " for " + DesfireUtils.byteArrayToHexString(aid));
 					authResultBean = this.authApp(aid, result, appKey, appKeyNo, appDefaultKeyType);
 					if(authResultBean.getFullApdu() == null) {
 						desfireFlowStep.authStep = 1;
@@ -449,7 +449,7 @@ public NfcResultBean readUid(String result){
 					}
 					break;
 				case CREATE_FILE:
-					log.debug("Write by " + eppnInit + " - Step : Create file in " + desFireEV1Service.byteArrayToHexString(aid) +" : " + fileNo);
+					log.debug("Write by " + eppnInit + " - Step : Create file in " + DesfireUtils.byteArrayToHexString(aid) +" : " + fileNo);
 					authResultBean = this.authApp(aid, result, appKey, appKeyNo, appDefaultKeyType);
 					if(authResultBean.getFullApdu() == null) {
 						desfireFlowStep.authStep = 1;
@@ -536,8 +536,8 @@ public NfcResultBean readUid(String result){
 				desfireFlowStep.action = Action.GET_APPS;
 			}
 		}
-		byte[] piccAid = desFireEV1Service.hexStringToByteArray("000000");
-		byte[] piccKeyStart = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyStart());
+		byte[] piccAid = DesfireUtils.hexStringToByteArray("000000");
+		byte[] piccKeyStart = DesfireUtils.hexStringToByteArray(desfireTag.getKeyStart());
 		KeyType piccKeyTypeStart = desfireTag.getKeyTypeStart();
 		
 		byte[] piccKeyFinish = null;
@@ -545,9 +545,9 @@ public NfcResultBean readUid(String result){
 		byte piccKeyVerFinish = 0;
 		
 		if(desfireTag.getKeyFinish() != null){
-			piccKeyFinish = desFireEV1Service.hexStringToByteArray(desfireTag.getKeyFinish());
+			piccKeyFinish = DesfireUtils.hexStringToByteArray(desfireTag.getKeyFinish());
 			piccKeyTypeFinish = desfireTag.getKeyTypeFinish();
-			piccKeyVerFinish = desFireEV1Service.hexStringToByte(desfireTag.getKeyVersionFinish());
+			piccKeyVerFinish = DesfireUtils.hexStringToByte(desfireTag.getKeyVersionFinish());
 		}
 		
 		DesfireApplication desfireApp = null;
@@ -577,23 +577,23 @@ public NfcResultBean readUid(String result){
 		
 		if(desfireTag.getApplications() != null && desfireTag.getApplications().size() >  desfireFlowStep.currentApp){
 			desfireApp = desfireTag.getApplications().get(desfireFlowStep.currentApp);
-			aid = desFireEV1Service.hexStringToByteArray(desfireApp.getDesfireAppId());
-			amks= desFireEV1Service.hexStringToByte(desfireApp.getAmks());
-			nok = desFireEV1Service.hexStringToByte(desfireApp.getNok());
+			aid = DesfireUtils.hexStringToByteArray(desfireApp.getDesfireAppId());
+			amks= DesfireUtils.hexStringToByte(desfireApp.getAmks());
+			nok = DesfireUtils.hexStringToByte(desfireApp.getNok());
 			
 			if(desfireApp.getNok().substring(0, 1).equals("8")){
-				defaultKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
+				defaultKey = DesfireUtils.hexStringToByteArray("00000000000000000000000000000000");
 				appDefaultKeyType = KeyType.AES;
-				appKey = desFireEV1Service.hexStringToByteArray("00000000000000000000000000000000");
-				appKeyNo = desFireEV1Service.hexStringToByte("00");
-				appKeyVer = desFireEV1Service.hexStringToByte("00");
+				appKey = DesfireUtils.hexStringToByteArray("00000000000000000000000000000000");
+				appKeyNo = DesfireUtils.hexStringToByte("00");
+				appKeyVer = DesfireUtils.hexStringToByte("00");
 				keyKeyType = appKeyType = KeyType.AES;
 			}else{
-				defaultKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
+				defaultKey = DesfireUtils.hexStringToByteArray("0000000000000000");
 				appDefaultKeyType = KeyType.DES;				
-				appKey = desFireEV1Service.hexStringToByteArray("0000000000000000");
-				appKeyNo = desFireEV1Service.hexStringToByte("00");
-				appKeyVer = desFireEV1Service.hexStringToByte("00");
+				appKey = DesfireUtils.hexStringToByteArray("0000000000000000");
+				appKeyNo = DesfireUtils.hexStringToByte("00");
+				appKeyVer = DesfireUtils.hexStringToByte("00");
 				keyKeyType = appKeyType = KeyType.DES;
 			}
 
@@ -605,22 +605,22 @@ public NfcResultBean readUid(String result){
 			
 			if(desfireApp.getKeys() != null && desfireApp.getKeys().size() > 0) {
 				DesfireKey desfireAppKey = desfireApp.getKeys().get(0);
-				appKey = desFireEV1Service.hexStringToByteArray(desfireAppKey.getKey());
-				appKeyNo = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyNo());
-				appKeyVer = desFireEV1Service.hexStringToByte(desfireAppKey.getKeyVer());
+				appKey = DesfireUtils.hexStringToByteArray(desfireAppKey.getKey());
+				appKeyNo = DesfireUtils.hexStringToByte(desfireAppKey.getKeyNo());
+				appKeyVer = DesfireUtils.hexStringToByte(desfireAppKey.getKeyVer());
 				if(desfireApp.getKeys().size() >  desfireFlowStep.currentKey) {
 					DesfireKey desfireKey = desfireApp.getKeys().get(desfireFlowStep.currentKey);
-					keyNo = desFireEV1Service.hexStringToByte(desfireKey.getKeyNo());
-					key = desFireEV1Service.hexStringToByteArray(desfireKey.getKey());
-					keyVer = desFireEV1Service.hexStringToByte(desfireKey.getKeyVer());
+					keyNo = DesfireUtils.hexStringToByte(desfireKey.getKeyNo());
+					key = DesfireUtils.hexStringToByteArray(desfireKey.getKey());
+					keyVer = DesfireUtils.hexStringToByte(desfireKey.getKeyVer());
 				}
 			}
 			
 			if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
 				desfireFile = desfireApp.getFiles().get(desfireFlowStep.currentFile);
-				accessRights = desFireEV1Service.hexStringToByteArray(desfireFile.getAccessRights());
-				cms = desFireEV1Service.hexStringToByte(desfireFile.getCommunicationSettings());
-				fileNo = desFireEV1Service.hexStringToByte(desfireFile.getFileNumber());
+				accessRights = DesfireUtils.hexStringToByteArray(desfireFile.getAccessRights());
+				cms = DesfireUtils.hexStringToByte(desfireFile.getCommunicationSettings());
+				fileNo = DesfireUtils.hexStringToByte(desfireFile.getFileNumber());
 				TagWriteApi tagWriteApi = desfireFile.getTagWriteApi();
 				desfireId = tagWriteApi.getIdFromCsn(csn);
 
@@ -630,9 +630,9 @@ public NfcResultBean readUid(String result){
 					//calcul automatique de la taille du fichier en fonction du contenu
 					int fileSize = desfireId.length() / 2;
 					String hexSize = leftPad(Integer.toHexString(fileSize), 6, '0');
-					writePayload = desfireFile.getWriteFilePayload() + desFireEV1Service.swapPairs(desFireEV1Service.hexStringToByteArray(hexSize));
+					writePayload = desfireFile.getWriteFilePayload() + DesfireUtils.swapPairs(DesfireUtils.hexStringToByteArray(hexSize));
 				}
-				byteWritePayload = desFireEV1Service.hexStringToByteArray(writePayload);
+				byteWritePayload = DesfireUtils.hexStringToByteArray(writePayload);
 			}
 		}
 
@@ -650,7 +650,7 @@ public NfcResultBean readUid(String result){
 					break;
 				case CHECK_APP: 
 					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Check Apps");
-					authResultBean.setFullApdu(desFireEV1Service.selectApplication(desFireEV1Service.hexStringToByteArray("000000")));
+					authResultBean.setFullApdu(desFireEV1Service.selectApplication(DesfireUtils.hexStringToByteArray("000000")));
 					authResultBean.setSize(16);
 					String appsString = result.substring(0, result.length()-4);
 					// split result : app id on 6 chars (3 bytes) 
@@ -660,7 +660,7 @@ public NfcResultBean readUid(String result){
 						log.debug("Check app dates : schemaDate = " + schemaDate + ", lastUpdate : " + lastUpdate);
 						if(schemaDate!=null && lastUpdate.before(schemaDate)){
 							authResultBean.setAction(NfcResultBean.Action.update);
-							if(!apps.contains(desFireEV1Service.byteArrayToHexString(desFireEV1Service.swapPairsByte(aid)))) {
+							if(!apps.contains(DesfireUtils.byteArrayToHexString(DesfireUtils.swapPairsByte(aid)))) {
 								desfireFlowStep.action = Action.CREATE_APP;
 							}else{
 								desfireFlowStep.action = Action.DELETE_APP;
@@ -681,19 +681,19 @@ public NfcResultBean readUid(String result){
 					authResultBean = this.authApp(aid, result, appKey, (byte) 0x00, KeyType.AES);
 					if(authResultBean.getFullApdu() == null) {
 						desfireFlowStep.authStep = 1;
-						authResultBean.setFullApdu(desFireEV1Service.deleteApplication(desFireEV1Service.swapPairsByte(aid)));
+						authResultBean.setFullApdu(desFireEV1Service.deleteApplication(DesfireUtils.swapPairsByte(aid)));
 						authResultBean.setSize(0);						
 						desfireFlowStep.action = Action.CREATE_APP;
 					}
 					break;
 				case CREATE_APP: 
-					log.debug("Update by " + eppnInit + "with csn : " + csn + " - Step : Create app : " + desFireEV1Service.byteArrayToHexString(aid));
-					authResultBean.setFullApdu(desFireEV1Service.createApplication(desFireEV1Service.swapPairsByte(aid),amks, nok));
+					log.debug("Update by " + eppnInit + "with csn : " + csn + " - Step : Create app : " + DesfireUtils.byteArrayToHexString(aid));
+					authResultBean.setFullApdu(desFireEV1Service.createApplication(DesfireUtils.swapPairsByte(aid),amks, nok));
 					authResultBean.setSize(0);
 					desfireFlowStep.action = Action.CHANGE_APP_MASTER_KEY;
 					break;
 				case CHANGE_APP_MASTER_KEY:
-					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change app key : " + desFireEV1Service.byteArrayToHexString(aid));
+					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change app key : " + DesfireUtils.byteArrayToHexString(aid));
 					authResultBean = this.authApp(aid, result, defaultKey, appKeyNo, appDefaultKeyType);
 					if(authResultBean.getFullApdu() == null) {
 						desfireFlowStep.authStep = 1;
@@ -720,7 +720,7 @@ public NfcResultBean readUid(String result){
 					}
 					break;
 				case CHANGE_KEYS:
-					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change app key : " + keyNo + " for " + desFireEV1Service.byteArrayToHexString(aid));
+					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change app key : " + keyNo + " for " + DesfireUtils.byteArrayToHexString(aid));
 					authResultBean = this.authApp(aid, result, appKey, appKeyNo, appDefaultKeyType);
 					if(authResultBean.getFullApdu() == null) {
 						desfireFlowStep.authStep = 1;
@@ -752,7 +752,7 @@ public NfcResultBean readUid(String result){
 					break;
 				case CREATE_FILE:	
 					if(authResultBean.getFullApdu() == null) {
-						log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Create file in " + desFireEV1Service.byteArrayToHexString(aid) +" : " + fileNo);
+						log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Create file in " + DesfireUtils.byteArrayToHexString(aid) +" : " + fileNo);
 						desfireFlowStep.authStep = 1;
 						authResultBean.setFullApdu(desFireEV1Service.createStdDataFile(byteWritePayload));
 						authResultBean.setSize(16);					
@@ -800,7 +800,7 @@ public NfcResultBean readUid(String result){
 					break;
 				case CHANGE_PICC_KEY:
 					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : PICC master key");
-					authResultBean = this.authApp(desFireEV1Service.hexStringToByteArray("000000"), result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
+					authResultBean = this.authApp(DesfireUtils.hexStringToByteArray("000000"), result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
 					if(authResultBean.getFullApdu() == null) {
 						authResultBean.setFullApdu(desFireEV1Service.changeKey((byte) 0x00, piccKeyVerFinish, piccKeyTypeFinish, piccKeyFinish, piccKeyStart));
 						authResultBean.setSize(16);					
@@ -827,7 +827,7 @@ public NfcResultBean readUid(String result){
 		authResultBean.setCode(CODE.OK);
 		switch(desfireFlowStep.authStep){
 			case 1:
-				authResultBean.setFullApdu(desFireEV1Service.selectApplication(desFireEV1Service.swapPairsByte(aid)));
+				authResultBean.setFullApdu(desFireEV1Service.selectApplication(DesfireUtils.swapPairsByte(aid)));
 				authResultBean.setSize(0);
 				desfireFlowStep.authStep++;
 				break;
@@ -837,12 +837,12 @@ public NfcResultBean readUid(String result){
 				desfireFlowStep.authStep++;
 				break;
 			case 3:
-				authResultBean.setFullApdu(desFireEV1Service.authenticate2(key, keyNo,keyType,desFireEV1Service.hexStringToByteArray(result)));
+				authResultBean.setFullApdu(desFireEV1Service.authenticate2(key, keyNo,keyType, DesfireUtils.hexStringToByteArray(result)));
 				authResultBean.setSize(16);
 				desfireFlowStep.authStep++;
 				break;
 			case 4:
-				authResultBean.setFullApdu(desFireEV1Service.authenticate3(key, keyNo, keyType, desFireEV1Service.hexStringToByteArray(result)));
+				authResultBean.setFullApdu(desFireEV1Service.authenticate3(key, keyNo, keyType, DesfireUtils.hexStringToByteArray(result)));
 				authResultBean.setSize(0);
 				break;
 			}
@@ -851,10 +851,10 @@ public NfcResultBean readUid(String result){
 	
 	
 	public String decriptDesfireId(String apdu){
-		byte[] resultByte = desFireEV1Service.hexStringToByteArray(apdu);
-		int length = Integer.parseInt(desFireEV1Service.swapPairs(desFireEV1Service.hexStringToByteArray(tempFileSize)), 16);
+		byte[] resultByte = DesfireUtils.hexStringToByteArray(apdu);
+		int length = Integer.parseInt(DesfireUtils.swapPairs(DesfireUtils.hexStringToByteArray(tempFileSize)), 16);
 		byte[] resultDecript = desFireEV1Service.postprocess(resultByte, length, DESFireEV1Service.CommunicationSetting.ENCIPHERED);
-		String hexaResult =  desFireEV1Service.byteArrayToHexString(resultDecript);
+		String hexaResult =  DesfireUtils.byteArrayToHexString(resultDecript);
 		log.info("En hexa : " + hexaResult);
 		log.info("En hexa : " + hexaResult.substring(0, length));
 		return hexaResult;
@@ -862,10 +862,10 @@ public NfcResultBean readUid(String result){
 
 	public String decriptUid(String apdu){
 		log.debug("APDU to decript : " + apdu);
-		byte[] resultByte = desFireEV1Service.hexStringToByteArray(apdu);
+		byte[] resultByte = DesfireUtils.hexStringToByteArray(apdu);
 		int length = 14;
 		byte[] resultDecript = desFireEV1Service.preprocess(resultByte, DESFireEV1Service.CommunicationSetting.ENCIPHERED);
-		String hexaResult =  desFireEV1Service.byteArrayToHexString(resultDecript);
+		String hexaResult =  DesfireUtils.byteArrayToHexString(resultDecript);
 		log.info("En hexa : " + hexaResult);
 		log.info("En hexa : " + hexaResult.substring(0, length));
 		return hexaResult;
@@ -874,7 +874,7 @@ public NfcResultBean readUid(String result){
 	public String asBytesString(String desfireId) {		
 		int size = (int)(desfireId.length()/16)+1;
 		desfireId = StringUtils.leftPad(desfireId, size*16, '0');	
-		String desfireIdAsBytesString = desFireEV1Service.byteArrayToHexString(desfireId.getBytes());
+		String desfireIdAsBytesString = DesfireUtils.byteArrayToHexString(desfireId.getBytes());
 		log.trace("desfireIdAsBytesString : " + desfireIdAsBytesString);
 		return desfireIdAsBytesString;
 	}
@@ -898,5 +898,5 @@ public NfcResultBean readUid(String result){
 		}
 		return paddedString;
 	}
-	   
+
 }
