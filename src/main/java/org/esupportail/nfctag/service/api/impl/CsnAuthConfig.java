@@ -16,7 +16,11 @@
  * limitations under the License.
  */
 package org.esupportail.nfctag.service.api.impl;
+import org.esupportail.nfctag.service.TagAuthService;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
+import org.esupportail.nfctag.service.desfire.DesfireService;
+import org.esupportail.nfctag.service.desfire.actions.DesfireActionService;
+import org.esupportail.nfctag.web.live.LiveLongPoolController;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.tostring.RooToString;
 
@@ -28,6 +32,10 @@ public class CsnAuthConfig extends NfcAuthConfig {
 	public AuthType getAuthType() {
 		return AuthType.CSN;
 	}
-	
+
+	@Override
+	public DesfireActionService getDesfireActionService(DesfireService desfireService, TagAuthService tagAuthService, LiveLongPoolController liveController) {
+		throw new RuntimeException("Not implemented");
+	}
     
 }

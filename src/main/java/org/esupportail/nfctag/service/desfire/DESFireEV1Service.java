@@ -1044,7 +1044,14 @@ public class DESFireEV1Service extends SimpleSCR {
 		
 		byte[] payload = new byte[7 + valueHexSize];
 		payload[0] = fileNo;
-		payload[4] = (byte) valueHex.length;
+		
+		// payload[4] = (byte) valueHex.length; Doesn't work BUG if valueHex > 127
+		int fileSize = valueHex.length;
+		String hexSize = DesfireService.leftPad(Integer.toHexString(fileSize), 6, '0');
+		byte[] lengthAsBytesArray = DesfireUtils.swapPairsByte(DesfireUtils.hexStringToByteArray(hexSize));
+		assert lengthAsBytesArray.length==3;
+		System.arraycopy(lengthAsBytesArray, 0, payload, 4, lengthAsBytesArray.length);
+	    
 		System.arraycopy(valueHex, 0, payload, 7, valueHexSize);
 		int totalPayload = payload.length;
 		

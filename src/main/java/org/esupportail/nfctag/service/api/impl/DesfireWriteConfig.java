@@ -17,7 +17,13 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 import org.esupportail.nfctag.beans.DesfireTag;
+import org.esupportail.nfctag.service.TagAuthService;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
+import org.esupportail.nfctag.service.desfire.DesfireService;
+import org.esupportail.nfctag.service.desfire.actions.DesfireActionService;
+import org.esupportail.nfctag.service.desfire.actions.DesfireUpdateActionService;
+import org.esupportail.nfctag.service.desfire.actions.DesfireWriteActionService;
+import org.esupportail.nfctag.web.live.LiveLongPoolController;
 import org.springframework.roo.addon.javabean.RooJavaBean;
 import org.springframework.roo.addon.tostring.RooToString;
 
@@ -30,6 +36,11 @@ public class DesfireWriteConfig extends NfcAuthConfig {
 	@Override
 	public AuthType getAuthType() {
 		return AuthType.DESFIRE;
+	}
+	
+	@Override
+	public DesfireActionService getDesfireActionService(DesfireService desfireService, TagAuthService tagAuthService, LiveLongPoolController liveController) {
+		return new DesfireWriteActionService(null, desfireService, tagAuthService, liveController);
 	}
 
 	public DesfireTag getDesfireTag() {

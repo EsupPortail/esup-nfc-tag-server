@@ -20,6 +20,8 @@ package org.esupportail.nfctag.exceptions;
 import javax.servlet.http.HttpServletRequest;
 
 import org.esupportail.nfctag.beans.ApplicationContextProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -28,6 +30,8 @@ import org.springframework.web.servlet.LocaleResolver;
 public class EsupNfcTagException extends RuntimeException {
 	
 	private static final long serialVersionUID = 1L;
+	
+	private final Logger log = LoggerFactory.getLogger(getClass());
 	
 	static public enum EsupNfcTagErrorMessage{
 		error_esupnfctagexception_serviceunavailable,
@@ -45,10 +49,17 @@ public class EsupNfcTagException extends RuntimeException {
 	
 	String message;
 	
+	String numeroId;
+	
 	public EsupNfcTagException(Throwable cause, EsupNfcTagErrorMessage message, String...params ) {
 		super(message.toString(), cause);
 		this.message = message.toString();
 		this.params = params;
+	}
+	
+	public EsupNfcTagException(String message, Throwable cause) {
+		super(message, cause);
+		this.message = message;
 	}
 
 	public EsupNfcTagException(EsupNfcTagErrorMessage message, String...params) {
@@ -62,11 +73,26 @@ public class EsupNfcTagException extends RuntimeException {
 		this.message = message.toString();
 	}
 	
+	public EsupNfcTagException(String message, String numeroId) {
+		super(message.toString());
+		this.numeroId = numeroId;
+	}
+	
+	@Override
 	public String getMessage() {
-		ReloadableResourceBundleMessageSource messageSource = ApplicationContextProvider.getApplicationContext().getBean("messageSource", ReloadableResourceBundleMessageSource.class);
-		LocaleResolver localeResolver = (LocaleResolver)ApplicationContextProvider.getApplicationContext().getBean("localeResolver");
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		return messageSource.getMessage(this.message, this.params, localeResolver.resolveLocale(request));
+		try {
+			ReloadableResourceBundleMessageSource messageSource = ApplicationContextProvider.getApplicationContext().getBean("messageSource", ReloadableResourceBundleMessageSource.class);
+			LocaleResolver localeResolver = (LocaleResolver)ApplicationContextProvider.getApplicationContext().getBean("localeResolver");
+			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+			return messageSource.getMessage(this.message, this.params, localeResolver.resolveLocale(request));
+		} catch(Exception e) {
+			log.debug("Exception during computing exception message (" + this.message + ") with localisation : " + e.getMessage());
+			return this.message;
+		}
+	}
+
+	public String getNumeroId() {
+		return numeroId;
 	}
 
 }

@@ -17,6 +17,11 @@
  */
 package org.esupportail.nfctag.service.api;
 
+import org.esupportail.nfctag.service.TagAuthService;
+import org.esupportail.nfctag.service.desfire.DesfireService;
+import org.esupportail.nfctag.service.desfire.actions.DesfireActionService;
+import org.esupportail.nfctag.web.live.LiveLongPoolController;
+
 public abstract class NfcAuthConfig {
 	
 	String id;
@@ -43,5 +48,8 @@ public abstract class NfcAuthConfig {
 		this.description = description;
 	}
 	
-	public abstract AuthType getAuthType();	
+	public abstract AuthType getAuthType();
+
+	public abstract DesfireActionService getDesfireActionService(DesfireService desfireService, TagAuthService tagAuthService, LiveLongPoolController liveController);
+	
 }

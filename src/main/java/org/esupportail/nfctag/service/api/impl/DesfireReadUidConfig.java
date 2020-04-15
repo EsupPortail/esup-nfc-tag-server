@@ -16,86 +16,18 @@
  * limitations under the License.
  */
 package org.esupportail.nfctag.service.api.impl;
-import org.esupportail.nfctag.service.api.NfcAuthConfig;
-import org.springframework.roo.addon.javabean.RooJavaBean;
-import org.springframework.roo.addon.tostring.RooToString;
 
-@RooJavaBean
-@RooToString
-public class DesfireReadUidConfig extends NfcAuthConfig {
-	
-	private String desfireAppName;
-	
-	private String desfireAppId;
+import org.esupportail.nfctag.service.TagAuthService;
+import org.esupportail.nfctag.service.desfire.DesfireService;
+import org.esupportail.nfctag.service.desfire.actions.DesfireActionService;
+import org.esupportail.nfctag.service.desfire.actions.DesfireReadUidActionService;
+import org.esupportail.nfctag.web.live.LiveLongPoolController;
 
-	private String desfireKeyNumber;
-	
-	private String desfireKey;
-	
-	private String desfireFileNumber;
-	
-	private String desfireFileOffset;
-	
-	private String desfireFileSize;
+public class DesfireReadUidConfig extends DesfireReadConfig {
 	
 	@Override
-	public AuthType getAuthType() {
-		return AuthType.DESFIRE;
-	}
-
-		public String getDesfireAppName() {
-		return desfireAppName;
-	}
-
-	public void setDesfireAppName(String desfireAppName) {
-		this.desfireAppName = desfireAppName;
-	}
-
-	public String getDesfireAppId() {
-		return desfireAppId;
-	}
-
-	public void setDesfireAppId(String desfireAppId) {
-		this.desfireAppId = desfireAppId;
-	}
-
-	public String getDesfireKeyNumber() {
-		return desfireKeyNumber;
-	}
-
-	public void setDesfireKeyNumber(String desfireKeyNumber) {
-		this.desfireKeyNumber = desfireKeyNumber;
-	}
-
-	public String getDesfireKey() {
-		return desfireKey;
-	}
-
-	public void setDesfireKey(String desfireKey) {
-		this.desfireKey = desfireKey;
-	}
-
-	public String getDesfireFileNumber() {
-		return desfireFileNumber;
-	}
-
-	public void setDesfireFileNumber(String desfireFileNumber) {
-		this.desfireFileNumber = desfireFileNumber;
+	public DesfireActionService getDesfireActionService(DesfireService desfireService, TagAuthService tagAuthService, LiveLongPoolController liveController) {
+		return new DesfireReadUidActionService(this, desfireService, tagAuthService, liveController);
 	}
 	
-	public String getDesfireFileOffset() {
-		return desfireFileOffset;
-	}
-
-	public void setDesfireFileOffset(String desfireFileOffset) {
-		this.desfireFileOffset = desfireFileOffset;
-	}
-
-	public String getDesfireFileSize() {
-		return desfireFileSize;
-	}
-
-	public void setDesfireFileSize(String desfireFileSize) {
-		this.desfireFileSize = desfireFileSize;
-	}
 }

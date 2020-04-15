@@ -16,28 +16,18 @@
  * limitations under the License.
  */
 package org.esupportail.nfctag.service.api.impl;
-import org.esupportail.nfctag.beans.DesfireTag;
-import org.esupportail.nfctag.service.api.NfcAuthConfig;
-import org.springframework.roo.addon.javabean.RooJavaBean;
-import org.springframework.roo.addon.tostring.RooToString;
 
-@RooJavaBean
-@RooToString
-public class DesfireUpdateConfig extends NfcAuthConfig {
+import org.esupportail.nfctag.service.TagAuthService;
+import org.esupportail.nfctag.service.desfire.DesfireService;
+import org.esupportail.nfctag.service.desfire.actions.DesfireActionService;
+import org.esupportail.nfctag.service.desfire.actions.DesfireUpdateActionService;
+import org.esupportail.nfctag.web.live.LiveLongPoolController;
 
-	private DesfireTag desfireTag;
+public class DesfireUpdateConfig extends DesfireWriteConfig {
 	
 	@Override
-	public AuthType getAuthType() {
-		return AuthType.DESFIRE;
+	public DesfireActionService getDesfireActionService(DesfireService desfireService, TagAuthService tagAuthService, LiveLongPoolController liveController) {
+		return new DesfireUpdateActionService(null, desfireService, tagAuthService, liveController);
 	}
-
-	public DesfireTag getDesfireTag() {
-		return desfireTag;
-	}
-
-	public void setDesfireTag(DesfireTag desfireTag) {
-		this.desfireTag = desfireTag;
-	}
-
+	
 }

@@ -23,7 +23,7 @@ public class EsupSgcAuthTokenService {
 		String esupSgcUrl4eppnInit = esupSgcUrl + "/wsrest/nfc/generateAuthToken?eppnInit=" + eppnInit;
 		log.info("Call " + esupSgcUrl4eppnInit);
 		String authToken = restTemplate.getForObject(esupSgcUrl4eppnInit, String.class);
-		log.info("tokken " + authToken);
+		log.info("token " + authToken);
 		return authToken;
 	}
 	

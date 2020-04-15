@@ -15,43 +15,47 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.esupportail.nfctag.service.desfire;
-
-import org.esupportail.nfctag.service.api.TagWriteApi;
+package org.esupportail.nfctag.service.api.impl;
+import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import org.esupportail.nfctag.service.TagAuthService;
+import org.esupportail.nfctag.service.desfire.DesfireDiversification;
+import org.esupportail.nfctag.service.desfire.DesfireService;
+import org.esupportail.nfctag.service.desfire.DesfireUtils;
+import org.esupportail.nfctag.service.desfire.actions.DesfireActionService;
+import org.esupportail.nfctag.service.desfire.actions.DesfireDeuinfoActionService;
+import org.esupportail.nfctag.web.live.LiveLongPoolController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.roo.addon.javabean.RooJavaBean;
+import org.springframework.roo.addon.tostring.RooToString;
 
-public class DesfireDiversificationService implements DesfireKeyService {
-
-	protected final static Logger log = LoggerFactory.getLogger(DesfireDiversificationService.class);
-
+@RooJavaBean
+@RooToString
+public class DesfireReadDeuinfoConfig extends DesfireReadConfig {
+	
+	private final Logger log = LoggerFactory.getLogger(getClass());
+	
 	String baseKey;
 	
-	TagWriteApi tagWriteApi;
+	public String getBaseKey() {
+		return baseKey;
+	}
 
 	public void setBaseKey(String baseKey) {
 		this.baseKey = baseKey;
 	}
 
-	public void setTagWriteApi(TagWriteApi tagWriteApi) {
-		this.tagWriteApi = tagWriteApi;
+	@Override
+	public DesfireActionService getDesfireActionService(DesfireService desfireService, TagAuthService tagAuthService, LiveLongPoolController liveController) {
+		return new DesfireDeuinfoActionService(this, desfireService, tagAuthService, liveController);
 	}
 
-	@Override
-	public String getKeyFromCsn(String csn) {
+	public String getDesfireDiversifiedKey(String csnOrEscn) {
 
 		String diversifiedKey = null;
-		
-		String data4diversification = "";
-		if(tagWriteApi == null) {
-			log.info(String.format("Call key diversification with CSN %s", csn));
-			data4diversification = csn; 
-		} else {
-			data4diversification = tagWriteApi.getIdFromCsn(csn);
-		}
-		
+
 		byte[] baseKeyBytes = DesfireUtils.hexStringToByteArray(baseKey);
-		byte[] diversificationInput = DesfireUtils.hexStringToByteArray(data4diversification);
+		byte[] diversificationInput = DesfireUtils.hexStringToByteArray(csnOrEscn);
 		int diversificationLength = diversificationInput.length;
 		
 		DesfireDiversification desfireDiversification = new DesfireDiversification();
@@ -60,11 +64,11 @@ public class DesfireDiversificationService implements DesfireKeyService {
 			byte[] diversifiedKeyBytes = desfireDiversification.diversificationAES128(baseKeyBytes, diversificationInput, diversificationLength);
 			diversifiedKey = DesfireUtils.byteArrayToHexString(diversifiedKeyBytes);
 		} catch (Exception e) {
-			throw new RuntimeException("Exception when diversify key !", e);
+			throw new EsupNfcTagException("Exception when diversify key !", e);
 		}
 		log.info(String.format("Diversified Key : %s", diversifiedKey));
 		
 		return diversifiedKey;
 	}
-
+	
 }

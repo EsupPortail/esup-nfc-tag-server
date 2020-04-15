@@ -2,6 +2,8 @@ package org.esupportail.nfctag.beans;
 
 import java.io.Serializable;
 
+import org.esupportail.nfctag.service.desfire.DesfireKeyService;
+
 public class DesfireKey implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -11,6 +13,8 @@ public class DesfireKey implements Serializable {
 	private String key;
 	
 	private String keyVer;
+	
+	private DesfireKeyService desfireKeyService;
 	
 	public String getKeyNo() {
 		return keyNo;
@@ -34,6 +38,14 @@ public class DesfireKey implements Serializable {
 
 	public void setKeyVer(String keyVer) {
 		this.keyVer = keyVer;
+	}
+
+	public DesfireKeyService getDesfireKeyService() {
+		return desfireKeyService;
+	}
+
+	public void setDesfireKeyService(DesfireKeyService desfireKeyService) {
+		this.desfireKeyService = desfireKeyService;
 	}
 
 	@Override

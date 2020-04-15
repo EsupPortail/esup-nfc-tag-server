@@ -98,7 +98,6 @@ public NfcResultBean readUid(String result){
 		
 		NfcResultBean authResultBean = new NfcResultBean();
 		authResultBean.setCode(CODE.OK);
-		DesfireReadUidConfig desfireReadConfig = (DesfireReadUidConfig) desfireAuthSession.getDesfireAuthConfig();
 		
 		switch(desfireFlowStep.action){
 			case READ:
@@ -161,14 +160,13 @@ public NfcResultBean readUid(String result){
 		return authResultBean;
 	}
 	
-	public NfcResultBean readDesfireId(String result){
+	public NfcResultBean readDesfireId(DesfireReadConfig desfireReadConfig, String result){
 		if(result.length()==0){
 			reset();
 			desfireFlowStep.action = Action.GET_FILE_SETTINGS;
 		}
 		NfcResultBean authResultBean = new NfcResultBean();
 		authResultBean.setCode(CODE.OK);
-		DesfireReadConfig desfireReadConfig = (DesfireReadConfig) desfireAuthSession.getDesfireAuthConfig();
 		byte[] aid = DesfireUtils.hexStringToByteArray(desfireReadConfig.getDesfireAppId());
 		byte keyNo = DesfireUtils.hexStringToByte(desfireReadConfig.getDesfireKeyNumber());
 		byte[] key = DesfireUtils.hexStringToByteArray(desfireReadConfig.getDesfireKey());
@@ -198,6 +196,57 @@ public NfcResultBean readUid(String result){
 					authResultBean.setSize(32);
 					desfireFlowStep.action = Action.MORE;
 				}
+				break;
+			case MORE:
+				if(result.endsWith("AF")){
+					tempRead += result.substring(0, result.length() - 4);
+					authResultBean.setFullApdu(desFireEV1Service.readMore());
+					authResultBean.setSize(32);
+					desfireFlowStep.action = Action.MORE;
+				}else if(result.endsWith("9100")){
+					tempRead += result;
+					authResultBean.setFullApdu("END");
+				}
+				break;
+			default:
+				break;
+		}
+		return authResultBean;
+	}
+	
+	public NfcResultBean readDesfireIdNoAuth(DesfireReadConfig desfireReadConfig, String result){
+		if(result.length()==0){
+			reset();
+			desfireFlowStep.action = Action.GET_FILE_SETTINGS;
+		}
+		NfcResultBean authResultBean = new NfcResultBean();
+		authResultBean.setCode(CODE.OK);
+		byte[] aid = DesfireUtils.hexStringToByteArray(desfireReadConfig.getDesfireAppId());
+		byte fileNo = DesfireUtils.hexStringToByte(desfireReadConfig.getDesfireFileNumber());
+		byte[] offset = DesfireUtils.hexStringToByteArray(desfireReadConfig.getDesfireFileOffset());
+		
+		switch(desfireFlowStep.action){
+			case GET_FILE_SETTINGS:
+				tempFileSize = "";
+				if(result.length()==0){
+					authResultBean.setFullApdu(desFireEV1Service.selectApplication(DesfireUtils.swapPairsByte(aid)));
+				}
+				if(authResultBean.getFullApdu() == null) {
+					desfireFlowStep.authStep = 1;
+					authResultBean.setFullApdu(desFireEV1Service.getFileSettings(fileNo));
+					desfireFlowStep.action = Action.READ;
+				}
+				break;
+			case READ:
+				tempRead = "";
+				if(tempFileSize.equals("")){
+					tempFileSize = result.substring(8, 14);
+				}
+				byte[] length = DesfireUtils.hexStringToByteArray(tempFileSize);
+				desfireFlowStep.authStep = 1;
+				authResultBean.setFullApdu(desFireEV1Service.readData(fileNo, offset, length));
+				authResultBean.setSize(32);
+				desfireFlowStep.action = Action.MORE;
 				break;
 			case MORE:
 				if(result.endsWith("AF")){
@@ -312,7 +361,12 @@ public NfcResultBean readUid(String result){
 					if(desfireApp.getKeys().size() >  desfireFlowStep.currentKey) {
 						DesfireKey desfireKey = desfireApp.getKeys().get(desfireFlowStep.currentKey);
 						keyNo = DesfireUtils.hexStringToByte(desfireKey.getKeyNo());
-						key = DesfireUtils.hexStringToByteArray(desfireKey.getKey());
+						DesfireKeyService desfireKeyService = desfireKey.getDesfireKeyService();
+						String desfireKeyAsHexa = desfireKey.getKey();
+						if(desfireKeyService!=null) {
+							desfireKeyAsHexa = desfireKeyService.getKeyFromCsn(csn);
+						}
+						key = DesfireUtils.hexStringToByteArray(desfireKeyAsHexa);
 						keyVer = DesfireUtils.hexStringToByte(desfireKey.getKeyVer());
 					}
 				}
@@ -610,8 +664,13 @@ public NfcResultBean readUid(String result){
 				appKeyVer = DesfireUtils.hexStringToByte(desfireAppKey.getKeyVer());
 				if(desfireApp.getKeys().size() >  desfireFlowStep.currentKey) {
 					DesfireKey desfireKey = desfireApp.getKeys().get(desfireFlowStep.currentKey);
-					keyNo = DesfireUtils.hexStringToByte(desfireKey.getKeyNo());
-					key = DesfireUtils.hexStringToByteArray(desfireKey.getKey());
+					keyNo = DesfireUtils.hexStringToByte(desfireKey.getKeyNo());		
+					DesfireKeyService desfireKeyService = desfireKey.getDesfireKeyService();
+					String desfireKeyAsHexa = desfireKey.getKey();
+					if(desfireKeyService!=null) {
+						desfireKeyAsHexa = desfireKeyService.getKeyFromCsn(csn);
+					}
+					key = DesfireUtils.hexStringToByteArray(desfireKeyAsHexa);		
 					keyVer = DesfireUtils.hexStringToByte(desfireKey.getKeyVer());
 				}
 			}
@@ -638,6 +697,21 @@ public NfcResultBean readUid(String result){
 
 		
 		switch(desfireFlowStep.action){
+				case FORMAT:
+					log.debug("Write by " + eppnInit + " - Step : Format card");
+					authResultBean = this.authApp(piccAid, result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
+					if(authResultBean.getFullApdu() == null) {
+						desfireFlowStep.authStep = 1;
+						authResultBean.setFullApdu(desFireEV1Service.formatPICC());
+						authResultBean.setSize(16);					
+						if(desfireTag.getApplications() != null &&  desfireTag.getApplications().size() > desfireFlowStep.currentApp){
+							desfireFlowStep.action = Action.CREATE_APP;
+						} else {
+							desfireFlowStep.currentApp = 0;
+							desfireFlowStep.action = Action.CHANGE_PICC_KEY;
+						}
+					}
+					break;
 				case GET_APPS:
 					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Get Apps");
 					authResultBean = this.authApp(piccAid, result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
@@ -763,20 +837,21 @@ public NfcResultBean readUid(String result){
 					break;
 				case WRITE_FILE:	
 					if(authResultBean.getFullApdu() == null || desfireFlowStep.writeStep>0) {
-						if(desfireFlowStep.writeStep==0 || result.endsWith("AF")) {
+						if(desfireFlowStep.writeStep==0) {
 							desfireFlowStep.authStep = 1;
-							TagWriteApi fileTagWriteApi = desfireFile.getTagWriteApi();
-							String desfireId = fileTagWriteApi.getIdFromCsn(csn);
-							log.debug("Update " + csn + " - Write in file " + fileNo +" : " + desfireId);
+							log.debug("Write by " + eppnInit + " - Write in file " + fileNo +" : " + desfireId);
 							authResultBean.setFullApdu(desFireEV1Service.writeData(fileNo, desfireId));
 							authResultBean.setSize(16);						
-							log.trace("write part");
 							desfireFlowStep.writeStep++;
+						}else if(desfireFlowStep.writeStep > 0 && result.endsWith("AF")){
+							authResultBean.setFullApdu(desFireEV1Service.writeMore(desfireId));
+							authResultBean.setSize(16);							
+							log.debug("Update by " + eppnInit + " - Write in file " + fileNo +" : " + desfireId);
 						} else {
 							desfireFlowStep.writeStep = 0;
 							desfireFlowStep.action = Action.CHANGE_FILE_KEY_SET;
-							authResultBean = updateCard(result, csn, csn);
-						} 
+							authResultBean = updateCard(result, eppnInit, csn);
+						}
 					} 
 					break;
 				case CHANGE_FILE_KEY_SET:	
@@ -818,7 +893,12 @@ public NfcResultBean readUid(String result){
 		return authResultBean;
 	}
 	
-	private NfcResultBean authApp(byte[] aid, String result, byte[] key, byte keyNo, KeyType keyType) {
+	public NfcResultBean authApp4ckeckKey(byte[] aid, String result, byte[] key, byte keyNo, KeyType keyType) {
+		desfireFlowStep.action=Action.AUTH;
+		return authApp(aid, result, key, keyNo, keyType);
+	}
+	
+	NfcResultBean authApp(byte[] aid, String result, byte[] key, byte keyNo, KeyType keyType) {
 		if(result.length()==0){
 			desfireFlowStep.authStep = 1;
 		}
