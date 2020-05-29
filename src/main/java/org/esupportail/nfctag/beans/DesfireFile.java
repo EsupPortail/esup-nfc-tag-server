@@ -4,12 +4,15 @@ import java.io.Serializable;
 
 import org.esupportail.nfctag.service.api.TagWriteApi;
 import org.esupportail.nfctag.service.api.impl.TagWriteNone;
+import org.esupportail.nfctag.service.desfire.DesfireUtils;
 
 public class DesfireFile implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
 	String fileNumber;
+	
+	String isoId;
 	
 	String communicationSettings;
 	
@@ -19,10 +22,16 @@ public class DesfireFile implements Serializable {
 	
 	TagWriteApi tagWriteApi = new TagWriteNone();
 	
-	public String getWriteFilePayload() {
+	public String getWriteFilePayload(boolean iso) {
 		// accessRights is setting after write command here
 		// return fileNumber + communicationSettings + accessRights + fileSize;
-		return fileNumber + communicationSettings + "EEEE";
+		if(iso) {
+			assert(isoId!=null && isoId.length()==4);
+			String lsbIsoId = DesfireUtils.swapPairs(DesfireUtils.hexStringToByteArray(isoId));
+			return fileNumber + lsbIsoId + communicationSettings + "EEEE";
+		} else {
+			return fileNumber + communicationSettings + "EEEE";
+		}
 	}
 
 	public String getFileNumber() {
@@ -31,6 +40,14 @@ public class DesfireFile implements Serializable {
 
 	public void setFileNumber(String fileNumber) {
 		this.fileNumber = fileNumber;
+	}
+	
+	public String getIsoId() {
+		return isoId;
+	}
+
+	public void setIsoId(String isoId) {
+		this.isoId = isoId;
 	}
 
 	public String getCommunicationSettings() {

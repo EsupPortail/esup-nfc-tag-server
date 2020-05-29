@@ -294,9 +294,7 @@ public class DESFireEV1Service extends SimpleSCR {
 	public String changeKey(byte keyNo, byte keyVersion, KeyType type, byte[] newKey, byte[] oldKey) {
 		log.trace("sessionKey : "+Dump.hex(skey) );
 		log.trace("kno : "+Dump.hex(kno)+ " = " +Dump.hex((byte)(keyNo & 0x0F)));
-		if (!validateKey(newKey, type)
-				|| Arrays.equals(aid, new byte[3]) && keyNo != 0x00
-				){
+		if (!validateKey(newKey, type)){
 			log.trace("You're doing it wrong with kno");
 			this.code = Response.WRONG_ARGUMENT.getCode();
 			return null;
@@ -508,17 +506,36 @@ public class DESFireEV1Service extends SimpleSCR {
 	 * @param aid	3-byte AID
 	 * @param amks	application master key settings
 	 * @param nok	number of keys (concatenated with 0x40 or 0x80 for 3K3DES and AES respectively)
+	 * @param isoName 
+	 * @param isoId 
 	 * @return		<code>true</code> on success, <code>false</code> otherwise
 	 */
-	public String createApplication(byte[] aid, byte amks, byte nok) {
-		byte[] apdu = new byte[11];
-		apdu[0] = (byte) 0x90;
-		apdu[1] = (byte) Command.CREATE_APPLICATION.getCode();
-		apdu[4] = 0x05;
-		System.arraycopy(aid, 0, apdu, 5, 3);
-		apdu[8] = amks;
-		apdu[9] = nok;
-		return Dump.hex(apdu).replace(" ", "").toUpperCase();
+	public String createApplication(byte[] aid, byte amks, byte nok, boolean iso, String isoId, String isoName) {
+		if(iso) {
+			byte[] iso_id = DesfireUtils.hexStringToByteArray(isoId);
+			byte[] iso_name = DesfireUtils.hexStringToByteArray(isoName);
+			int apduLen = 11 + iso_id.length + iso_name.length;
+			byte[] apdu = new byte[apduLen];
+			apdu[0] = (byte) 0x90;
+			apdu[1] = (byte) Command.CREATE_APPLICATION.getCode();
+			int payloadLen = apduLen - 6;
+			apdu[4] = (byte)payloadLen;
+			System.arraycopy(aid, 0, apdu, 5, 3);
+			apdu[8] = amks;
+			apdu[9] = nok;
+			System.arraycopy(iso_id, 0, apdu, 10, iso_id.length);
+			System.arraycopy(iso_name, 0, apdu, 10 + iso_id.length, iso_name.length);
+			return Dump.hex(apdu).replace(" ", "").toUpperCase();
+		} else {
+			byte[] apdu = new byte[11];
+			apdu[0] = (byte) 0x90;
+			apdu[1] = (byte) Command.CREATE_APPLICATION.getCode();
+			apdu[4] = 0x05;
+			System.arraycopy(aid, 0, apdu, 5, 3);
+			apdu[8] = amks;
+			apdu[9] = nok;
+			return Dump.hex(apdu).replace(" ", "").toUpperCase();
+		}
 	}
 
 	/**
@@ -819,8 +836,8 @@ public class DESFireEV1Service extends SimpleSCR {
 	 * 					<br>file size (3 bytes)
 	 * @return			{@code true} on success, {@code false} otherwise
 	 */
-	public String createStdDataFile(byte[] payload) {
-		return createDataFile(payload, (byte) Command.CREATE_STD_DATA_FILE.getCode());
+	public String createStdDataFile(byte[] payload, boolean iso) {
+		return createDataFile(payload, (byte) Command.CREATE_STD_DATA_FILE.getCode(), iso);
 	}
 
 	/**
@@ -838,20 +855,32 @@ public class DESFireEV1Service extends SimpleSCR {
 	 * @return			{@code true} on success, {@code false} otherwise
 	 */
 	public String createBackupDataFile(byte[] payload) {
-		return createDataFile(payload, (byte) Command.CREATE_BACKUP_DATA_FILE.getCode());
+		return createDataFile(payload, (byte) Command.CREATE_BACKUP_DATA_FILE.getCode(), false);
 	}
 
 	/* Support method for createStdDataFile/createBackupDataFile. */
-	private String createDataFile(byte[] payload, byte cmd) {
-		byte[] apdu = new byte[13];
-		apdu[0] = (byte) 0x90;
-		apdu[1] = cmd;
-		apdu[2] = 0x00;
-		apdu[3] = 0x00;
-		apdu[4] = 0x07;
-		System.arraycopy(payload, 0, apdu, 5, 7);
-		apdu[12] = 0x00;
-		return Dump.hex(apdu).replace(" ", "").toUpperCase();
+	private String createDataFile(byte[] payload, byte cmd, boolean iso) {
+		if(iso) {
+			byte[] apdu = new byte[15];
+			apdu[0] = (byte) 0x90;
+			apdu[1] = cmd;
+			apdu[2] = 0x00;
+			apdu[3] = 0x00;
+			apdu[4] = 0x09;
+			System.arraycopy(payload, 0, apdu, 5, 9);
+			apdu[14] = 0x00;
+			return Dump.hex(apdu).replace(" ", "").toUpperCase();
+		} else {
+			byte[] apdu = new byte[13];
+			apdu[0] = (byte) 0x90;
+			apdu[1] = cmd;
+			apdu[2] = 0x00;
+			apdu[3] = 0x00;
+			apdu[4] = 0x07;
+			System.arraycopy(payload, 0, apdu, 5, 7);
+			apdu[12] = 0x00;
+			return Dump.hex(apdu).replace(" ", "").toUpperCase();
+		}
 	}
 
 	//public boolean createValueFile(int fileNo, CommunicationSetting cs, byte ar1, byte ar2, int, int, int, boolean)

@@ -33,14 +33,20 @@ public class DesfireApplication implements Serializable {
 	/**
 	 * number of keys (concatenated with 0x40 or 0x80 for 3K3DES and AES respectively)
 	 * -> 84 for 4 keys with AES
+	 * -> A4 for 4 keys with AES and ISO
 	 */
 	private String nok; 
+	
+	private String isoId;
+	
+	private String isoName;
 	
 	private List<DesfireKey> keys;
 	
 	private List<DesfireFile> files;
 	
 	private String updateDate;
+	
 	
 	TagWriteApi tagWriteApi = new TagWriteNone();
 	
@@ -92,6 +98,22 @@ public class DesfireApplication implements Serializable {
 
 	public void setNok(String nok) {
 		this.nok = nok;
+	}
+
+	public String getIsoId() {
+		return isoId;
+	}
+
+	public void setIsoId(String isoId) {
+		this.isoId = isoId;
+	}
+
+	public String getIsoName() {
+		return isoName;
+	}
+
+	public void setIsoName(String isoName) {
+		this.isoName = isoName;
 	}
 
 	public List<DesfireKey> getKeys() {
