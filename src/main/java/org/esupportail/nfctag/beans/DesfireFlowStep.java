@@ -24,7 +24,8 @@ public class DesfireFlowStep implements Serializable {
 	    CHANGE_FILE_KEY_SET, 
 	    CHANGE_PICC_KEY,
 	    UNBRICK, 
-	    SWITCH_TO_AES, AUTH
+	    SWITCH_TO_AES, AUTH,
+	    FREE_MEMORY
 	}
 	
 	public int authStep = 1;

@@ -1,5 +1,7 @@
 package org.esupportail.nfctag.service.desfire.actions;
 
+import java.math.BigInteger;
+
 import org.apache.commons.lang3.StringUtils;
 import org.esupportail.nfctag.beans.NfcResultBean;
 import org.esupportail.nfctag.beans.NfcResultBean.Action;
@@ -21,7 +23,7 @@ public class DesfireDeuinfoActionService extends DesfireActionService {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	enum Step{NONE, UID, ESCN, SIGNATURE, CERT, END, CHECK_KEY_ESCN, CHECK_KEY_UID};
+	enum Step{NONE, UID, ESCN, SIGNATURE, CERT, END, CHECK_KEY_ESCN, CHECK_KEY_UID, FREE_MEMORY};
 	
 	String escn = null;
 
@@ -30,6 +32,8 @@ public class DesfireDeuinfoActionService extends DesfireActionService {
 	String cert;
 	
 	String uid = null;
+	
+	Long freeMemory = null;
 	
 	DesfireActionService currentDesfireActionService;
 	
@@ -131,14 +135,25 @@ public class DesfireDeuinfoActionService extends DesfireActionService {
 			if(!StringUtils.isEmpty(currentDesfireActionService.desfireId)) {
 				cert = currentDesfireActionService.desfireId;
 				log.info("Got cert : " + cert);
+				step = Step.FREE_MEMORY;
+				result = "";
+			}
+		}
+		if(Step.FREE_MEMORY.equals(step)) {
+			nfcResultBean = desfireService.readFreeMemory(result);
+			if(!result.isEmpty()) {
+				log.debug("Got freeMemory : " + result);
+				// delete 4 last chars 9100                                                                                                                                                              
+				result = result.replaceAll("9100$", "");
+				byte[] freeMemoryBytes = DesfireUtils.swapPairsByte(DesfireUtils.hexStringToByteArray(result));
+				freeMemory = new BigInteger(freeMemoryBytes).longValue();
+				log.info("Free Memory : " + freeMemory + " bytes");
 				step = Step.END;
+				nfcResultBean.setAction(Action.read);
 			}
 		}
 		if(Step.END.equals(step)) {
-			boolean validate = true;
-			if(nfcResultBean.getAction().equals(Action.none)){
-				validate = false;
-			}
+			boolean validate = nfcResultBean==null || Action.none.equals(nfcResultBean.getAction());
 			if(tagAuthService!=null) {
 				TagLog tagLog = tagAuthService.auth(TagType.DESFIRE, getDesfireId(), numeroId, cardId, "Deuinfo", validate);
 				if(liveController!=null) {
@@ -147,12 +162,13 @@ public class DesfireDeuinfoActionService extends DesfireActionService {
 				nfcResultBean.setMsg(tagLog.getFirstname() + " " + tagLog.getLastname());
 				nfcResultBean.setTaglogId(tagLog.getId());
 			}
+			desfireService.reset();
 		}
 		return nfcResultBean;
 	}
 
 	String getDesfireId() {
-		return String.format("%s@%s@%s@%s", uid, escn, signature, cert);
+		return String.format("%s@%s@%s@%s@%s", uid, escn, signature, cert, freeMemory);
 	}
 	
 	@Override

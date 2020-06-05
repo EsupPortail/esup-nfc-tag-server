@@ -38,7 +38,6 @@ import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
 import org.esupportail.nfctag.service.api.TagWriteApi;
 import org.esupportail.nfctag.service.api.impl.DesfireReadConfig;
-import org.esupportail.nfctag.service.api.impl.DesfireReadUidConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireReadUidWithAuthConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireUpdateConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireWriteConfig;
@@ -158,6 +157,32 @@ public NfcResultBean readUid(String result){
 				break;
 		}
 		return authResultBean;
+	}
+	
+
+	public NfcResultBean callApdu(String result, String apdu){
+		
+		if(result.length()==0){
+			reset();
+			desfireFlowStep.action = Action.READ;
+		}
+		
+		NfcResultBean resultBean = new NfcResultBean();
+		resultBean.setCode(CODE.OK);
+		
+		switch(desfireFlowStep.action){
+			case READ:
+				resultBean.setFullApdu(apdu);
+				desfireFlowStep.action = Action.END;
+				break;
+			case END:
+				resultBean.setFullApdu("END");
+				desfireFlowStep.action = Action.END;
+				break;
+			default:
+				break;
+		}
+		return resultBean;
 	}
 	
 	public NfcResultBean readDesfireId(DesfireReadConfig desfireReadConfig, String result){
@@ -1006,6 +1031,19 @@ public NfcResultBean readUid(String result){
 			paddedString = padCharacter + paddedString;
 		}
 		return paddedString;
+	}
+	
+	public NfcResultBean readFreeMemory(String result) {	
+		reset();
+		desfireFlowStep.action = Action.FREE_MEMORY;
+		NfcResultBean freeMemoryResultBean = new NfcResultBean();
+		freeMemoryResultBean.setCode(CODE.OK);
+		if(result.isEmpty()) {
+			freeMemoryResultBean.setFullApdu(desFireEV1Service.freeMemory());
+		} else {
+			freeMemoryResultBean.setFullApdu("END");
+		}
+		return freeMemoryResultBean;
 	}
 
 }
