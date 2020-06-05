@@ -24,7 +24,7 @@
 	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder name="enc" class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
 	        <layout class="org.esupportail.nfctag.logs.PatternLayoutWithUserContext">
-	            <param name="Pattern" value="[%-5level] %date{dd/MM/yyyy HH:mm:ss} [%-20thread] [%user %remote %session] %logger{36} - %msg - %n" />
+	            <param name="Pattern" value="[%-5level] %date{dd/MM/yyyy HH:mm:ss} [%-20thread] [%user %remote %session] %logger{36} (%file:%line\) - %msg - %n" />
     	    </layout>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -36,7 +36,7 @@
        <file>/opt/tomcat-esup-nfc-tag/logs/esupnfctagserver.log</file>
 		<encoder name="enc" class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
 	        <layout class="org.esupportail.nfctag.logs.PatternLayoutWithUserContext">
-	            <param name="Pattern" value="[%-5level] %date{dd/MM/yyyy HH:mm:ss} [%-20thread] [%user %remote %session] %logger{36} - %msg - %n" />
+	            <param name="Pattern" value="[%-5level] %date{dd/MM/yyyy HH:mm:ss} [%-20thread] [%user %remote %session] %logger{36} (%file:%line\) - %msg - %n" />
     	    </layout>
 		</encoder>
 		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">
@@ -51,7 +51,7 @@
         <from>esup-nfc-tag-logs@univ-ville.fr</from>
         <subject>%-5level - esup-nfc-tag %date{dd/MM/yyyy HH:mm:ss}</subject>
         <layout class="ch.qos.logback.classic.PatternLayout">
-            <pattern>[%-5level] %date{dd/MM/yyyy HH:mm:ss} [%-20thread] %logger{36} - %msg%n</pattern>
+            <pattern>[%-5level] %date{dd/MM/yyyy HH:mm:ss} [%-20thread] %logger{36} (%file:%line\) - %msg%n</pattern>
         </layout>
         <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
 			<level>ERROR</level>
