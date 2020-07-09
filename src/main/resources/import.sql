@@ -9,4 +9,4 @@ CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON tag_log FOR EACH ROW EX
 CREATE FUNCTION textsearchable_device_trigger() RETURNS trigger AS $$ begin new.textsearchable_index_col = setweight(to_tsvector('simple', coalesce(new.eppn_init,'')), 'A')||setweight(to_tsvector('simple', coalesce(new.numero_id,'')), 'A')||setweight(to_tsvector('simple', coalesce(new.imei,'')), 'A')||setweight(to_tsvector('simple', coalesce(new.mac_address,'')), 'A')||setweight(to_tsvector('simple', coalesce(new.location,'')), 'A')||setweight(to_tsvector('simple', coalesce(application.name,'')), 'A') FROM application where new.application=application.id; return new; end $$ LANGUAGE plpgsql;
 CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON device FOR EACH ROW EXECUTE PROCEDURE textsearchable_device_trigger();
 
-INSERT INTO appli_version (id, esup_nfc_tag_version, version) SELECT nextval('hibernate_sequence'), '2.1.x', '1' WHERE NOT EXISTS (SELECT * FROM appli_version);
+INSERT INTO appli_version (id, esup_nfc_tag_version, version) SELECT nextval('hibernate_sequence'), '2.3.x', '1' WHERE NOT EXISTS (SELECT * FROM appli_version);
