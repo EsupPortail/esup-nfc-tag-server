@@ -119,7 +119,7 @@ public class DesfireWsController {
 		TagError tagError = new TagError();
 		tagError.setNumeroId(e.getNumeroId());
 		tagError = new TagError(e);
-		log.error("desfire error : " + e.getMessage());
+		log.error("desfire error",  e);
 		nfcResultBean.setMsg(e.getMessage());		
 		errorLongPoolController.handleError(tagError);
 		nfcResultBean.setCode(CODE.ERROR);

@@ -67,7 +67,7 @@ public abstract class DesfireActionService {
 				String msg = result.substring(result.length() - 2);
 				response = DESFireEV1Service.Response.getResponse(Integer.parseInt(msg, 16));
 			}
-			if(DESFireEV1Service.Response.OPERATION_OK.equals(response)){
+			if(result.isEmpty() || DESFireEV1Service.Response.OPERATION_OK.equals(response)) {
 				TagType tagType = getTagType();
 				desfireId = getDesfireId(result);
 				String appName = getAppName();
@@ -89,7 +89,7 @@ public abstract class DesfireActionService {
 				}
 
 			} else {
-				throw new EsupNfcTagException("Aucun encodage : " + response.toString(), numeroId);	
+				throw new EsupNfcTagException(String.format("Aucun encodage : %s", response), numeroId);	
 			}
 		}
 

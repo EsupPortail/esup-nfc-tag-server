@@ -354,8 +354,7 @@ public NfcResultBean readUid(String result){
 		byte cms = 0;
 		byte fileNo = 0;
 		
-		if(desfireTag.getApplications() != null) { 
-			if(desfireTag.getApplications().size() >  desfireFlowStep.currentApp) {
+		if(desfireTag.getApplications() != null  && desfireTag.getApplications().size() >  desfireFlowStep.currentApp) {
 			
 				desfireApp = desfireTag.getApplications().get(desfireFlowStep.currentApp);
 				aid = DesfireUtils.hexStringToByteArray(desfireApp.getDesfireAppId());
@@ -420,11 +419,11 @@ public NfcResultBean readUid(String result){
 					byteWritePayload = DesfireUtils.hexStringToByteArray(writePayload);
 				}
 			} else {
-				//Si pas d'application ni master key on valide l'encodage pour affectation de la carte
-				if(desfireTag.getApplications().size() == 0 && piccKeyStart == null) {
+				// si pas d'application ni master key à changer on valide l'encodage pour affectation de la carte
+				if((desfireTag.getApplications() == null || desfireTag.getApplications().size() == 0) && desfireTag.getKeyFinish() == null) {
+					log.debug("No applications and no keys to write - goal is just to read uid and assign the tag");
 					desfireFlowStep.action = Action.END;
 				}
-			}
 		}
 
 		switch(desfireFlowStep.action){
