@@ -11,6 +11,7 @@ import javax.annotation.Resource;
 import javax.sql.DataSource;
 
 import org.esupportail.nfctag.domain.AppliVersion;
+import org.esupportail.nfctag.domain.Application;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -22,7 +23,7 @@ public class DbToolService {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	final static String currentEsupSgcVersion = "2.3.x";
+	final static String currentEsupSgcVersion = "2.4.x";
 		
 	@Resource
 	DataSource dataSource;
@@ -82,6 +83,14 @@ public class DbToolService {
 	    				"Mise en place des triggers" +
 	    				"\n#####\n");
 				log.warn("Mise à jour de numero de version : 2.3.x");
+			}
+			
+			if ("2.3.x".equals(esupSgcVersion)) {
+				esupSgcVersion = "2.4.x";
+				for(Application app : Application.findAllApplications()) {
+					app.setSgcClientApp(false);
+				}
+				log.warn("Mise à jour de numero de version : 2.4.x");
 			}
 				
 			log.warn("\n\n#####\n\t" +

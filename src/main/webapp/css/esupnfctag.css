@@ -376,3 +376,9 @@ background-color: #c9302c;
 	height: 40px;
 	background-size: 40px;
 }
+
+#esup-nfc-tag-stats canvas {
+	width: 354px;
+	height: 100%;
+	max-height: 400px;	
+}

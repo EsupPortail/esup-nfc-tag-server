@@ -44,12 +44,12 @@ var nbTagLastHour = ${nbTagLastHour};
    	</select>
    </h1>
    </form>
-	<div class="row">
+	<div class="row" id="esup-nfc-tag-stats">
 		<div class="col-lg-12" >
 		<div class="panel panel-primary">
 		<div class="panel-heading"><h5>Tags by month</h5></div>
 		<div class="panel-body ">
-		<canvas height="354" width="354" id="tagsByWeek" style="display: block; width: 354px; height: 354px;"><!--  --></canvas>
+		<canvas id="tagsByWeek" height="454"><!--  --></canvas>
 		</div>
 		</div>
 		</div>
@@ -58,7 +58,7 @@ var nbTagLastHour = ${nbTagLastHour};
 		<div class="panel panel-primary">
 		<div class="panel-heading"><h5>Tags by location</h5></div>
 		<div class="panel-body ">
-		<canvas height="354" width="354" id="tagsByLocation" style="display: block; width: 354px; height: 354px;"><!--  --></canvas>
+		<canvas height="454" id="tagsByLocation"><!--  --></canvas>
 		</div>
 		</div>
 		</div>
@@ -67,7 +67,7 @@ var nbTagLastHour = ${nbTagLastHour};
 		<div class="panel panel-primary">
 		<div class="panel-heading"><h5>Devices by Application : ${nbDevice}</h5></div>
 		<div class="panel-body ">
-		<canvas height="454" width="354" id="deviceByUserAgent" style="display: block; width: 354px; height: 354px;"><!--  --></canvas>
+		<canvas height="454" id="deviceByUserAgent"><!--  --></canvas>
 		</div>
 		</div>
 		</div>
@@ -76,7 +76,7 @@ var nbTagLastHour = ${nbTagLastHour};
 		<div class="panel panel-primary">
 		<div class="panel-heading"><h5>Tags last hour : ${nbTagLastHour}</h5></div>
 		<div class="panel-body ">
-		<canvas height="354" width="354" id="nbTagLastHour" style="display: block; width: 354px; height: 354px;"><!--  --></canvas>
+		<canvas height="454" id="nbTagLastHour"><!--  --></canvas>
 		</div>
 		</div>
 		</div>

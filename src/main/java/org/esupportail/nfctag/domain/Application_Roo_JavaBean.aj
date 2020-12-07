@@ -82,6 +82,14 @@ privileged aspect Application_Roo_JavaBean {
         this.active = active;
     }
     
+    public boolean Application.isSgcClientApp() {
+        return this.sgcClientApp;
+    }
+    
+    public void Application.setSgcClientApp(boolean sgcClientApp) {
+        this.sgcClientApp = sgcClientApp;
+    }
+    
     public Boolean Application.getValidateAuthWoConfirmationDefault() {
         return this.validateAuthWoConfirmationDefault;
     }

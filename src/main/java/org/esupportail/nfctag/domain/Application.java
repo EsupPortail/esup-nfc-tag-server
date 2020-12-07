@@ -17,6 +17,7 @@
  */
 package org.esupportail.nfctag.domain;
 import javax.annotation.Resource;
+import javax.persistence.Column;
 import javax.persistence.Transient;
 import javax.validation.constraints.NotNull;
 import org.esupportail.nfctag.service.ApplisExtService;
@@ -59,8 +60,11 @@ public class Application {
     private String tagIdCheck;
 
     private String description;
-
+    
     private boolean active = true;
+    
+    @Column
+    private Boolean sgcClientApp = false;
 
     public String getNfcConfigDesc() {
         NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(this.nfcConfig);

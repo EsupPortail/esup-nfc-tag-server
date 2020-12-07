@@ -108,7 +108,7 @@ public class StatsService {
 	public List<Object[]> countNumberTagByLocation(String annee) {
 		EntityManager em = TagLog.entityManager();
 		Query q = em.createNativeQuery(
-				"SELECT location as labels, count(id) as value FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + "GROUP BY location ORDER BY value DESC");
+				"SELECT location as labels, count(id) as value FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + "GROUP BY location ORDER BY value DESC LIMIT 25");
 		return q.getResultList();
 	}
 	

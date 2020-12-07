@@ -10,6 +10,7 @@
     <spring:url value="/resources/css/bootstrap-select.min.css" var="select_css_url" />
 	<spring:url value="/resources/css/bootstrap-datepicker.min.css" var="datepicker_css_url" />
 	<spring:url value="/resources/css/tabdrop.css" var="tabdrop_css_url" />
+	<spring:url value="/resources/css/Chart.css" var="chart_css_url" />
 	<spring:url value="/resources/css/esupnfctag.css" var="esupnfctag_css_url" />
 	
 	<spring:url value="/resources/js/jquery-2.2.4.min.js" var="jquery_url" />
@@ -43,6 +44,7 @@
 	<link rel="stylesheet" type="text/css" href="${datepicker_css_url}" />
     <link rel="stylesheet" type="text/css" href="${select_css_url}" />
 	<link rel="stylesheet" type="text/css" href="${tabdrop_css_url}" />
+	<link rel="stylesheet" type="text/css" href="${chart_css_url}" />
 	<link rel="stylesheet" type="text/css" href="${esupnfctag_css_url}" />
   
 	<link rel="SHORTCUT ICON" href="${favicon}" />

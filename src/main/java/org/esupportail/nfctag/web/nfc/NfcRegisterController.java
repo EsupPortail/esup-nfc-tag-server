@@ -204,7 +204,10 @@ public class NfcRegisterController {
 		for(Application application : applications) {
 			String nfcAuthConfigKey = application.getNfcConfig(); 
 			NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(nfcAuthConfigKey);
-			if(nfcAuthConfig.getClass().equals(DesfireWriteConfig.class)) {
+			if(application.isSgcClientApp()) {
+				writeSgcApplication = application;
+			}
+			if(writeSgcApplication == null && nfcAuthConfig.getClass().equals(DesfireWriteConfig.class)) {
 				writeSgcApplication = application;
 			}
 		}

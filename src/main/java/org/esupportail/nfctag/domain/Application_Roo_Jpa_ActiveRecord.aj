@@ -14,7 +14,7 @@ privileged aspect Application_Roo_Jpa_ActiveRecord {
     @PersistenceContext
     transient EntityManager Application.entityManager;
     
-    public static final List<String> Application.fieldNames4OrderClauseFilter = java.util.Arrays.asList("applisExtService", "nfcAuthConfigService", "tagIdCheckService", "name", "nfcConfig", "appliExt", "tagIdCheck", "description", "active", "validateAuthWoConfirmationDefault");
+    public static final List<String> Application.fieldNames4OrderClauseFilter = java.util.Arrays.asList("applisExtService", "nfcAuthConfigService", "tagIdCheckService", "name", "nfcConfig", "appliExt", "tagIdCheck", "description", "active", "sgcClientApp", "validateAuthWoConfirmationDefault");
     
     public static final EntityManager Application.entityManager() {
         EntityManager em = new Application().entityManager;

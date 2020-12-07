@@ -16,6 +16,7 @@
         <field:input field="applisExtService" id="c_org_esupportail_nfctag_domain_Application_applisExtService" render="false" z="user-managed"/>
         <field:input field="nfcAuthConfigService" id="c_org_esupportail_nfctag_domain_Application_nfcAuthConfigService" render="false" z="user-managed"/>
         <field:input field="tagIdCheckService" id="c_org_esupportail_nfctag_domain_Application_tagIdCheckService" render="false" z="user-managed"/>
+        <field:checkbox field="sgcClientApp" id="c_org_esupportail_nfctag_domain_Application_sgcClientApp" z="s3GL/RoNS4J9ZQQK9iQga1wZCeI="/>
     </form:create>
     <form:dependency dependencies="${dependencies}" id="d_org_esupportail_nfctag_domain_Application" render="${not empty dependencies}" z="user-managed"/>
 </div>
