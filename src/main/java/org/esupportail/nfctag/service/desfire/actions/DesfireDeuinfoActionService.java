@@ -10,7 +10,7 @@ import org.esupportail.nfctag.service.TagAuthService;
 import org.esupportail.nfctag.service.api.TagIdCheckApi.TagType;
 import org.esupportail.nfctag.service.api.impl.DesfireReadConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireReadDeuinfoConfig;
-import org.esupportail.nfctag.service.api.impl.DesfireReadUidConfig;
+import org.esupportail.nfctag.service.api.impl.DesfireReadUidWithAuthConfig;
 import org.esupportail.nfctag.service.desfire.DESFireEV1Service.KeyType;
 import org.esupportail.nfctag.service.desfire.DESFireEV1Service.Response;
 import org.esupportail.nfctag.service.desfire.DesfireService;
@@ -50,24 +50,14 @@ public class DesfireDeuinfoActionService extends DesfireActionService {
 	public NfcResultBean process(String eppnInit, Response response, String numeroId, String cardId, String result) {
 		NfcResultBean nfcResultBean = null;
 		if(step == Step.NONE) {
-			desfireReadConfig = new DesfireReadUidConfig();
+			// now get escn
+			desfireReadConfig = new DesfireReadConfig();
+			desfireReadConfig.setDesfireAppId("F58840");
+			desfireReadConfig.setDesfireFileNumber("00");
 			currentDesfireActionService = desfireReadConfig.getDesfireActionService(desfireService, null, null);
-			step = Step.UID;
+			step = Step.ESCN;
+			result = "";
 		}
-		if(Step.UID.equals(step)) {
-			nfcResultBean = currentDesfireActionService.process(eppnInit, response, numeroId, cardId, result);
-			if(!StringUtils.isEmpty(currentDesfireActionService.desfireId)) {
-				uid = currentDesfireActionService.desfireId;
-				log.info("Got uid : " + uid);
-				// now get escn
-				desfireReadConfig = new DesfireReadConfig();
-				desfireReadConfig.setDesfireAppId("F58840");
-				desfireReadConfig.setDesfireFileNumber("00");
-				currentDesfireActionService = desfireReadConfig.getDesfireActionService(desfireService, null, null);
-				step = Step.ESCN;
-				result = "";
-			}
-		} 
 		if(Step.ESCN.equals(step)) {
 			nfcResultBean = currentDesfireActionService.process(eppnInit, response, numeroId, cardId, result);
 			if(!StringUtils.isEmpty(currentDesfireActionService.desfireId)) {
@@ -77,6 +67,7 @@ public class DesfireDeuinfoActionService extends DesfireActionService {
 					// now check key escn
 					step = Step.CHECK_KEY_ESCN;
 					result = "";
+					currentDesfireActionService = desfireReadConfig.getDesfireActionService(desfireService, null, null);
 				} else {
 					log.warn("baseKey for deuinfo is not setup ; we didn't check auth on diversified keys");
 					// now get signature
@@ -96,11 +87,27 @@ public class DesfireDeuinfoActionService extends DesfireActionService {
 			nfcResultBean = desfireService.authApp4ckeckKey(aid, result, key, keyNo, KeyType.AES);
 			if(nfcResultBean.getFullApdu() == null) {			
 				log.info("Auth with escn diversified key ok");
-				// now check key uid
+				// now get uid with authentication and getCardUID APDU (to handle desfire random uid feature) 
+				desfireReadConfig = new DesfireReadUidWithAuthConfig();
+				desfireReadConfig.setDesfireAppId("F58840");
+				desfireReadConfig.setDesfireFileNumber("01");
+				desfireReadConfig.setDesfireKeyNumber("01");
+				desfireReadConfig.setDesfireKey(desfireReadDeuinfoConfig.getDesfireDiversifiedKey(escn));
+				currentDesfireActionService = desfireReadConfig.getDesfireActionService(desfireService, null, null);
+				result = "";
+				step = Step.UID;
+			}
+		}
+		if(Step.UID.equals(step)) {
+			nfcResultBean = currentDesfireActionService.process(eppnInit, response, numeroId, cardId, result);
+			if(!StringUtils.isEmpty(currentDesfireActionService.desfireId)) {
+				uid = currentDesfireActionService.desfireId;
+				log.debug("Got uid : " + uid);
+				// now check key  uid
 				step = Step.CHECK_KEY_UID;
 				result = "";
 			}
-		}
+		} 
 		if(Step.CHECK_KEY_UID.equals(step)) {
 			byte[] aid = DesfireUtils.hexStringToByteArray("F58840");
 			byte keyNo = DesfireUtils.hexStringToByte("02");

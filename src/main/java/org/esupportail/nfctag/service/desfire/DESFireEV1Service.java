@@ -767,6 +767,7 @@ public class DESFireEV1Service extends SimpleSCR {
 		byte[] apdu = new byte[5];
 		apdu[0] = (byte) 0x90;
 		apdu[1] = (byte) Command.GET_CARD_UID.getCode();
+		this.preprocess(apdu, CommunicationSetting.PLAIN);
 		return Dump.hex(apdu).replace(" ", "").toUpperCase();
 	}
 

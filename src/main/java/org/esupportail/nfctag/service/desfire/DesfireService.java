@@ -38,7 +38,6 @@ import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
 import org.esupportail.nfctag.service.api.TagWriteApi;
 import org.esupportail.nfctag.service.api.impl.DesfireReadConfig;
-import org.esupportail.nfctag.service.api.impl.DesfireReadUidWithAuthConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireUpdateConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireWriteConfig;
 import org.esupportail.nfctag.service.desfire.DESFireEV1Service.KeyType;
@@ -124,9 +123,8 @@ public NfcResultBean readUid(String result){
 		}
 		return authResultBean;
 	}
-
 	
-	public NfcResultBean readUidWithAuth(String result){
+	public NfcResultBean readUidWithAuth(String result, DesfireReadConfig desfireReadConfig){
 		
 		if(result.length()==0){
 			reset();
@@ -135,16 +133,17 @@ public NfcResultBean readUid(String result){
 		
 		NfcResultBean authResultBean = new NfcResultBean();
 		authResultBean.setCode(CODE.OK);
-		DesfireReadUidWithAuthConfig desfireReadConfig = (DesfireReadUidWithAuthConfig) desfireAuthSession.getDesfireAuthConfig();
 		byte[] aid = DesfireUtils.hexStringToByteArray(desfireReadConfig.getDesfireAppId());
 		byte[] key = DesfireUtils.hexStringToByteArray(desfireReadConfig.getDesfireKey());
+		byte keyNo = DesfireUtils.hexStringToByte(desfireReadConfig.getDesfireKeyNumber());
 		
 		switch(desfireFlowStep.action){
 			case SELECT_ROOT:
-				log.debug("ReadUid - Step : Select root");
-				authResultBean = this.authApp(aid, result, key, (byte) 0x00, KeyType.AES);
+				log.debug("ReadUid - Step : auth on app / key");
+				authResultBean = this.authApp(aid, result, key, keyNo, KeyType.AES);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
+					log.debug("ReadUid - Step : getCardUID");
 					authResultBean.setFullApdu(desFireEV1Service.getCardUID());
 					desfireFlowStep.action = Action.END;
 				}
@@ -996,11 +995,9 @@ public NfcResultBean readUid(String result){
 	public String decriptUid(String apdu){
 		log.debug("APDU to decript : " + apdu);
 		byte[] resultByte = DesfireUtils.hexStringToByteArray(apdu);
-		int length = 14;
-		byte[] resultDecript = desFireEV1Service.preprocess(resultByte, DESFireEV1Service.CommunicationSetting.ENCIPHERED);
+		byte[] resultDecript = desFireEV1Service.postprocess(resultByte, 7, DESFireEV1Service.CommunicationSetting.ENCIPHERED);
 		String hexaResult =  DesfireUtils.byteArrayToHexString(resultDecript);
 		log.info("En hexa : " + hexaResult);
-		log.info("En hexa : " + hexaResult.substring(0, length));
 		return hexaResult;
 	}
 

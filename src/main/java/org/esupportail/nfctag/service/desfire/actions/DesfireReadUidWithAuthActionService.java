@@ -27,20 +27,20 @@ public class DesfireReadUidWithAuthActionService extends DesfireActionService {
 
 	@Override
 	NfcResultBean computeNfcResultBean(String result, String eppnInit, String cardId) {
-		NfcResultBean nfcResultBean = desfireService.readUidWithAuth(result);
+		NfcResultBean nfcResultBean = desfireService.readUidWithAuth(result, desfireReadConfig);
 		return nfcResultBean;
 	}
 	
 	@Override
 	TagType getTagType() {
-		return TagType.CSN;
+		return TagType.DESFIRE;
 	}
 	
 	@Override
 	String getDesfireId(String result) {
 		log.debug("UID  : " + result);
 		String desfireId = desfireService.decriptUid(result);
-		log.debug("UID descrypted  : " + desfireId);
+		log.debug("UID decrypted  : " + desfireId);
 		return desfireId;
 	}
 	
