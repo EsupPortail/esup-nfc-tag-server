@@ -480,7 +480,7 @@ public NfcResultBean readUid(String result){
 							log.debug("Iso Application NOT requested via nok");
 							assert(desfireApp.getIsoId() == null && desfireApp.getIsoName() == null);
 						}				
-						authResultBean.setFullApdu(desFireEV1Service.createApplication(DesfireUtils.swapPairsByte(aid),amks, nok,(nok|0x20)==nok, desfireApp.getIsoId(), desfireApp.getIsoName()));
+						authResultBean.setFullApdu(desFireEV1Service.createApplication(DesfireUtils.swapPairsByte(aid),amks, nok,(nok|0x20)==nok, desfireApp.getLsbIsoId(), desfireApp.getIsoName()));
 						authResultBean.setSize(0);
 						if(appKey != null){
 							desfireFlowStep.action = Action.CHANGE_APP_MASTER_KEY;
@@ -814,7 +814,7 @@ public NfcResultBean readUid(String result){
 						log.debug("Iso Application NOT requested via nok");
 						assert(desfireApp.getIsoId() == null && desfireApp.getIsoName() == null);
 					}				
-					authResultBean.setFullApdu(desFireEV1Service.createApplication(DesfireUtils.swapPairsByte(aid),amks, nok,(nok|0x20)==nok, desfireApp.getIsoId(), desfireApp.getIsoName()));
+					authResultBean.setFullApdu(desFireEV1Service.createApplication(DesfireUtils.swapPairsByte(aid),amks, nok,(nok|0x20)==nok, desfireApp.getLsbIsoId(), desfireApp.getIsoName()));
 					authResultBean.setSize(0);
 					desfireFlowStep.action = Action.CHANGE_APP_MASTER_KEY;
 					break;

@@ -8,6 +8,7 @@ import javax.annotation.PostConstruct;
 import org.esupportail.nfctag.service.api.TagWriteApi;
 import org.esupportail.nfctag.service.api.impl.TagLastUpdateRestWs;
 import org.esupportail.nfctag.service.api.impl.TagWriteNone;
+import org.esupportail.nfctag.service.desfire.DesfireUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +107,13 @@ public class DesfireApplication implements Serializable {
 
 	public void setIsoId(String isoId) {
 		this.isoId = isoId;
+	}
+	
+	public String getLsbIsoId() {
+		if(isoId==null) {
+			return null;
+		}
+		return DesfireUtils.swapPairs(DesfireUtils.hexStringToByteArray(isoId));
 	}
 
 	public String getIsoName() {
