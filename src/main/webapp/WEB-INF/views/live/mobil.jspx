@@ -2,7 +2,18 @@
 	<jsp:directive.page contentType="text/html;charset=UTF-8" />
 	<jsp:output omit-xml-declaration="yes" />
 
-
+	<c:if test="${application.displayAppNameBlock}">
+	  <div class="panel panel-success">
+	    <div class="panel-heading">
+	      <h2 class="panel-title" onclick="document.getElementById('description').classList.toggle('hide');">${application.name}</h2>
+	   </div>
+	   <div class="panel-body hide" id="description">
+	     <c:if test="${not empty application.description}">
+	 	<pre>${application.description}</pre>
+	    </c:if>
+	    </div>
+	  </div>
+	</c:if>
 
 	<c:if test="${not empty backgroundColor}">
 	<style>

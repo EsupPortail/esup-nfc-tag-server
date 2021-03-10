@@ -104,6 +104,7 @@ public class LiveLongPoolController {
 
 				uiModel.addAttribute("pageHeader", appliExtApi.getHeader());
 				uiModel.addAttribute("backgroundColor", appliExtApi.getBackgroundColor());
+				uiModel.addAttribute("application", app);
 				uiModel.addAttribute("isActiv", app.isActive());
 				uiModel.addAttribute("isDisplay", appliExtApi.isDisplay());
 				uiModel.addAttribute("imei", device.getImei());
