@@ -21,7 +21,6 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -29,7 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.transaction.Transactional;
 
 import org.apache.commons.io.IOUtils;
-import org.esupportail.nfctag.domain.AppLocation;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
@@ -67,16 +65,14 @@ public class NfcIndexController {
 	private ApplicationsService applicationsService;
 
 	@RequestMapping
-	public String index(@RequestParam(required=false) String numeroId, 
+	public String index(@RequestParam(required=false) String numeroId,
 			@RequestParam(required=false) String imei,
 			@RequestParam(required=false) String macAddress,
 			@RequestParam(required=false) String apkVersion,
 			@RequestParam(required=false) String jarVersion) {
 
-		if(imei.equals("esupSgcClient") && (numeroId == null || numeroId.equals(""))) {
-			
+		if(imei.equals("esupSgcClient") && (numeroId == null || numeroId.equals(""))) {		
 			return "redirect:/nfc/register-sgc?userAgent=esup-sgc-client&imei=" + imei + "&macAddress=" + macAddress;
-
 		}
 		
 		if(apkVersion == null) {
@@ -91,7 +87,7 @@ public class NfcIndexController {
 					return "redirect:/nfc-index/download?jarVersion=" + versionJarService.getJarVersion();
 				}
 			}
-		}else{
+		} else {
 			if(!versionApkService.isSkipApkVersion()) {
 				if(!versionApkService.isUserApkVersionUp2Date(apkVersion)){
 					return "redirect:/nfc-index/download?apkVersion=" + versionApkService.getApkVersion();
@@ -186,15 +182,15 @@ public class NfcIndexController {
 		log.info("eppn init : " + eppn);
 		
 		try {
-			List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppn, true);
-			if (appLocations.isEmpty()) {
+			List<Application> applications = applicationsService.getApplications4Eppn(eppn, true);
+			if (applications.isEmpty()) {
 				log.info(eppn + " don't have location to manage");
 				throw new AccessDeniedException(eppn + " don't have location to manage");
 			}
 			uiModel.addAttribute("numeroId", numeroId);
 			uiModel.addAttribute("macAddress", device.getMacAddress());
 			uiModel.addAttribute("imei", device.getImei());
-			uiModel.addAttribute("appLocations", appLocations);
+			uiModel.addAttribute("applications", applications);
 			uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
 			uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
 		} catch (EmptyResultDataAccessException ex) {
@@ -233,9 +229,7 @@ public class NfcIndexController {
 		Application application = Application.findApplication(applicationId);
 		
 		// check right access ...
-		List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppnInit, true);
-		Optional<AppLocation> appLocation = appLocations.stream().filter(appLoc -> appLoc.getApplication().getId().equals(applicationId)).findAny();
-		if(!appLocation.isPresent() || !appLocation.get().getLocations().contains(location)) {
+		if(!applicationsService.hasApplicationLocationRightAcces(eppnInit, applicationId, location)) {
 			log.warn(eppnInit + " can not register in this location " + location);
 			throw new AccessDeniedException(eppnInit + " can not register in this location " + location);
 		}

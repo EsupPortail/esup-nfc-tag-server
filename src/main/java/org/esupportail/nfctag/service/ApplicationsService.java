@@ -22,7 +22,6 @@ import java.util.List;
 
 import javax.annotation.Resource;
 
-import org.esupportail.nfctag.domain.AppLocation;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
@@ -32,6 +31,7 @@ import org.esupportail.nfctag.service.api.NfcAuthConfig;
 import org.esupportail.nfctag.service.api.TagIdCheckApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -61,44 +61,70 @@ public class ApplicationsService {
 		}
 		return application;
 	}
-
-	public List<AppLocation> getAppsLocations4Eppn(String eppn, boolean checkActive) throws EsupNfcTagException {
-		List<AppLocation> appLocations = new ArrayList<AppLocation>();
+	
+	public List<Application> getApplications4Eppn(String eppn, boolean checkActive) throws EsupNfcTagException {
+		List<Application> applications = new ArrayList<Application>();
 		for(Application appli: Application.findAllApplications()) {
 			AppliExtApi appliExtApi = applisExtService.get(appli.getAppliExt());
-			AppLocation appLocation = new AppLocation(appli, true);
 			try {
 				List<String> locations = appliExtApi.getLocations4Eppn(eppn);
 				if(locations.size()>0 && (appli.isActive() || !checkActive)) { 
-					appLocation.setLocations(locations);
+					appli.setLocations(locations);
 				}
 			} catch(Exception e) {
 				log.error("Exception on" + appli.getName() + "!");
-				appLocation.setAvailable(false);
+				appli.setAvailable(false);
 			}
-			appLocations.add(appLocation);
+			if(!appli.getLocations().isEmpty() || !appli.getAvailable()) {
+				applications.add(appli);
+			}
 		}
-		return appLocations;
+		applications.sort((a1, a2) -> { 
+			int cmp = a2.getAvailable().compareTo(a1.getAvailable());
+			if(cmp==0) {
+				cmp =  Integer.compare(a2.getLocations().size(), a1.getLocations().size());
+			}
+			if(cmp==0) {
+				if(a1.getLocations().size()==1 && a2.getLocations().size()==1) {
+					cmp =  a1.getLocations().get(0).compareTo( a2.getLocations().get(0));
+				} else {
+					cmp =  a1.getName().compareTo(a2.getName());
+				}
+			}
+			return cmp;
+		});
+		return applications;
 	}
 	
-	public List<AppLocation> getAppLocations4Eppn(String eppn, long applicationId, boolean checkActive) throws EsupNfcTagException {
-		List<AppLocation> appLocations = new ArrayList<AppLocation>();
+	
+	public Application getSgcClientApplication4Eppn(String eppn) throws EsupNfcTagException {
+		List<Application> applications = Application.findApplicationsBySgcClientApp(true).getResultList();
+		if(applications.isEmpty()) {
+			throw new AccessDeniedException("Pas d'application d'écriture pour esup-sgc-client de trouvé");
+		}
+		if(applications.size()>1) {
+			log.warn("Plus d'1 application d'écriture pour esup-sgc-client de trouvées !?");
+		}
+		Application appli = applications.get(0);
+		AppliExtApi appliExtApi = applisExtService.get(appli.getAppliExt());
+		appli.setLocations(appliExtApi.getLocations4Eppn(eppn));
+		return appli;
+	}
+	
+
+	public boolean hasApplicationLocationRightAcces(String eppn, Long applicationId, String location) {
 		Application appli = Application.findApplication(applicationId);
 		AppliExtApi appliExtApi = applisExtService.get(appli.getAppliExt());
-		AppLocation appLocation = new AppLocation(appli, true);
 		try {
 			List<String> locations = appliExtApi.getLocations4Eppn(eppn);
-			if(locations.size()>0 && (appli.isActive() || !checkActive)) { 
-				appLocation.setLocations(locations);
-			}
+			return locations.contains(location);
 		} catch(Exception e) {
 			log.error("Exception on" + appli.getName() + "!");
-			appLocation.setAvailable(false);
 		}
-		appLocations.add(appLocation);
-		return appLocations;
+		return false;
 	}
-	
+
+
 	public boolean checkApplicationFromNumeroId(String numeroId) throws EsupNfcTagException {
 		boolean isDeviceValid = false;
 		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
@@ -128,3 +154,4 @@ public class ApplicationsService {
 		return isApplicationValid;
 	}
 }
+

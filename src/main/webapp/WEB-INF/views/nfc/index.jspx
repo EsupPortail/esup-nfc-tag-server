@@ -7,28 +7,61 @@
 	<div class="row">
 	<div class="col-lg-12 text-center">
 		<h1><spring:message code="message_location_choice" /></h1>
-		<c:forEach items="${appLocations}" var = "appLocation">
+		<c:forEach items="${applications}" var = "application">
 			<c:choose>
-				<c:when test="${appLocation.available}">
-					<c:forEach items="${appLocation.locations}" var = "location">
-						<hr/>
-						<spring:url value="/nfc-index/register/" var="register_url" htmlEscape="false">
-							<spring:param name="location" value="${location}"/>
-							<spring:param name="applicationId" value="${appLocation.application.id}"/>
-							<spring:param name="imei" value="${imei}"/>
-							<spring:param name="macAddress" value="${macAddress}"/>
-							<spring:param name="apkVersion" value="${apkVersion}"/>
-							<spring:param name="jarVersion" value="${jarVersion}"/>
-							<spring:param name="numeroId" value="${numeroId}"/>
+			  <c:when test="${application.available and application.displayAppNameBlock}">
+				<div class="panel panel-success">
+				  <div class="panel-heading">
+				    <h2 class="panel-title">${application.name}</h2>
+				   </div>
+				   <div class="panel-body">
+				   	    <c:if test="${not empty application.description}">
+					   		<pre>${application.description}</pre>
+				   		</c:if>
+						<c:forEach items="${application.locations}" var = "location" varStatus="status">
+							<spring:url value="/nfc-index/register/" var="register_url" htmlEscape="false">
+								<spring:param name="location" value="${location}"/>
+								<spring:param name="applicationId" value="${application.id}"/>
+								<spring:param name="imei" value="${imei}"/>
+								<spring:param name="macAddress" value="${macAddress}"/>
+								<spring:param name="apkVersion" value="${apkVersion}"/>
+								<spring:param name="jarVersion" value="${jarVersion}"/>
+								<spring:param name="numeroId" value="${numeroId}"/>
+							</spring:url>
+							<a href="${register_url}" class="btn btn-lg btn-success">${location}</a>
+							<c:if test="${not status.last}">
+								<br/><br/>
+							</c:if>
+						</c:forEach>  	
+					</div>
+					</div>
+			</c:when>
+					<c:when test="${application.available}">
+						<spring:url value="/nfc-index/register/" var="register_url"
+							htmlEscape="false">
+							<spring:param name="location" value="${application.locations[0]}" />
+							<spring:param name="applicationId" value="${application.id}" />
+							<spring:param name="imei" value="${imei}" />
+							<spring:param name="macAddress" value="${macAddress}" />
+							<spring:param name="apkVersion" value="${apkVersion}" />
+							<spring:param name="jarVersion" value="${jarVersion}" />
+							<spring:param name="numeroId" value="${numeroId}" />
 						</spring:url>
-						<a href="${register_url}" class="btn btn-lg btn-success">${location}</a>
-					</c:forEach>  	
-				</c:when>
-				<c:otherwise>
-					<hr/>
-					<a class="btn btn-lg btn-danger">${appLocation.application.name} <spring:message code="message_unavailable"/> </a>
-				</c:otherwise>
-			</c:choose>
+						<a href="${register_url}" class="btn btn-lg btn-success">${application.locations[0]}</a>
+						<hr />
+					</c:when>
+					<c:otherwise>
+				<div class="panel panel-danger">
+				  <div class="panel-heading">
+				    <h2 class="panel-title">${application.name}</h2>
+				   </div>
+				    <div class="panel-body">
+				    	<span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+						${application.name} <spring:message code="message_unavailable"/> 
+					</div>
+				</div>
+			</c:otherwise>
+		</c:choose>
 		</c:forEach>
 		<hr/>
 		<div id="debug"><!--  --></div>

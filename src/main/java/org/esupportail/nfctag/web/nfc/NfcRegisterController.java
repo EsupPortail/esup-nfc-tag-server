@@ -20,23 +20,18 @@ package org.esupportail.nfctag.web.nfc;
 import java.io.IOException;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import javax.annotation.Resource;
 import javax.transaction.Transactional;
 
-import org.esupportail.nfctag.domain.AppLocation;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.ApplicationsService;
 import org.esupportail.nfctag.service.DeviceService;
-import org.esupportail.nfctag.service.EsupSgcAuthTokenService;
 import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.VersionApkService;
 import org.esupportail.nfctag.service.VersionJarService;
-import org.esupportail.nfctag.service.api.NfcAuthConfig;
-import org.esupportail.nfctag.service.api.impl.DesfireWriteConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,9 +66,6 @@ public class NfcRegisterController {
 	
 	@Autowired
 	private ApplicationsService applicationsService;
-	
-	@Autowired
-	private EsupSgcAuthTokenService esupSgcAuthTokenService;
 
 	@RequestMapping("/locations")
 	public String selectedLocationForm(
@@ -109,8 +101,8 @@ public class NfcRegisterController {
 		log.info(eppn + "access to /nfc/locations");
 
 		try {
-			List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppn, true);
-			if (appLocations.isEmpty()) {
+			List<Application> applications = applicationsService.getApplications4Eppn(eppn, true);
+			if (applications.isEmpty()) {
 				log.info(eppn + " don't have location to manage");
 				throw new AccessDeniedException(eppn + " don't have location to manage");
 			}
@@ -126,7 +118,7 @@ public class NfcRegisterController {
 			uiModel.addAttribute("numeroId", numeroId);
 			uiModel.addAttribute("macAddress", macAddress);
 			uiModel.addAttribute("imei", imei);
-			uiModel.addAttribute("appLocations", appLocations);
+			uiModel.addAttribute("applications", applications);
 			uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
 			uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
 		} catch (EmptyResultDataAccessException ex) {
@@ -152,15 +144,12 @@ public class NfcRegisterController {
 		String eppnInit = auth.getName();
 		
 		// check right access ...
-		List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppnInit, true);
-		Optional<AppLocation> appLocation = appLocations.stream().filter(appLoc -> appLoc.getApplication().getId().equals(applicationId)).findAny();
-		if(!appLocation.isPresent() || !appLocation.get().getLocations().contains(location)) {
+		if(!applicationsService.hasApplicationLocationRightAcces(eppnInit,  applicationId, location)) {
 			log.warn(eppnInit + " can not register in this location " + location);
 			throw new AccessDeniedException(eppnInit + " can not register in this location " + location);
 		}
 		
 		String numeroId;
-		
 		if (Device.countFindDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)==0) {
 			numeroId = deviceService.generateNumeroId();
 			Device device = new Device();
@@ -199,35 +188,14 @@ public class NfcRegisterController {
 		log.info("start register sgc");
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String eppnInit = auth.getName();
-		List<Application> applications = Application.findAllApplications();
-		Application writeSgcApplication = null;
-		for(Application application : applications) {
-			String nfcAuthConfigKey = application.getNfcConfig(); 
-			NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(nfcAuthConfigKey);
-			if(application.isSgcClientApp()) {
-				writeSgcApplication = application;
-			}
-			if(writeSgcApplication == null && nfcAuthConfig.getClass().equals(DesfireWriteConfig.class)) {
-				writeSgcApplication = application;
-			}
-		}
-		
-		String location = "";
+		Application writeSgcApplication = applicationsService.getSgcClientApplication4Eppn(eppnInit);
+		String location = writeSgcApplication.getLocations().get(0);
 		String numeroId;		
+		
 		// check right access ...
-		if(writeSgcApplication != null) {
-			long applicationId = writeSgcApplication.getId();
-			List<AppLocation> appLocations = applicationsService.getAppsLocations4Eppn(eppnInit, false);
-			System.err.println(appLocations);
-			Optional<AppLocation> appLocation = appLocations.stream().filter(appLoc -> appLoc.getApplication().getId().equals(applicationId)).findAny();
-			if(!appLocation.isPresent() || appLocation.get().getLocations().size() == 0) {
-				log.warn(eppnInit + " can not register in write sgc");
-				throw new AccessDeniedException(eppnInit + " can not register in write sgc");
-			}
-			location = appLocation.get().getLocations().get(0);
-		} else {
-			log.warn(eppnInit + " no write sgc application");
-			throw new AccessDeniedException(eppnInit + " no write sgc application");
+		if(!applicationsService.hasApplicationLocationRightAcces(eppnInit,  writeSgcApplication.getId(), location)) {
+			log.warn(eppnInit + " can not register in write sgc");
+			throw new AccessDeniedException(eppnInit + " can not register in write sgc");
 		}
 		
 		if (Device.countFindDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)==0) {

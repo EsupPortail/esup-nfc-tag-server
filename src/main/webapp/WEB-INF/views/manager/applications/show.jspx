@@ -17,7 +17,10 @@
             <field:display field="validateAuthWoConfirmationDefault" id="s_org_esupportail_nfctag_domain_Application_validateAuthWoConfirmationDefault" object="${application}" z="user-managed"/>
             <field:display field="active" id="s_org_esupportail_nfctag_domain_Application_active" object="${application}" z="user-managed"/>
             <field:display field="sgcClientApp" id="s_org_esupportail_nfctag_domain_Application_sgcClientApp" object="${application}" z="q0FSUmbkZAqkVdg4kHxR6DLtxBA="/>
+                    <field:display field="displayAppNameBlock" id="s_org_esupportail_nfctag_domain_Application_displayAppNameBlock" object="${application}" z="TfCwQklSDLHLLVbnXjvof+ClQAo="/>
         </dl>
-       
+        <field:display field="locations" id="s_org_esupportail_nfctag_domain_Application_locations" object="${application}" render="false" z="user-managed"/>
+        <field:display field="available" id="s_org_esupportail_nfctag_domain_Application_available" object="${application}" render="false" z="user-managed"/>
+
     </page:show>
 </div>

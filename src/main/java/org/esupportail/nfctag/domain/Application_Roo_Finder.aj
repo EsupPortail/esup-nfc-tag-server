@@ -17,6 +17,14 @@ privileged aspect Application_Roo_Finder {
         return ((Long) q.getSingleResult());
     }
     
+    public static Long Application.countFindApplicationsBySgcClientApp(Boolean sgcClientApp) {
+        if (sgcClientApp == null) throw new IllegalArgumentException("The sgcClientApp argument is required");
+        EntityManager em = Application.entityManager();
+        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM Application AS o WHERE o.sgcClientApp = :sgcClientApp", Long.class);
+        q.setParameter("sgcClientApp", sgcClientApp);
+        return ((Long) q.getSingleResult());
+    }
+    
     public static TypedQuery<Application> Application.findApplicationsByNameEquals(String name) {
         if (name == null || name.length() == 0) throw new IllegalArgumentException("The name argument is required");
         EntityManager em = Application.entityManager();
@@ -37,6 +45,29 @@ privileged aspect Application_Roo_Finder {
         }
         TypedQuery<Application> q = em.createQuery(queryBuilder.toString(), Application.class);
         q.setParameter("name", name);
+        return q;
+    }
+    
+    public static TypedQuery<Application> Application.findApplicationsBySgcClientApp(Boolean sgcClientApp) {
+        if (sgcClientApp == null) throw new IllegalArgumentException("The sgcClientApp argument is required");
+        EntityManager em = Application.entityManager();
+        TypedQuery<Application> q = em.createQuery("SELECT o FROM Application AS o WHERE o.sgcClientApp = :sgcClientApp", Application.class);
+        q.setParameter("sgcClientApp", sgcClientApp);
+        return q;
+    }
+    
+    public static TypedQuery<Application> Application.findApplicationsBySgcClientApp(Boolean sgcClientApp, String sortFieldName, String sortOrder) {
+        if (sgcClientApp == null) throw new IllegalArgumentException("The sgcClientApp argument is required");
+        EntityManager em = Application.entityManager();
+        StringBuilder queryBuilder = new StringBuilder("SELECT o FROM Application AS o WHERE o.sgcClientApp = :sgcClientApp");
+        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
+            queryBuilder.append(" ORDER BY ").append(sortFieldName);
+            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
+                queryBuilder.append(" ").append(sortOrder);
+            }
+        }
+        TypedQuery<Application> q = em.createQuery(queryBuilder.toString(), Application.class);
+        q.setParameter("sgcClientApp", sgcClientApp);
         return q;
     }
     

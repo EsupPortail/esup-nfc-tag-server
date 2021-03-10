@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 package org.esupportail.nfctag.domain;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.annotation.Resource;
 import javax.persistence.Column;
 import javax.persistence.Transient;
@@ -32,7 +35,7 @@ import org.springframework.roo.addon.tostring.RooToString;
 
 @RooJavaBean
 @RooToString
-@RooJpaActiveRecord(finders = { "findApplicationsByNameEquals" })
+@RooJpaActiveRecord(finders = { "findApplicationsByNameEquals", "findApplicationsBySgcClientApp" })
 public class Application {
 
     @Transient
@@ -65,6 +68,17 @@ public class Application {
     
     @Column
     private Boolean sgcClientApp = false;
+    
+    private Boolean validateAuthWoConfirmationDefault = false;
+    
+    private Boolean displayAppNameBlock = false;
+    
+    @Transient
+    private List<String> locations = new ArrayList<String>();
+    
+    @Transient
+    private Boolean available = true;
+	
 
     public String getNfcConfigDesc() {
         NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(this.nfcConfig);
@@ -93,7 +107,4 @@ public class Application {
         }
     }
 
-    /**
-     */
-    private Boolean validateAuthWoConfirmationDefault;
 }

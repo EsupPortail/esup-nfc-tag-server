@@ -315,7 +315,15 @@ span.error {
 	}
 }
 
+.panel {
+background-color: #ccc;
+}
 
+.panel-danger>.panel-heading {
+background-color: #c9302c;
+color: white;
+}
+ 
 .btn-danger{
 background-color: #c9302c;	
 }

@@ -3,6 +3,7 @@
 
 package org.esupportail.nfctag.domain;
 
+import java.util.List;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.service.ApplisExtService;
 import org.esupportail.nfctag.service.NfcAuthConfigService;
@@ -82,11 +83,11 @@ privileged aspect Application_Roo_JavaBean {
         this.active = active;
     }
     
-    public boolean Application.isSgcClientApp() {
+    public Boolean Application.getSgcClientApp() {
         return this.sgcClientApp;
     }
     
-    public void Application.setSgcClientApp(boolean sgcClientApp) {
+    public void Application.setSgcClientApp(Boolean sgcClientApp) {
         this.sgcClientApp = sgcClientApp;
     }
     
@@ -96,6 +97,30 @@ privileged aspect Application_Roo_JavaBean {
     
     public void Application.setValidateAuthWoConfirmationDefault(Boolean validateAuthWoConfirmationDefault) {
         this.validateAuthWoConfirmationDefault = validateAuthWoConfirmationDefault;
+    }
+    
+    public Boolean Application.getDisplayAppNameBlock() {
+        return this.displayAppNameBlock;
+    }
+    
+    public void Application.setDisplayAppNameBlock(Boolean displayAppNameBlock) {
+        this.displayAppNameBlock = displayAppNameBlock;
+    }
+    
+    public List<String> Application.getLocations() {
+        return this.locations;
+    }
+    
+    public void Application.setLocations(List<String> locations) {
+        this.locations = locations;
+    }
+    
+    public Boolean Application.getAvailable() {
+        return this.available;
+    }
+    
+    public void Application.setAvailable(Boolean available) {
+        this.available = available;
     }
     
 }

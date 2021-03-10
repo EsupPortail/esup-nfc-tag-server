@@ -32,7 +32,6 @@ import javax.persistence.criteria.Root;
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
-import org.esupportail.nfctag.domain.AppLocation;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.domain.TagLog;
@@ -173,14 +172,14 @@ public class DeviceController {
 			) {
 		List<String> json = new ArrayList<String>();
 		try {
-			List<AppLocation> appLocations = applicationsService.getAppLocations4Eppn(eppn, applicationId, false);
-			if (appLocations.isEmpty()) {
-				log.info(eppn + " don't have location to manage");
-				throw new AccessDeniedException(eppn + " don't have location to manage");
+			List<Application> applications = applicationsService.getApplications4Eppn(eppn, false);
+			if (applications.isEmpty()) {
+				log.info(eppn + " don't have applications to manage");
+				throw new AccessDeniedException(eppn + " don't have applications to manage");
 			}
-			for (AppLocation appLocation : appLocations) {
-				if(appLocation.getApplication().getId().equals(applicationId)){
-					for (String locationName : appLocation.getLocations()) {
+			for (Application application : applications) {
+				if(application.getId().equals(applicationId)){
+					for (String locationName : application.getLocations()) {
 						json.add(locationName);
 					}
 				}
