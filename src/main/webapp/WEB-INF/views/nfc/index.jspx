@@ -37,9 +37,10 @@
 					</div>
 			</c:when>
 					<c:when test="${application.available}">
+ 				            <c:forEach items="${application.locations}" var = "location" varStatus="status">
 						<spring:url value="/nfc-index/register/" var="register_url"
 							htmlEscape="false">
-							<spring:param name="location" value="${application.locations[0]}" />
+							<spring:param name="location" value="${location}" />
 							<spring:param name="applicationId" value="${application.id}" />
 							<spring:param name="imei" value="${imei}" />
 							<spring:param name="macAddress" value="${macAddress}" />
@@ -47,8 +48,9 @@
 							<spring:param name="jarVersion" value="${jarVersion}" />
 							<spring:param name="numeroId" value="${numeroId}" />
 						</spring:url>
-						<a href="${register_url}" class="btn btn-lg btn-success">${application.locations[0]}</a>
+						<a href="${register_url}" class="btn btn-lg btn-success">${location}</a>
 						<hr />
+                                          </c:forEach>
 					</c:when>
 					<c:otherwise>
 				<div class="panel panel-danger">
