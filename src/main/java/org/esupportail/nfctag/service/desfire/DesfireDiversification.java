@@ -105,6 +105,11 @@ public class DesfireDiversification {
 		rb_xor_value = (byte) 0x87;
 		block_size = 16;
 
+		for (i = 0; i < 16; i++)
+		{
+			cmac_subkey_0[i] = cmac_subkey_1[i] = cmac_subkey_2[i] = 0x00;
+		}
+
 		cmac_subkey_0 = encrypt(base_key, cmac_subkey_0, init_vector);
 		cmac_subkey_1 = Arrays.copyOf(cmac_subkey_0, cmac_subkey_0.length);
 		// If the MSBit of the generated cipher == 1 -> K1 = (cipher << 1) ^ Rb ...
