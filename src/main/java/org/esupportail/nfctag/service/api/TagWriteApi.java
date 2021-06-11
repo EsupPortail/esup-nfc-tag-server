@@ -23,4 +23,10 @@ public interface TagWriteApi {
 
 	String getIdFromCsn(String csn) throws EsupNfcTagException;
 
+	String createDiversDamKey(String csn) throws EsupNfcTagException;
+
+	String getDiversDamKey(String csn) throws EsupNfcTagException;
+
+	String resetDiversDamKey(String csn) throws EsupNfcTagException;
+
 }

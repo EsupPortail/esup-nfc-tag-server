@@ -38,5 +38,20 @@ public class TagWriteNone implements TagWriteApi {
 	public String getIdFromCsn(String csn) throws EsupNfcTagException {
 		return "00";
 	}
-	
+
+	@Override
+	public String createDiversDamKey(String csn) throws EsupNfcTagException {
+		return "00";
+	}
+
+	@Override
+	public String getDiversDamKey(String csn) throws EsupNfcTagException {
+		return "00";
+	}
+
+	@Override
+	public String resetDiversDamKey(String csn) throws EsupNfcTagException {
+		return "00";
+	}
+
 }

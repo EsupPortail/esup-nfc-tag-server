@@ -25,12 +25,17 @@ public class DesfireFlowStep implements Serializable {
 	    CHANGE_PICC_KEY,
 	    UNBRICK, 
 	    SWITCH_TO_AES, AUTH,
-	    FREE_MEMORY
+	    FREE_MEMORY,
+		LOAD_DAM_KEYS
 	}
 	
 	public int authStep = 1;
 	
 	public int writeStep = 0;
+
+	public int damKeysStep = 0;
+
+	public int resetStep = 0;
 	 
 	public Action action;
 	

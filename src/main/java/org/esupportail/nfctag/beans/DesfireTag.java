@@ -31,6 +31,8 @@ public class DesfireTag implements Serializable {
 	 * keyType : AES, DES
 	 */
 	private KeyType keyTypeFinish;
+
+	Boolean loadDamKeys = false;
 	
 	public String getKeyStart() {
 		return keyStart;
@@ -86,6 +88,14 @@ public class DesfireTag implements Serializable {
 
 	public void setFormatBeforeWrite(Boolean formatBeforeWrite) {
 		this.formatBeforeWrite = formatBeforeWrite;
+	}
+
+	public Boolean getLoadDamKeys() {
+		return loadDamKeys;
+	}
+
+	public void setLoadDamKeys(Boolean loadDamKeys) {
+		this.loadDamKeys = loadDamKeys;
 	}
 
 	@Override

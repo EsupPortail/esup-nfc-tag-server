@@ -61,7 +61,7 @@ public class DESFireEV1Service extends SimpleSCR {
 	private byte[] fileSett;  // file settings of the last used file (caching)
 
 	private int code;         // response status code of previous command
-	
+
 	private int payloadSent = 0;
 
 	public DESFireEV1Service() {
@@ -407,6 +407,117 @@ public class DESFireEV1Service extends SimpleSCR {
 		System.arraycopy(ciphertext, 0, apdu, 6, ciphertext.length);
 		return Dump.hex(apdu).replace(" ", "").toUpperCase();
 		
+	}
+
+	public String changeDamKey(byte keyNo, byte keyVersion, KeyType type, byte[] newKey, byte[] oldKey) {
+		if (!validateKey(newKey, type)
+				|| kno != (keyNo & 0x3F)
+				&& (oldKey == null
+				|| ktype == DESFireEV1Service.KeyType.DES && oldKey.length != 8
+				|| ktype == DESFireEV1Service.KeyType.TDES && oldKey.length != 16
+				|| ktype == DESFireEV1Service.KeyType.TKTDES && oldKey.length != 24
+				|| ktype == DESFireEV1Service.KeyType.AES && oldKey.length != 16)) {
+			// basic checks to mitigate the possibility of messing up the keys
+			System.err.println("You're doing it wrong, chief! (changeDamKey: check your args)");
+			this.code = DESFireEV1Service.Response.WRONG_ARGUMENT.getCode();
+			return null;
+		}
+
+		byte[] plaintext = null;
+		byte[] ciphertext = null;
+		int nklen = type == DESFireEV1Service.KeyType.TKTDES ? 24 : 16;  // length of new key
+
+		switch (ktype) {
+			case DES:
+			case TDES:
+				plaintext = type == DESFireEV1Service.KeyType.TKTDES ? new byte[32] : new byte[24];
+				break;
+			case TKTDES:
+			case AES:
+				plaintext = new byte[32];
+				break;
+			default:
+				assert false : ktype; // this point should never be reached
+		}
+		if (type == DESFireEV1Service.KeyType.AES) {
+			plaintext[16] = keyVersion;
+		} else {
+			setKeyVersion(newKey, 0, newKey.length, keyVersion);
+		}
+		System.arraycopy(newKey, 0, plaintext, 0, newKey.length);
+		if (type == DESFireEV1Service.KeyType.DES) {
+			// 8-byte DES keys accepted: internally have to be handled w/ 16 bytes
+			System.arraycopy(newKey, 0, plaintext, 8, newKey.length);
+			newKey = Arrays.copyOfRange(plaintext, 0, 16);
+		}
+
+		// tweak for when changing PICC master key
+		if (Arrays.equals(aid, new byte[3]) && (keyNo & 0x3F) == 0x00) {
+			switch (type) {
+				case TKTDES:
+					keyNo = 0x40;
+					break;
+				case AES:
+					keyNo = (byte) 0x80;
+					break;
+				default:
+					break;
+			}
+		}
+
+		if ((keyNo & 0x3F) != kno) {
+			for (int i = 0; i < newKey.length; i++) {
+				plaintext[i] ^= oldKey[i % oldKey.length];
+			}
+		}
+
+		byte[] tmpForCRC;
+		byte[] crc;
+		int addAesKeyVersionByte = type == DESFireEV1Service.KeyType.AES ? 1 : 0;
+
+		switch (ktype) {
+			case DES:
+			case TDES:
+				crc = CRC16.get(plaintext, 0, nklen + addAesKeyVersionByte);
+				System.arraycopy(crc, 0, plaintext, nklen + addAesKeyVersionByte, 2);
+
+				if ((keyNo & 0x3F) != kno) {
+					crc = CRC16.get(newKey);
+					System.arraycopy(crc, 0, plaintext, nklen + addAesKeyVersionByte + 2, 2);
+				}
+
+				ciphertext = send(this.skey, plaintext, ktype, null);
+				break;
+			case TKTDES:
+			case AES:
+				tmpForCRC = new byte[1 + 1 + nklen + addAesKeyVersionByte];
+				tmpForCRC[0] = (byte) DESFireEV1Service.Command.CHANGE_KEY.getCode();
+				tmpForCRC[1] = keyNo;
+				System.arraycopy(plaintext, 0, tmpForCRC, 2, nklen + addAesKeyVersionByte);
+				crc = CRC32.get(tmpForCRC);
+				System.arraycopy(crc, 0, plaintext, nklen + addAesKeyVersionByte, crc.length);
+
+				if ((keyNo & 0x3F) != kno) {
+					crc = CRC32.get(newKey);
+					System.arraycopy(crc, 0, plaintext, nklen + addAesKeyVersionByte + 4, crc.length);
+				}
+
+				ciphertext = send(this.skey, plaintext, ktype, iv);
+				this.iv = Arrays.copyOfRange(ciphertext, ciphertext.length - iv.length, ciphertext.length);
+				break;
+			default:
+				assert false : ktype; // should never be reached
+		}
+
+		byte[] apdu = new byte[5 + 1 + ciphertext.length + 1];
+		apdu[0] = (byte) 0x90;
+		apdu[1] = (byte) DESFireEV1Service.Command.CHANGE_KEY.getCode();
+		apdu[4] = (byte) (1 + plaintext.length);
+		apdu[5] = keyNo;
+		System.arraycopy(ciphertext, 0, apdu, 6, ciphertext.length);
+
+
+		return Dump.hex(apdu).replace(" ", "").toUpperCase();
 	}
 
 	public String switchToAES(byte[] newKey) {

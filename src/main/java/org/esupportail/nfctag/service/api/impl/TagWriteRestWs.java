@@ -50,21 +50,51 @@ public class TagWriteRestWs implements TagWriteApi {
 		@Override
 	    protected boolean removeEldestEntry(Entry<URI, String> eldest) {
 	        return size() > 200;
-	    }		
+	    }
 	};
-	
+
 	@Resource
-    protected RestTemplate restTemplate;
-    
-    protected String idFromCsnUrlTemplate;
-	
-    protected String getIdFromCsnUrl(String csn){
-    	String url = MessageFormat.format(idFromCsnUrlTemplate, csn);
-    	return url;
-    }
-    
+	protected RestTemplate restTemplate;
+
+	protected String idFromCsnUrlTemplate;
+
+	protected String createDamKeysFromCsnUrlTemplate;
+
+	protected String damKeysFromCsnUrlTemplate;
+
+	protected String resetDamKeysUrlTemplate;
+
+	protected String getIdFromCsnUrl(String csn){
+		String url = MessageFormat.format(idFromCsnUrlTemplate, csn);
+		return url;
+	}
+
 	public void setIdFromCsnUrlTemplate(String idFromCsnUrlTemplate) {
 		this.idFromCsnUrlTemplate = idFromCsnUrlTemplate;
+	}
+
+	public String getCreateDamKeysFromCsnUrl(String csn) {
+		return MessageFormat.format(createDamKeysFromCsnUrlTemplate, csn);
+	}
+
+	public void setCreateDamKeysFromCsnUrlTemplate(String createDamKeysFromCsnUrlTemplate) {
+		this.createDamKeysFromCsnUrlTemplate = createDamKeysFromCsnUrlTemplate;
+	}
+
+	public String getDamKeysFromCsnUrl(String csn) {
+		return MessageFormat.format(damKeysFromCsnUrlTemplate, csn);
+	}
+
+	public void setDamKeysFromCsnUrlTemplate(String damKeysFromCsnUrlTemplate) {
+		this.damKeysFromCsnUrlTemplate = damKeysFromCsnUrlTemplate;
+	}
+
+	public String getResetDamKeysUrl(String csn) {
+		return MessageFormat.format(resetDamKeysUrlTemplate, csn);
+	}
+
+	public void setResetDamKeysUrlTemplate(String resetDamKeysUrlTemplate) {
+		this.resetDamKeysUrlTemplate = resetDamKeysUrlTemplate;
 	}
 
 	@Override
@@ -75,23 +105,60 @@ public class TagWriteRestWs implements TagWriteApi {
 		String id = cacheIdsMap.get(targetUrl);
 		if(id == null) {
 			log.trace("Call " + getIdFromCsnUrl(csn) + " with csn = " + csn);
-			try {
-				id = restTemplate.getForObject(targetUrl, String.class);
-				cacheIdsMap.put(targetUrl, id);
-			} catch(HttpStatusCodeException e){
-				log.warn("tagIdCheck error : " + targetUrl);
-				HttpStatus status = e.getStatusCode();
-			    if (!HttpStatus.NOT_FOUND.equals(status)) {
-			    	throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable);
-			    } else {
-			    	throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_unknowcard);
-			    }
-			}
-			log.trace("Got :  " + id);
+			id = callUrlGetForObject(targetUrl);
 		} else {
 			log.trace("Cache for " + getIdFromCsnUrl(csn) + " with csn = " + csn + " -> " + id);
 		}
 		return id;
 	}
-	
+
+	@Override
+	public String createDiversDamKey(String csn) throws EsupNfcTagException {
+		URI targetUrl= UriComponentsBuilder.fromUriString(getCreateDamKeysFromCsnUrl(csn))
+				.build()
+				.toUri();
+
+		log.trace("Call " + getCreateDamKeysFromCsnUrl(csn) + " with csn = " + csn);
+		return callUrlGetForObject(targetUrl);
+	}
+
+	@Override
+	public String getDiversDamKey(String csn) throws EsupNfcTagException {
+		URI targetUrl= UriComponentsBuilder.fromUriString(getDamKeysFromCsnUrl(csn))
+				.build()
+				.toUri();
+
+		log.trace("Call " + getDamKeysFromCsnUrl(csn) + " with csn = " + csn);
+		return callUrlGetForObject(targetUrl);
+	}
+
+	@Override
+	public String resetDiversDamKey(String csn) throws EsupNfcTagException {
+		URI targetUrl= UriComponentsBuilder.fromUriString(getResetDamKeysUrl(csn))
+				.build()
+				.toUri();
+
+		log.trace("Call " + getResetDamKeysUrl(csn) + " with csn = " + csn);
+
+		return callUrlGetForObject(targetUrl);
+	}
+
+	private String callUrlGetForObject(URI targetUrl) {
+		String id;
+		try {
+			id = restTemplate.getForObject(targetUrl, String.class);
+			cacheIdsMap.put(targetUrl, id);
+		} catch(HttpStatusCodeException e){
+			log.warn("tagIdCheck error : " + targetUrl);
+			HttpStatus status = e.getStatusCode();
+			if (!HttpStatus.NOT_FOUND.equals(status)) {
+				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable);
+			} else {
+				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_unknowcard);
+			}
+		}
+		log.trace("Got :  " + id);
+		return id;
+	}
+
 }
