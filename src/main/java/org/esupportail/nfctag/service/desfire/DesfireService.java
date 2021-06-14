@@ -329,16 +329,11 @@ public NfcResultBean readUid(String result){
 		byte[] piccKeyFinish = null;
 		KeyType piccKeyTypeFinish = null;
 		byte piccKeyVerFinish = 0;
-		byte[] divertKey = null;
 
 		if(desfireTag.getKeyFinish() != null){
 			piccKeyFinish = DesfireUtils.hexStringToByteArray(desfireTag.getKeyFinish());
 			piccKeyTypeFinish = desfireTag.getKeyTypeFinish();
 			piccKeyVerFinish = DesfireUtils.hexStringToByte(desfireTag.getKeyVersionFinish());
-		}
-
-		if (desfireTag.getLoadDamKeys()) {
-			divertKey = DesfireUtils.hexStringToByteArray(desfireTag.getDiversDamBaseKey());
 		}
 
 		DesfireApplication desfireApp = null;
@@ -482,7 +477,7 @@ public NfcResultBean readUid(String result){
 							if (piccKeyFinish != null) {
 								desfireFlowStep.currentApp = 0;
 								desfireFlowStep.action = Action.CHANGE_PICC_KEY;
-							} else if (divertKey != null) {
+							} else if (desfireTag.getLoadDamKeys()) {
 								desfireFlowStep.currentApp = 0;
 								desfireFlowStep.action = Action.LOAD_DAM_KEYS;
 							}
@@ -507,7 +502,7 @@ public NfcResultBean readUid(String result){
 					} else if(piccKeyFinish != null){
 						desfireFlowStep.currentApp = 0;
 						desfireFlowStep.action = Action.CHANGE_PICC_KEY;
-					} else if(divertKey != null){
+					} else if(desfireTag.getLoadDamKeys()){
 						desfireFlowStep.currentApp = 0;
 						desfireFlowStep.action = Action.LOAD_DAM_KEYS;
 					} else {
@@ -558,7 +553,7 @@ public NfcResultBean readUid(String result){
 						} else if(piccKeyFinish != null){
 							desfireFlowStep.currentApp = 0;
 							desfireFlowStep.action = Action.CHANGE_PICC_KEY;
-						} else if(divertKey != null){
+						} else if(desfireTag.getLoadDamKeys()){
 							desfireFlowStep.currentApp = 0;
 							desfireFlowStep.action = Action.LOAD_DAM_KEYS;
 						} else {
@@ -590,7 +585,7 @@ public NfcResultBean readUid(String result){
 							} else if(piccKeyFinish != null){
 								desfireFlowStep.currentApp = 0;
 								desfireFlowStep.action = Action.CHANGE_PICC_KEY;
-							} else if(divertKey != null){
+							} else if(desfireTag.getLoadDamKeys()){
 								desfireFlowStep.currentApp = 0;
 								desfireFlowStep.action = Action.LOAD_DAM_KEYS;
 							}else {
@@ -644,7 +639,7 @@ public NfcResultBean readUid(String result){
 					} else if(piccKeyFinish != null){
 						desfireFlowStep.currentApp = 0;
 						desfireFlowStep.action = Action.CHANGE_PICC_KEY;
-					} else if(divertKey != null){
+					} else if(desfireTag.getLoadDamKeys()){
 						desfireFlowStep.currentApp = 0;
 						desfireFlowStep.action = Action.LOAD_DAM_KEYS;
 					} else {
@@ -659,7 +654,7 @@ public NfcResultBean readUid(String result){
 					desfireFlowStep.authStep = 1;
 					authResultBean.setFullApdu(desFireEV1Service.changeKey((byte) 0x00, piccKeyVerFinish, piccKeyTypeFinish, piccKeyFinish, piccKeyStart));
 					authResultBean.setSize(16);
-					if(divertKey != null){
+					if(desfireTag.getLoadDamKeys()){
 						desfireFlowStep.currentApp = 0;
 						desfireFlowStep.action = Action.LOAD_DAM_KEYS;
 					} else {
