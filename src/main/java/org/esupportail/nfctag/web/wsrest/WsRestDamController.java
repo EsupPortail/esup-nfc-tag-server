@@ -20,7 +20,7 @@ import java.util.List;
 @Controller
 public class WsRestDamController {
 
-    @Autowired
+    @Autowired(required=false)
     private DesfireDiversificationDamService desfireDiversificationDamService;
 
     @RequestMapping(value = "/dam_request_auth_key", method= RequestMethod.GET)

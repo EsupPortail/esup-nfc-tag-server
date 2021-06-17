@@ -61,7 +61,7 @@ public class DesfireService {
 
 	private NfcAuthConfigService nfcAuthConfigService;
 
-	@Autowired
+    @Autowired(required=false)
 	private DesfireDiversificationDamService desfireDiversificationDamService;
 
 	public String tempRead = "";
@@ -435,7 +435,7 @@ public NfcResultBean readUid(String result){
 				authResultBean = this.authApp(piccAid, result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
-					if (desfireFlowStep.resetStep == 0) {
+					if (desfireTag.getLoadDamKeys() && desfireFlowStep.resetStep == 0) {
 						log.debug("Reset DamAuthKey - Step : Format card");
 						try {
 							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x10, (byte) 0x00, KeyType.AES, new byte[16], desfireDiversificationDamService.getDamAuthKey(csn)));
@@ -444,7 +444,7 @@ public NfcResultBean readUid(String result){
 						}
 						authResultBean.setSize(16);
 						desfireFlowStep.resetStep++;
-					} else if (desfireFlowStep.resetStep == 1) {
+					} else if (desfireTag.getLoadDamKeys() && desfireFlowStep.resetStep == 1) {
 						log.debug("Reset DamEncKey - Step : Format card");
 						try {
 							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x12, (byte) 0x00, KeyType.AES, new byte[16], desfireDiversificationDamService.getDamEncKey(csn)));
@@ -453,7 +453,7 @@ public NfcResultBean readUid(String result){
 						}
 						authResultBean.setSize(16);
 						desfireFlowStep.resetStep++;
-					} else if (desfireFlowStep.resetStep == 2) {
+					} else if (desfireTag.getLoadDamKeys() && desfireFlowStep.resetStep == 2) {
 						log.debug("Reset DamMacKey - Step : Format card");
 						try {
 							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x11, (byte) 0x00, KeyType.AES, new byte[16], desfireDiversificationDamService.getDamMacKey(csn)));
