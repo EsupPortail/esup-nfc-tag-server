@@ -30,6 +30,7 @@
     <!-- HTTP security configurations -->
     <http disable-url-rewriting="true" use-expressions="true" entry-point-ref="http403EntryPoint">
 		<intercept-url pattern="/wsrest/**" access="hasIpAddress('127.0.0.1')" /> <!-- Esup-SGC IP Address -->
+    	    <intercept-url pattern="/wsrestdam/**" access="hasIpAddress('127.0.0.1')" />
 	    <intercept-url pattern="/admin/**" access="hasRole('ROLE_ADMIN')" />
 	    <intercept-url pattern="/manager" access="isAuthenticated()" />
 	    <intercept-url pattern="/manager/taglogs" access="hasRole('ROLE_SUPERVISOR') or hasRole('ROLE_ADMIN')" />
