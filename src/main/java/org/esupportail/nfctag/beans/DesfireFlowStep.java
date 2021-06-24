@@ -36,6 +36,8 @@ public class DesfireFlowStep implements Serializable {
 	public int damKeysStep = 0;
 
 	public int resetStep = 0;
+
+	public int createDamStep = 0;
 	 
 	public Action action;
 	

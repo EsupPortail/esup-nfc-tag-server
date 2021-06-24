@@ -28,6 +28,9 @@ import javax.annotation.Resource;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
 import org.esupportail.nfctag.service.api.TagWriteApi;
+import org.esupportail.nfctag.web.wsrest.json.JsonDamAuthKey;
+import org.esupportail.nfctag.web.wsrest.json.JsonFormCryptogram;
+import org.esupportail.nfctag.web.wsrest.json.JsonResponseCryptogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -64,6 +67,10 @@ public class TagWriteRestWs implements TagWriteApi {
 
 	protected String resetDamKeysUrlTemplate;
 
+	protected String damAuthKeyUrlTemplate;
+
+	protected String cryptogramUrlTemplate;
+
 	protected String getIdFromCsnUrl(String csn){
 		String url = MessageFormat.format(idFromCsnUrlTemplate, csn);
 		return url;
@@ -96,6 +103,24 @@ public class TagWriteRestWs implements TagWriteApi {
 	public void setResetDamKeysUrlTemplate(String resetDamKeysUrlTemplate) {
 		this.resetDamKeysUrlTemplate = resetDamKeysUrlTemplate;
 	}
+
+	public String getDamAuthKeyFromCsnUrl(String csn) {
+		return MessageFormat.format(damAuthKeyUrlTemplate, csn);
+	}
+
+	public void setDamAuthKeyUrlTemplate(String damAuthKeyUrlTemplate) {
+		this.damAuthKeyUrlTemplate = damAuthKeyUrlTemplate;
+	}
+
+
+	public String getCryptogramUrl() {
+		return cryptogramUrlTemplate;
+	}
+
+	public void setCryptogramUrlTemplateUrlTemplate(String cryptogramUrlTemplate) {
+		this.cryptogramUrlTemplate = cryptogramUrlTemplate;
+	}
+
 
 	@Override
 	public String getIdFromCsn(String csn) {
@@ -141,6 +166,40 @@ public class TagWriteRestWs implements TagWriteApi {
 		log.trace("Call " + getResetDamKeysUrl(csn) + " with csn = " + csn);
 
 		return callUrlGetForObject(targetUrl);
+	}
+
+	@Override
+	public JsonDamAuthKey getDamAuthKey(String csn) throws EsupNfcTagException {
+		URI targetUrl= UriComponentsBuilder.fromUriString(getDamAuthKeyFromCsnUrl(csn))
+				.build()
+				.toUri();
+
+		log.trace("Call " + getDamAuthKeyFromCsnUrl(csn) + " with csn = " + csn);
+
+		return restTemplate.getForObject(targetUrl, JsonDamAuthKey.class);
+	}
+
+	@Override
+	public JsonResponseCryptogram getCryptogram(JsonFormCryptogram jsonFormCryptogram) throws EsupNfcTagException {
+		URI targetUrl= UriComponentsBuilder.fromUriString(getCryptogramUrl())
+				.build()
+				.toUri();
+
+		log.trace("Call " + getCryptogramUrl() + " with form = " + jsonFormCryptogram);
+
+		try {
+			JsonResponseCryptogram jsonResponseCryptogram = restTemplate.postForObject(targetUrl, jsonFormCryptogram, JsonResponseCryptogram.class);
+			log.trace("Got :  " + jsonResponseCryptogram);
+			return jsonResponseCryptogram;
+		} catch(HttpStatusCodeException e){
+			log.warn("tagIdCheck error : " + targetUrl);
+			HttpStatus status = e.getStatusCode();
+			if (!HttpStatus.NOT_FOUND.equals(status)) {
+				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable);
+			} else {
+				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_unknowcard);
+			}
+		}
 	}
 
 	private String callUrlGetForObject(URI targetUrl) {

@@ -9,6 +9,8 @@ import org.esupportail.nfctag.service.desfire.DesfireUtils;
 import org.esupportail.nfctag.web.wsrest.json.JsonDamAuthKey;
 import org.esupportail.nfctag.web.wsrest.json.JsonFormCryptogram;
 import org.esupportail.nfctag.web.wsrest.json.JsonResponseCryptogram;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,8 @@ import java.util.List;
 @Controller
 public class WsRestDamController {
 
+    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+
     @Autowired(required=false)
     private DesfireDiversificationDamService desfireDiversificationDamService;
 
@@ -29,7 +33,7 @@ public class WsRestDamController {
         JsonDamAuthKey jsonDamAuthKey = new JsonDamAuthKey();
         jsonDamAuthKey.setResult("ok");
         jsonDamAuthKey.setUid(csn);
-        jsonDamAuthKey.setDamAuthKey(DesfireUtils.byteArrayToHexString(desfireDiversificationDamService.getDamAuthKey(csn)) + " " + DesfireUtils.byteArrayToHexString(desfireDiversificationDamService.getDamEncKey(csn)) + " " + DesfireUtils.byteArrayToHexString(desfireDiversificationDamService.getDamMacKey(csn)));
+        jsonDamAuthKey.setDamAuthKey(DesfireUtils.byteArrayToHexString(desfireDiversificationDamService.getDamAuthKey(csn)));
         return jsonDamAuthKey;
     }
 
@@ -45,12 +49,28 @@ public class WsRestDamController {
         byte rollKey = 0x00;
         JsonResponseCryptogram jsonResponseCryptogram = new JsonResponseCryptogram();
         jsonResponseCryptogram.setResult("ok");
-        byte[] encK = desfireDiversificationDamService.calcEncK(desfireDiversificationDamService.getDamEncKey(jsonFormCryptogram.getCsn()), DesfireUtils.hexStringToByteArray(jsonFormCryptogram.getDamDefaultKey()), jsonFormCryptogram.getDamDefaultKeyVersion());
+        byte[] encK = desfireDiversificationDamService.calcEncK(desfireDiversificationDamService.getDamEncKey(jsonFormCryptogram.getCsn()), DesfireUtils.hexStringToByteArray(jsonFormCryptogram.getDamDefaultKey()), jsonFormCryptogram.getDamDefaultKeyVersionAsByte());
         jsonResponseCryptogram.setEncK(DesfireUtils.byteArrayToHexString(encK));
+        Integer aid = null;
+        if (jsonFormCryptogram.getAid() != null) {
+            aid = Integer.parseInt(jsonFormCryptogram.getAid(), 16);
+        }
+        Integer quotaLimit = null;
+        if (jsonFormCryptogram.getQuotaLimit() != null) {
+            quotaLimit = Integer.parseInt(jsonFormCryptogram.getQuotaLimit());
+        }
+        Integer isoDfId = null;
+        if (jsonFormCryptogram.getIsoDfId() != null) {
+            isoDfId = Integer.parseInt(jsonFormCryptogram.getIsoDfId(), 16);
+        }
+        byte[] isoDfName = null;
+        if (jsonFormCryptogram.getIsoDfName() != null) {
+            isoDfName = DesfireUtils.hexStringToByteArray(jsonFormCryptogram.getIsoDfName());
+        }
+        log.info(jsonFormCryptogram.toString());
         byte[] dammac = desfireDiversificationDamService.calcDAMMAC(desfireDiversificationDamService.getDamMacKey(jsonFormCryptogram.getCsn()),
-                (byte) DESFireEV1Service.Command.CREATE_DELEGATED_APPLICATION.getCode(), Integer.parseInt(jsonFormCryptogram.getAid(), 16),
-                damSlotNo, damSlotVersion, Integer.parseInt(jsonFormCryptogram.getQuotaLimit(), 16), jsonFormCryptogram.getKeySetting1(), jsonFormCryptogram.getKeySetting2(), keySettings3,
-                aksVersion, noKeySet, maxKeySize, rollKey, Integer.parseInt(jsonFormCryptogram.getIsoDfId(), 16), DesfireUtils.hexStringToByteArray(jsonFormCryptogram.getIsoDfName()), encK);
+                (byte) DESFireEV1Service.Command.CREATE_DELEGATED_APPLICATION.getCode(), aid, damSlotNo, damSlotVersion, quotaLimit, jsonFormCryptogram.getKeySetting1AsByte(), jsonFormCryptogram.getKeySetting2AsByte(), keySettings3,
+                aksVersion, noKeySet, maxKeySize, rollKey, isoDfId, isoDfName, encK);
         jsonResponseCryptogram.setDammac(DesfireUtils.byteArrayToHexString(dammac));
         jsonResponseCryptogram.setDamSlotNO(damSlotNo);
         jsonResponseCryptogram.setDamSlotVersion(damSlotVersion);

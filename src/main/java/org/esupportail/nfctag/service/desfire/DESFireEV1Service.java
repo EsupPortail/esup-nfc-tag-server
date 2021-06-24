@@ -16,6 +16,7 @@ import java.util.Arrays;
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 
+import nfcjlib.core.DESFireEV1;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,6 +52,9 @@ public class DESFireEV1Service extends SimpleSCR {
 	private byte[] iv0;        // the IV, kept updated between operations (for 3K3DES/AES)
 	private byte[] iv1;        // the IV, kept updated between operations (for 3K3DES/AES)
 	private byte[] iv2;        // the IV, kept updated between operations (for 3K3DES/AES)
+
+	private byte[] enck;
+	private byte[] dammac;
 
 	private byte[] ciphertext;
 	private byte[] randA;
@@ -648,6 +652,96 @@ public class DESFireEV1Service extends SimpleSCR {
 			return Dump.hex(apdu).replace(" ", "").toUpperCase();
 		}
 	}
+
+	public String createDelegatedApplication(byte[] aid, int damSlotNo, byte damSlotVersion, int quotaLimit, byte key_setting_1, byte key_setting_2, byte key_setting_3,
+												 byte aks_version, byte NoKeySets, byte MaxKeySize, byte Aks, byte[] iso_df_id, byte[] iso_df_name, int iso_df_namelen, byte[] enck, byte[] dammac) {
+		byte[] xfer_buffer = new byte[1000000];
+		int xfer_length;
+		this.enck = enck;
+		this.dammac = dammac;
+		/* Create the info block containing the command code and the given parameters. */
+		xfer_length = 0;
+		xfer_buffer[xfer_length++] = (byte) Command.CREATE_DELEGATED_APPLICATION.getCode();
+		System.arraycopy(aid, 0, xfer_buffer, xfer_length, 3);
+		xfer_length += 3;
+
+		xfer_buffer[xfer_length++] = (byte) (damSlotNo & 0x00FF);
+		damSlotNo >>= 8;
+		xfer_buffer[xfer_length++] = (byte) (damSlotNo & 0x00FF);
+		xfer_buffer[xfer_length++] = damSlotVersion;
+		xfer_buffer[xfer_length++] = (byte) (quotaLimit & 0x00FF);
+		quotaLimit >>= 8;
+		xfer_buffer[xfer_length++] = (byte) (quotaLimit & 0x00FF);
+
+		xfer_buffer[xfer_length++] = key_setting_1;
+		xfer_buffer[xfer_length++] = key_setting_2;
+		if ((key_setting_2 & 0x10) == 0x10)
+			xfer_buffer[xfer_length++] = key_setting_3;
+		if ((key_setting_3 & 0x01) == 0x01) {
+			xfer_buffer[xfer_length++] = aks_version;
+			if ((NoKeySets >= 2) && (NoKeySets <= 16)) {
+				xfer_buffer[xfer_length++] = NoKeySets;
+				if (NoKeySets == 0x10) {
+					xfer_buffer[xfer_length++] = MaxKeySize;
+				} else {
+					return null;
+				}
+
+				xfer_buffer[xfer_length++] = Aks;
+			} else {
+				return null;
+			}
+		}
+		if (iso_df_name != null) {
+			System.arraycopy(iso_df_id, 0, xfer_buffer, xfer_length, 2);
+			xfer_length += 2;
+
+			if (iso_df_namelen == 0)
+				iso_df_namelen = (byte) iso_df_name.length;
+			if (iso_df_namelen > 16)
+				return null;
+
+			System.arraycopy(iso_df_name, 0, xfer_buffer, xfer_length, iso_df_namelen);
+			xfer_length += iso_df_namelen;
+		}
+
+
+	/* Send the command string to the PICC and get its response (1st frame exchange).
+	   The PICC has to respond with an DF_ADDITIONAL_FRAME status byte. */
+
+		byte[] apdu = new byte[xfer_length + 5];
+		apdu[0] = (byte) 0x90;
+		apdu[1] = xfer_buffer[0];
+		apdu[2] = 0x00;
+		apdu[3] = 0x00;
+		apdu[4] = (byte) (xfer_length - 1);
+		System.arraycopy(xfer_buffer, 1, apdu, 5, xfer_length - 1);
+		apdu[xfer_length + 4] = 0x00;
+		return Dump.hex(apdu).replace(" ", "").toUpperCase();
+	}
+
+	public String createDelegatedApplicationAf() {
+		byte[] xfer_buffer = new byte[1000000];
+		int xfer_length;
+		xfer_length = 0;
+		xfer_buffer[xfer_length++] = (byte) Command.MORE.getCode();
+		System.arraycopy(enck, 0, xfer_buffer, 1, enck.length);
+		xfer_length += enck.length;
+		System.arraycopy(dammac, 0, xfer_buffer, xfer_length, dammac.length);
+		xfer_length += dammac.length;
+
+		/* Send the 2nd frame to the PICC and get its response. */
+		byte[] apdu = new byte[xfer_length+5];
+		apdu[0] = (byte) 0x90;
+		apdu[1] = xfer_buffer[0];
+		apdu[2] = 0x00;
+		apdu[3] = 0x00;
+		apdu[4] = (byte) (xfer_length - 1);
+		System.arraycopy(xfer_buffer, 1, apdu, 5, xfer_length - 1);
+		apdu[xfer_length+4] = 0x00;
+		return Dump.hex(apdu).replace(" ", "").toUpperCase();
+	}
+
 
 	/**
 	 * Delete an application.
