@@ -18,6 +18,12 @@
 package org.esupportail.nfctag.service.api;
 
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import org.esupportail.nfctag.web.wsrest.json.JsonDamAuthKey;
+import org.esupportail.nfctag.web.wsrest.json.JsonFormCryptogram;
+import org.esupportail.nfctag.web.wsrest.json.JsonResponseCryptogram;
+import org.springframework.web.util.UriComponentsBuilder;
+
+import java.net.URI;
 
 public interface TagWriteApi {
 
@@ -28,5 +34,9 @@ public interface TagWriteApi {
 	String getDiversDamKey(String csn) throws EsupNfcTagException;
 
 	String resetDiversDamKey(String csn) throws EsupNfcTagException;
+
+	JsonDamAuthKey getDamAuthKey(String csn) throws EsupNfcTagException;
+
+	JsonResponseCryptogram getCryptogram(JsonFormCryptogram jsonFormCryptogram) throws EsupNfcTagException;
 
 }

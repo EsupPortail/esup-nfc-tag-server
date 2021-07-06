@@ -1,5 +1,6 @@
 package org.esupportail.nfctag.web.wsrest.json;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.esupportail.nfctag.service.desfire.DesfireUtils;
 
 public class JsonFormCryptogram {
@@ -38,8 +39,13 @@ public class JsonFormCryptogram {
         this.damDefaultKey = damDefaultKey;
     }
 
-    public byte getDamDefaultKeyVersion() {
+    @JsonIgnore
+    public byte getDamDefaultKeyVersionAsByte() {
         return DesfireUtils.hexStringToByte(damDefaultKeyVersion);
+    }
+
+    public String getDamDefaultKeyVersion() {
+        return damDefaultKeyVersion;
     }
 
     public void setDamDefaultKeyVersion(String damDefaultKeyVersion) {
@@ -62,16 +68,26 @@ public class JsonFormCryptogram {
         this.quotaLimit = quotaLimit;
     }
 
-    public byte getKeySetting1() {
+    @JsonIgnore
+    public byte getKeySetting1AsByte() {
         return DesfireUtils.hexStringToByte(keySetting1);
+    }
+
+    public String getKeySetting1() {
+        return keySetting1;
     }
 
     public void setKeySetting1(String keySetting1) {
         this.keySetting1 = keySetting1;
     }
 
-    public byte getKeySetting2() {
+    @JsonIgnore
+    public byte getKeySetting2AsByte() {
         return DesfireUtils.hexStringToByte(keySetting2);
+    }
+
+    public String getKeySetting2() {
+        return keySetting2;
     }
 
     public void setKeySetting2(String keySetting2) {
@@ -92,5 +108,20 @@ public class JsonFormCryptogram {
 
     public void setIsoDfName(String isoDfName) {
         this.isoDfName = isoDfName;
+    }
+
+    @Override
+    public String toString() {
+        return "JsonFormCryptogram{" +
+                "csn='" + csn + '\'' +
+                ", damDefaultKey='" + damDefaultKey + '\'' +
+                ", damDefaultKeyVersion='" + damDefaultKeyVersion + '\'' +
+                ", aid='" + aid + '\'' +
+                ", quotaLimit='" + quotaLimit + '\'' +
+                ", keySetting1='" + keySetting1 + '\'' +
+                ", keySetting2='" + keySetting2 + '\'' +
+                ", isoDfId='" + isoDfId + '\'' +
+                ", isoDfName='" + isoDfName + '\'' +
+                '}';
     }
 }

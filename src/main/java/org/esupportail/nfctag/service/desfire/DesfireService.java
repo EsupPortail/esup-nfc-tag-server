@@ -37,10 +37,13 @@ import org.esupportail.nfctag.service.ApplicationsService;
 import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
 import org.esupportail.nfctag.service.api.TagWriteApi;
+import org.esupportail.nfctag.service.api.impl.DesfireDamUpdateConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireReadConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireUpdateConfig;
 import org.esupportail.nfctag.service.api.impl.DesfireWriteConfig;
 import org.esupportail.nfctag.service.desfire.DESFireEV1Service.KeyType;
+import org.esupportail.nfctag.web.wsrest.json.JsonFormCryptogram;
+import org.esupportail.nfctag.web.wsrest.json.JsonResponseCryptogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -301,6 +304,11 @@ public NfcResultBean readUid(String result){
 	public DesfireTag getDesfireTagToUpdate() {
 		DesfireUpdateConfig desfireUpdateConfig = (DesfireUpdateConfig) desfireAuthSession.getDesfireAuthConfig();
 		return desfireUpdateConfig.getDesfireTag();
+	}
+
+	public DesfireTag getDesfireTagToDamUpdate() {
+		DesfireDamUpdateConfig desfireDamUpdateConfig = (DesfireDamUpdateConfig) desfireAuthSession.getDesfireAuthConfig();
+		return desfireDamUpdateConfig.getDesfireTag();
 	}
 
 	public NfcResultBean writeCard(String result, String eppnInit, String csn) throws EsupNfcTagException {
@@ -1028,6 +1036,280 @@ public NfcResultBean readUid(String result){
 					desfireFlowStep.authStep = 1;
 					desfireFlowStep.action = Action.END;
 					desfireFlowStep.currentKey = 0;
+				}
+				break;
+			case END:
+				authResultBean.setFullApdu("END");
+				break;
+			default:
+				break;
+		}
+		return authResultBean;
+	}
+
+	public NfcResultBean damUpdateCard(String result, String eppnInit, String csn) throws EsupNfcTagException {
+		NfcResultBean authResultBean = new NfcResultBean();
+		authResultBean.setAction(NfcResultBean.Action.none);
+		authResultBean.setCode(CODE.OK);
+
+		byte[] defaultKey = null;
+		DesfireTag desfireTag =  getDesfireTagToDamUpdate();
+
+		if(result.length()==0){
+			reset();
+			if(desfireTag.getFormatBeforeWrite()){
+				desfireFlowStep.action = Action.FORMAT;
+			}else{
+				desfireFlowStep.action = Action.CREATE_APP;
+			}
+		}
+		byte[] piccAid = DesfireUtils.hexStringToByteArray("000000");
+
+
+		DesfireApplication desfireApp = null;
+		byte[] aid = null;
+		byte amks = 0;
+		byte nok = 0;
+
+		byte[] appKey = null;
+		byte appKeyNo = 0;
+		byte appKeyVer = 0;
+		KeyType appKeyType = null;
+		KeyType appDefaultKeyType = null;
+
+		byte keyNo = 0;
+		byte[] key = null;
+		byte keyVer = 0;
+		KeyType keyKeyType = null;
+
+		byte[] byteWritePayload = null;
+		byte[] accessRights = null;
+		byte cms = 0;
+		byte fileNo = 0;
+
+		DesfireFile desfireFile = null;
+
+		String writePayload = null;
+
+		if(desfireTag.getApplications() != null && desfireTag.getApplications().size() >  desfireFlowStep.currentApp){
+			desfireApp = desfireTag.getApplications().get(desfireFlowStep.currentApp);
+			aid = DesfireUtils.hexStringToByteArray(desfireApp.getDesfireAppId());
+			amks= DesfireUtils.hexStringToByte(desfireApp.getAmks());
+			nok = DesfireUtils.hexStringToByte(desfireApp.getNok());
+
+			if(desfireApp.getNok().substring(0, 1).equals("8") || desfireApp.getNok().substring(0, 1).equals("A")){
+				defaultKey = DesfireUtils.hexStringToByteArray("00000000000000000000000000000000");
+				appDefaultKeyType = KeyType.AES;
+				appKey = DesfireUtils.hexStringToByteArray("00000000000000000000000000000000");
+				appKeyNo = DesfireUtils.hexStringToByte("00");
+				appKeyVer = DesfireUtils.hexStringToByte("00");
+				keyKeyType = appKeyType = KeyType.AES;
+			}else{
+				defaultKey = DesfireUtils.hexStringToByteArray("0000000000000000");
+				appDefaultKeyType = KeyType.DES;
+				appKey = DesfireUtils.hexStringToByteArray("0000000000000000");
+				appKeyNo = DesfireUtils.hexStringToByte("00");
+				appKeyVer = DesfireUtils.hexStringToByte("00");
+				keyKeyType = appKeyType = KeyType.DES;
+			}
+
+			if(desfireApp.getKeys() != null && desfireApp.getKeys().size() > 0) {
+				DesfireKey desfireAppKey = desfireApp.getKeys().get(0);
+				appKey = DesfireUtils.hexStringToByteArray(desfireAppKey.getKey());
+				appKeyNo = DesfireUtils.hexStringToByte(desfireAppKey.getKeyNo());
+				appKeyVer = DesfireUtils.hexStringToByte(desfireAppKey.getKeyVer());
+				if(desfireApp.getKeys().size() >  desfireFlowStep.currentKey) {
+					DesfireKey desfireKey = desfireApp.getKeys().get(desfireFlowStep.currentKey);
+					keyNo = DesfireUtils.hexStringToByte(desfireKey.getKeyNo());
+					DesfireKeyService desfireKeyService = desfireKey.getDesfireKeyService();
+					String desfireKeyAsHexa = desfireKey.getKey();
+					if(desfireKeyService!=null) {
+						desfireKeyAsHexa = desfireKeyService.getKeyFromCsn(csn);
+					}
+					key = DesfireUtils.hexStringToByteArray(desfireKeyAsHexa);
+					keyVer = DesfireUtils.hexStringToByte(desfireKey.getKeyVer());
+				}
+			}
+
+			if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
+				desfireFile = desfireApp.getFiles().get(desfireFlowStep.currentFile);
+				accessRights = DesfireUtils.hexStringToByteArray(desfireFile.getAccessRights());
+				cms = DesfireUtils.hexStringToByte(desfireFile.getCommunicationSettings());
+				fileNo = DesfireUtils.hexStringToByte(desfireFile.getFileNumber());
+				TagWriteApi tagWriteApi = desfireFile.getTagWriteApi();
+				desfireId = tagWriteApi.getIdFromCsn(csn);
+				if(desfireFile.getFileSize() != null){
+					writePayload = desfireFile.getWriteFilePayload((nok|0x20)==nok) + desfireFile.getFileSize();
+				} else{
+					//calcul automatique de la taille du fichier en fonction du contenu
+					int fileSize = desfireId.length() / 2;
+					String hexSize = leftPad(Integer.toHexString(fileSize), 6, '0');
+					writePayload = desfireFile.getWriteFilePayload((nok|0x20)==nok) + DesfireUtils.swapPairs(DesfireUtils.hexStringToByteArray(hexSize));
+				}
+				byteWritePayload = DesfireUtils.hexStringToByteArray(writePayload);
+			}
+		}
+
+
+		switch(desfireFlowStep.action){
+			case CREATE_APP:
+				log.debug("Update by " + eppnInit + "with csn : " + csn + " - Step : Create app : " + DesfireUtils.byteArrayToHexString(aid));
+				if (desfireFlowStep.createDamStep == 0) {
+					try {
+						authResultBean = this.authApp(piccAid, result, DesfireUtils.hexStringToByteArray(desfireApp.getTagWriteApi().getDamAuthKey(csn).getDamAuthKey()), (byte) 0x10, KeyType.AES);
+					} catch (NullPointerException e) {
+						throw new EsupNfcTagException("TagWrite not define", e);
+					}
+				}
+				if(authResultBean.getFullApdu() == null) {
+					if (desfireFlowStep.createDamStep == 0) {
+						if ((nok | 0x20) == nok) {
+							log.debug("Iso Application requested via nok");
+							assert (desfireApp.getIsoId() != null && desfireApp.getIsoName() != null);
+						} else {
+							log.debug("Iso Application NOT requested via nok");
+							assert (desfireApp.getIsoId() == null && desfireApp.getIsoName() == null);
+						}
+						JsonFormCryptogram jsonFormCryptogram = new JsonFormCryptogram();
+						jsonFormCryptogram.setCsn(csn);
+						jsonFormCryptogram.setAid(DesfireUtils.byteArrayToHexString(aid));
+						jsonFormCryptogram.setDamDefaultKey(DesfireUtils.byteArrayToHexString(new byte[16]));
+						jsonFormCryptogram.setDamDefaultKeyVersion("0");
+						jsonFormCryptogram.setKeySetting1(desfireApp.getAmks());
+						jsonFormCryptogram.setKeySetting2(desfireApp.getNok());
+						int sumFileSize = 0;
+						for (int i = 0; i < desfireApp.getFiles().size(); i++) {
+							sumFileSize += Integer.parseInt(DesfireUtils.swapPairs(DesfireUtils.hexStringToByteArray(desfireApp.getFiles().get(i).getFileSize())), 16);
+						}
+						int quotaLimit = (Math.floorDiv(sumFileSize, 32) + 1 + desfireApp.getKeys().size()) * 2; // *2 WTF ?
+						jsonFormCryptogram.setQuotaLimit(String.valueOf(quotaLimit));
+						byte[] isoDfId = null;
+						byte[] isoName = null;
+						int isoNameLen = 0;
+						if (desfireApp.getIsoId() != null && desfireApp.getIsoName() != null) {
+							jsonFormCryptogram.setIsoDfName(desfireApp.getIsoName());
+							jsonFormCryptogram.setIsoDfId(desfireApp.getIsoId());
+							isoDfId = DesfireUtils.hexStringToByteArray(desfireApp.getLsbIsoId());
+							isoName = DesfireUtils.hexStringToByteArray(desfireApp.getIsoName());
+							isoNameLen = isoName.length;
+						}
+						log.info(jsonFormCryptogram.toString());
+						JsonResponseCryptogram jsonResponseCryptogram = desfireApp.getTagWriteApi().getCryptogram(jsonFormCryptogram);
+						String apdu = desFireEV1Service.createDelegatedApplication(DesfireUtils.swapPairsByte(aid), jsonResponseCryptogram.getDamSlotNO(), jsonResponseCryptogram.getDamSlotVersion(), quotaLimit, amks, nok, (byte) 0x00, (byte) 0x00,
+								(byte) 0x00, (byte) 0x00, (byte) 0x00, isoDfId, isoName, isoNameLen, DesfireUtils.hexStringToByteArray(jsonResponseCryptogram.getEncK()),
+								DesfireUtils.hexStringToByteArray(jsonResponseCryptogram.getDammac()));
+						authResultBean.setFullApdu(apdu);
+						authResultBean.setSize(0);
+						desfireFlowStep.createDamStep++;
+					} else if (desfireFlowStep.createDamStep == 1) {
+						desfireFlowStep.authStep = 1;
+						String apdu = desFireEV1Service.createDelegatedApplicationAf();
+						authResultBean.setFullApdu(apdu);
+						authResultBean.setSize(0);
+						desfireFlowStep.createDamStep++;
+						desfireFlowStep.action = Action.CHANGE_APP_MASTER_KEY;
+					}
+				}
+				break;
+			case CHANGE_APP_MASTER_KEY:
+				log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change app key : " + DesfireUtils.byteArrayToHexString(aid));
+				authResultBean = this.authApp(aid, result, defaultKey, appKeyNo, appDefaultKeyType);
+				if(authResultBean.getFullApdu() == null) {
+					desfireFlowStep.authStep = 1;
+					authResultBean.setFullApdu(desFireEV1Service.changeKey(appKeyNo, appKeyVer, appKeyType, appKey, defaultKey));
+					authResultBean.setSize(16);
+					if(desfireApp.getKeys() != null && desfireApp.getKeys().size() >  1) {
+						desfireFlowStep.currentKey = 1;
+						desfireFlowStep.action = Action.CHANGE_KEYS;
+					} else if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
+						desfireFlowStep.action = Action.CREATE_FILE;
+						desfireFlowStep.currentKey = 1;
+					} else {
+						desfireFlowStep.currentFile = 0;
+						desfireFlowStep.currentApp++;
+						if(desfireTag.getApplications().size() > desfireFlowStep.currentApp){
+							desfireFlowStep.action = Action.CREATE_APP;
+						} else {
+							desfireFlowStep.action = Action.END;
+						}
+					}
+				}
+				break;
+			case CHANGE_KEYS:
+				log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change app key : " + keyNo + " for " + DesfireUtils.byteArrayToHexString(aid));
+				authResultBean = this.authApp(aid, result, appKey, appKeyNo, appDefaultKeyType);
+				if(authResultBean.getFullApdu() == null) {
+					desfireFlowStep.authStep = 1;
+					authResultBean.setFullApdu(desFireEV1Service.changeKey(keyNo, keyVer, keyKeyType, key, defaultKey));
+					authResultBean.setSize(16);
+					log.trace("change key part");
+					if(desfireApp.getKeys().size() >  desfireFlowStep.currentKey + 1){
+						desfireFlowStep.currentKey++;
+						desfireFlowStep.action = Action.CHANGE_KEYS;
+					} else {
+						if(desfireApp.getFiles() != null && desfireApp.getFiles().size() >  desfireFlowStep.currentFile){
+							desfireFlowStep.action = Action.CREATE_FILE;
+							desfireFlowStep.currentKey = 1;
+						} else {
+							desfireFlowStep.currentFile = 0;
+							desfireFlowStep.currentApp++;
+							if(desfireTag.getApplications().size() > desfireFlowStep.currentApp){
+								desfireFlowStep.action = Action.CREATE_APP;
+							} else {
+								desfireFlowStep.action = Action.END;
+							}
+						}
+					}
+				}
+
+				break;
+			case CREATE_FILE:
+				if(authResultBean.getFullApdu() == null) {
+					log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Create file in " + DesfireUtils.byteArrayToHexString(aid) +" : " + fileNo);
+					desfireFlowStep.authStep = 1;
+					authResultBean.setFullApdu(desFireEV1Service.createStdDataFile(byteWritePayload, (nok|0x20)==nok));
+					authResultBean.setSize(16);
+					desfireFlowStep.action = Action.WRITE_FILE;
+					desfireFlowStep.authStep = 1;
+				}
+				desfireFlowStep.writeStep = 0;
+				break;
+			case WRITE_FILE:
+				if(authResultBean.getFullApdu() == null || desfireFlowStep.writeStep>0) {
+					if(desfireFlowStep.writeStep==0) {
+						desfireFlowStep.authStep = 1;
+						log.debug("Write by " + eppnInit + " - Write in file " + fileNo +" : " + desfireId);
+						authResultBean.setFullApdu(desFireEV1Service.writeData(fileNo, desfireId));
+						authResultBean.setSize(16);
+						desfireFlowStep.writeStep++;
+					}else if(desfireFlowStep.writeStep > 0 && result.endsWith("AF")){
+						authResultBean.setFullApdu(desFireEV1Service.writeMore(desfireId));
+						authResultBean.setSize(16);
+						log.debug("Update by " + eppnInit + " - Write in file " + fileNo +" : " + desfireId);
+					} else {
+						desfireFlowStep.writeStep = 0;
+						desfireFlowStep.action = Action.CHANGE_FILE_KEY_SET;
+						authResultBean = damUpdateCard(result, eppnInit, csn);
+					}
+				}
+				break;
+			case CHANGE_FILE_KEY_SET:
+				log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change key settings " + fileNo +" : " + cms + ", " + accessRights[1] +", "+accessRights[0]);
+				authResultBean.setFullApdu(desFireEV1Service.changeFileSettings(fileNo, cms, accessRights[1], accessRights[0]));
+				authResultBean.setSize(16);
+				log.trace("change key set part");
+				if(desfireFlowStep.currentFile + 1 < desfireApp.getFiles().size()) {
+					desfireFlowStep.currentFile++;
+					desfireFlowStep.action = Action.CREATE_FILE;
+				} else {
+					desfireFlowStep.currentFile = 0;
+					if(desfireFlowStep.currentApp + 1 < desfireTag.getApplications().size()) {
+						desfireFlowStep.currentApp++;
+						desfireFlowStep.action = Action.GET_APPS;
+					} else {
+						desfireFlowStep.currentApp = 0;
+						desfireFlowStep.action = Action.END;
+					}
 				}
 				break;
 			case END:

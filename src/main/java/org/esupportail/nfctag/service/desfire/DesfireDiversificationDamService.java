@@ -76,20 +76,19 @@ public class DesfireDiversificationDamService implements InitializingBean {
         System.arraycopy(appDAMDefault, 0, input, 7, 16);
         input[input.length - 1] = keyVerAppDAMDefault;
 
-        System.out.println("ENCK in " + DesfireUtils.byteArrayToHexString(input));
-        System.out.println("ENCK in " + DesfireUtils.byteArrayToHexString(piccDamEncKey));
-        System.out.println("ENCK in " + DesfireUtils.byteArrayToHexString(IV));
+        log.info("ENCK in " + DesfireUtils.byteArrayToHexString(input));
+        log.info("ENCK in " + DesfireUtils.byteArrayToHexString(piccDamEncKey));
+        log.info("ENCK in " + DesfireUtils.byteArrayToHexString(IV));
 
         byte[] EncK = desfireDiversification.encrypt(piccDamEncKey, input, IV);
 
-        System.out.println("ENCK  out" + DesfireUtils.byteArrayToHexString(EncK));
+        log.info("ENCK  out" + DesfireUtils.byteArrayToHexString(EncK));
 
         return EncK;
     }
 
     public byte[] calcDAMMAC(byte[] piccDamMacKey, byte cmd, int aid, int damSlotNo, byte damSlotVersion, int quotaLimit, byte key_setting_1, byte key_setting_2,
-                             byte key_setting_3, byte aks_version, byte NoKeySets, byte MaxKeySize, byte Aks, int iso_df_id, byte[] iso_df_name, byte[] enck) throws Exception {
-
+                             byte key_setting_3, byte aks_version, byte NoKeySets, byte MaxKeySize, byte Aks, Integer iso_df_id, byte[] iso_df_name, byte[] enck) {
         byte[] IV = {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
         byte[] input;
         int inputLength = 0;
@@ -149,20 +148,20 @@ public class DesfireDiversificationDamService implements InitializingBean {
         /* add encK at the end */
         for (byte b : enck) input[inputLength++] = b;
 
-        System.out.println("DAMMAC  in " + DesfireUtils.byteArrayToHexString(input));
-        System.out.println("DAMMAC  PICCDAMMACKey " + DesfireUtils.byteArrayToHexString(piccDamMacKey));
-        System.out.println("DAMMAC  IV " + DesfireUtils.byteArrayToHexString(IV));
+        log.info("DAMMAC  in " + DesfireUtils.byteArrayToHexString(input));
+        log.info("DAMMAC  PICCDAMMACKey " + DesfireUtils.byteArrayToHexString(piccDamMacKey));
+        log.info("DAMMAC  IV " + DesfireUtils.byteArrayToHexString(IV));
 
         byte[] CMAC_enormous = this.CalculateCMAC(piccDamMacKey, IV, input);
 
-        System.out.println("DAMMAC  out " + DesfireUtils.byteArrayToHexString(CMAC_enormous));
+        log.info("DAMMAC  out " + DesfireUtils.byteArrayToHexString(CMAC_enormous));
 
-        System.out.println("CMAC_enormous calcul soft: " + DesfireUtils.byteArrayToHexString(CMAC_enormous));
+        log.info("CMAC_enormous calcul soft: " + DesfireUtils.byteArrayToHexString(CMAC_enormous));
 
         byte[] CMAC_full = new byte[16];
         System.arraycopy(CMAC_enormous, CMAC_enormous.length - 16, CMAC_full, 0, 16);
 
-        System.out.println("CMAC_full calcul soft: " + DesfireUtils.byteArrayToHexString(CMAC_full));
+        log.info("CMAC_full calcul soft: " + DesfireUtils.byteArrayToHexString(CMAC_full));
 
         byte[] CMAC = new byte[8];
         int j = 0;
@@ -172,21 +171,26 @@ public class DesfireDiversificationDamService implements InitializingBean {
             i += 2;
         }
 
-        System.out.println("CMAC calcul soft: " + DesfireUtils.byteArrayToHexString(CMAC));
+        log.info("CMAC calcul soft: " + DesfireUtils.byteArrayToHexString(CMAC));
 
         return CMAC;
     }
 
-    public byte[] CalculateCMAC(byte[] Key, byte[] IV, byte[] input) throws Exception {
+    public byte[] CalculateCMAC(byte[] Key, byte[] IV, byte[] input) {
 
         // First : calculate subkey1 and subkey2
         byte[] Zeros = {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};
 
         //byte[] K = { 0x2b, 0x7e, 0x15, 0x16, 0x28, 0xae, 0xd2, 0xa6, 0xab, 0xf7, 0x15, 0x88, 0x09, 0xcf, 0x4f, 0x3c } ;
 
-        byte[] L = desfireDiversification.encrypt(Key, Zeros, IV);
+        byte[] L = new byte[0];
+        try {
+            L = desfireDiversification.encrypt(Key, Zeros, IV);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
-        System.out.println(DesfireUtils.byteArrayToHexString(L));
+        log.info(DesfireUtils.byteArrayToHexString(L));
 
         byte[] Key1;
         byte[] Key2;
@@ -215,7 +219,7 @@ public class DesfireDiversificationDamService implements InitializingBean {
 
         Key1 = L;
 
-        System.out.println(DesfireUtils.byteArrayToHexString(Key1));
+        log.info(DesfireUtils.byteArrayToHexString(Key1));
 
         byte[] tmp = new byte[Key1.length];
         System.arraycopy(Key1, 0, tmp, 0, Key1.length);
@@ -240,9 +244,9 @@ public class DesfireDiversificationDamService implements InitializingBean {
 
         Key2 = tmp;
 
-        System.out.println(DesfireUtils.byteArrayToHexString(Key2));
+        log.info(DesfireUtils.byteArrayToHexString(Key2));
 
-        byte[] result;
+        byte[] result = null;
 
         /*-------------------------------------------------*/
         /* Cas 1 : la chaine est vide    */
@@ -256,7 +260,11 @@ public class DesfireDiversificationDamService implements InitializingBean {
             for (int k = 0; k < 16; k++)
                 M1[k] = (byte) (data[k] ^ Key2[k]); // input
 
-            result = desfireDiversification.encrypt(Key, M1, IV);
+            try {
+                result = desfireDiversification.encrypt(Key, M1, IV);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
 
         } else {
             /**/
@@ -273,7 +281,11 @@ public class DesfireDiversificationDamService implements InitializingBean {
                 for (int k = 0; k < input.length; k++)
                     M1[k] = (byte) (input[k] ^ Key1[k]);
 
-                result = desfireDiversification.encrypt(Key, M1, IV);
+                try {
+                    result = desfireDiversification.encrypt(Key, M1, IV);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             } else {
                 byte[] M = new byte[input.length + 16];
                 int offset = 0;
@@ -311,7 +323,11 @@ public class DesfireDiversificationDamService implements InitializingBean {
                 byte[] Message = new byte[offset];
                 System.arraycopy(M, 0, Message, 0, offset);
 
-                result = desfireDiversification.encrypt(Key, Message, IV);
+                try {
+                    result = desfireDiversification.encrypt(Key, Message, IV);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         }
         return result;
