@@ -11,6 +11,7 @@ import org.esupportail.nfctag.web.wsrest.json.JsonFormCryptogram;
 import org.esupportail.nfctag.web.wsrest.json.JsonResponseCryptogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -27,7 +28,7 @@ public class WsRestDamController {
     @Resource
     private DesfireDiversificationDamService desfireDiversificationDamService;
     
-    @Resource
+    @Autowired(required=false)
     DamKeysTagWriteApi damKeysTagWriteApi;
 
     @RequestMapping(value = "/dam_request_auth_key", method= RequestMethod.GET)
