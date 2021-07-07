@@ -5,9 +5,8 @@ import java.util.List;
 
 import javax.annotation.PostConstruct;
 
-import org.esupportail.nfctag.service.api.TagWriteApi;
+import org.esupportail.nfctag.service.api.DamTagWriteApi;
 import org.esupportail.nfctag.service.api.impl.TagLastUpdateRestWs;
-import org.esupportail.nfctag.service.api.impl.TagWriteNone;
 import org.esupportail.nfctag.service.desfire.DesfireUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,10 +47,10 @@ public class DesfireApplication implements Serializable {
 	
 	private String updateDate;
 	
+	// TODO : retrieve it dynamically via ESCR
+	private DamTagWriteApi damTagWriteApi = null;
 	
-	TagWriteApi tagWriteApi = new TagWriteNone();
-	
-	TagLastUpdateRestWs tagLastUpdateRestWs;
+	private TagLastUpdateRestWs tagLastUpdateRestWs;
 	
 	public TagLastUpdateRestWs getTagLastUpdateRestWs() {
 		return tagLastUpdateRestWs;
@@ -61,14 +60,14 @@ public class DesfireApplication implements Serializable {
 		this.tagLastUpdateRestWs = tagLastUpdateRestWs;
 	}
 
-	public TagWriteApi getTagWriteApi() {
-		return tagWriteApi;
+	public DamTagWriteApi getDamTagWriteApi() {
+		return damTagWriteApi;
 	}
 
-	public void setTagWriteApi(TagWriteApi tagWriteApi) {
-		this.tagWriteApi = tagWriteApi;
+	public void setDamTagWriteApi(DamTagWriteApi damTagWriteApi) {
+		this.damTagWriteApi = damTagWriteApi;
 	}
-	
+
 	public String getUpdateDate() {
 		return updateDate;
 	}

@@ -19,8 +19,12 @@ package org.esupportail.nfctag.service.api;
 
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 
-public interface TagWriteApi {
+public interface DamKeysTagWriteApi {
 
-	String getIdFromCsn(String csn) throws EsupNfcTagException;
+	String createDiversDamKey(String csn) throws EsupNfcTagException;
 
+	String getDiversDamKey(String csn) throws EsupNfcTagException;
+
+	String resetDiversDamKey(String csn) throws EsupNfcTagException;
+	
 }

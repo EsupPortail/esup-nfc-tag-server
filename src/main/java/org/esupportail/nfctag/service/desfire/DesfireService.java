@@ -46,7 +46,6 @@ import org.esupportail.nfctag.web.wsrest.json.JsonFormCryptogram;
 import org.esupportail.nfctag.web.wsrest.json.JsonResponseCryptogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class DesfireService {
 
@@ -64,10 +63,10 @@ public class DesfireService {
 
 	private NfcAuthConfigService nfcAuthConfigService;
 
-    @Autowired(required=false)
 	private DesfireDiversificationDamService desfireDiversificationDamService;
 
 	public String tempRead = "";
+	
 	public String tempFileSize = "";
 
 	public void setDesfireAuthSession(DesfireAuthSession desfireAuthSession) {
@@ -84,6 +83,10 @@ public class DesfireService {
 
 	public void setNfcAuthConfigService(NfcAuthConfigService nfcAuthConfigService) {
 		this.nfcAuthConfigService = nfcAuthConfigService;
+	}
+
+	public void setDesfireDiversificationDamService(DesfireDiversificationDamService desfireDiversificationDamService) {
+		this.desfireDiversificationDamService = desfireDiversificationDamService;
 	}
 
 	public Action getStep() {
@@ -443,29 +446,29 @@ public NfcResultBean readUid(String result){
 				authResultBean = this.authApp(piccAid, result, piccKeyStart, (byte) 0x00, piccKeyTypeStart);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
-					if (desfireTag.getLoadDamKeys() && desfireFlowStep.resetStep == 0) {
+					if (desfireTag.getDamKeysTagWriteApi()!=null && desfireFlowStep.resetStep == 0) {
 						log.debug("Reset DamAuthKey - Step : Format card");
 						try {
-							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x10, (byte) 0x00, KeyType.AES, new byte[16], desfireDiversificationDamService.getDamAuthKey(csn)));
+							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x10, (byte) 0x00, KeyType.AES, new byte[16], desfireDiversificationDamService.getDamAuthKey(desfireTag.getDamKeysTagWriteApi(), csn)));
 						} catch (Exception e) {
 							throw new EsupNfcTagException("Reset DamAuthKey failed", e);
 						}
 						authResultBean.setSize(16);
 						desfireFlowStep.resetStep++;
-					} else if (desfireTag.getLoadDamKeys() && desfireFlowStep.resetStep == 1) {
+					} else if (desfireTag.getDamKeysTagWriteApi()!=null && desfireFlowStep.resetStep == 1) {
 						log.debug("Reset DamEncKey - Step : Format card");
 						try {
-							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x12, (byte) 0x00, KeyType.AES, new byte[16], desfireDiversificationDamService.getDamEncKey(csn)));
+							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x12, (byte) 0x00, KeyType.AES, new byte[16], desfireDiversificationDamService.getDamEncKey(desfireTag.getDamKeysTagWriteApi(), csn)));
 						} catch (Exception e) {
 							throw new EsupNfcTagException("Reset DamEncKey failed", e);
 						}
 						authResultBean.setSize(16);
 						desfireFlowStep.resetStep++;
-					} else if (desfireTag.getLoadDamKeys() && desfireFlowStep.resetStep == 2) {
+					} else if (desfireTag.getDamKeysTagWriteApi()!=null && desfireFlowStep.resetStep == 2) {
 						log.debug("Reset DamMacKey - Step : Format card");
 						try {
-							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x11, (byte) 0x00, KeyType.AES, new byte[16], desfireDiversificationDamService.getDamMacKey(csn)));
-							desfireDiversificationDamService.resetDamBaseKey(csn);
+							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x11, (byte) 0x00, KeyType.AES, new byte[16], desfireDiversificationDamService.getDamMacKey(desfireTag.getDamKeysTagWriteApi(), csn)));
+							desfireDiversificationDamService.resetDamBaseKey(desfireTag.getDamKeysTagWriteApi(), csn);
 						} catch (Exception e) {
 							throw new EsupNfcTagException("Reset DamMacKey failed", e);
 						}
@@ -485,7 +488,7 @@ public NfcResultBean readUid(String result){
 							if (piccKeyFinish != null) {
 								desfireFlowStep.currentApp = 0;
 								desfireFlowStep.action = Action.CHANGE_PICC_KEY;
-							} else if (desfireTag.getLoadDamKeys()) {
+							} else if (desfireTag.getDamKeysTagWriteApi()!=null) {
 								desfireFlowStep.currentApp = 0;
 								desfireFlowStep.action = Action.LOAD_DAM_KEYS;
 							}
@@ -510,7 +513,7 @@ public NfcResultBean readUid(String result){
 					} else if(piccKeyFinish != null){
 						desfireFlowStep.currentApp = 0;
 						desfireFlowStep.action = Action.CHANGE_PICC_KEY;
-					} else if(desfireTag.getLoadDamKeys()){
+					} else if(desfireTag.getDamKeysTagWriteApi()!=null){
 						desfireFlowStep.currentApp = 0;
 						desfireFlowStep.action = Action.LOAD_DAM_KEYS;
 					} else {
@@ -561,7 +564,7 @@ public NfcResultBean readUid(String result){
 						} else if(piccKeyFinish != null){
 							desfireFlowStep.currentApp = 0;
 							desfireFlowStep.action = Action.CHANGE_PICC_KEY;
-						} else if(desfireTag.getLoadDamKeys()){
+						} else if(desfireTag.getDamKeysTagWriteApi()!=null){
 							desfireFlowStep.currentApp = 0;
 							desfireFlowStep.action = Action.LOAD_DAM_KEYS;
 						} else {
@@ -593,7 +596,7 @@ public NfcResultBean readUid(String result){
 							} else if(piccKeyFinish != null){
 								desfireFlowStep.currentApp = 0;
 								desfireFlowStep.action = Action.CHANGE_PICC_KEY;
-							} else if(desfireTag.getLoadDamKeys()){
+							} else if(desfireTag.getDamKeysTagWriteApi()!=null){
 								desfireFlowStep.currentApp = 0;
 								desfireFlowStep.action = Action.LOAD_DAM_KEYS;
 							}else {
@@ -647,7 +650,7 @@ public NfcResultBean readUid(String result){
 					} else if(piccKeyFinish != null){
 						desfireFlowStep.currentApp = 0;
 						desfireFlowStep.action = Action.CHANGE_PICC_KEY;
-					} else if(desfireTag.getLoadDamKeys()){
+					} else if(desfireTag.getDamKeysTagWriteApi()!=null){
 						desfireFlowStep.currentApp = 0;
 						desfireFlowStep.action = Action.LOAD_DAM_KEYS;
 					} else {
@@ -662,7 +665,7 @@ public NfcResultBean readUid(String result){
 					desfireFlowStep.authStep = 1;
 					authResultBean.setFullApdu(desFireEV1Service.changeKey((byte) 0x00, piccKeyVerFinish, piccKeyTypeFinish, piccKeyFinish, piccKeyStart));
 					authResultBean.setSize(16);
-					if(desfireTag.getLoadDamKeys()){
+					if(desfireTag.getDamKeysTagWriteApi()!=null){
 						desfireFlowStep.currentApp = 0;
 						desfireFlowStep.action = Action.LOAD_DAM_KEYS;
 					} else {
@@ -678,10 +681,10 @@ public NfcResultBean readUid(String result){
 					desfireFlowStep.authStep = 1;
 					if (desfireFlowStep.damKeysStep == 0) {
 						log.debug("Create DamBaseKey - Step : Load dam keys");
-						desfireDiversificationDamService.createDamBaseKey(csn);
+						desfireDiversificationDamService.createDamBaseKey(desfireTag.getDamKeysTagWriteApi(), csn);
 						log.debug("Load DamAuthKey - Step : Load dam keys");
 						try {
-							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x10, (byte) 0x00, KeyType.AES, desfireDiversificationDamService.getDamAuthKey(csn), new byte[16]));
+							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x10, (byte) 0x00, KeyType.AES, desfireDiversificationDamService.getDamAuthKey(desfireTag.getDamKeysTagWriteApi(), csn), new byte[16]));
 						} catch (Exception e) {
 							throw new EsupNfcTagException("Load DamAuthKey failed", e);
 						}
@@ -690,7 +693,7 @@ public NfcResultBean readUid(String result){
 					} else if (desfireFlowStep.damKeysStep == 1) {
 						log.debug("Load DamEncKey - Step : Load dam keys");
 						try {
-							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x12, (byte) 0x00, KeyType.AES, desfireDiversificationDamService.getDamEncKey(csn), new byte[16]));
+							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x12, (byte) 0x00, KeyType.AES, desfireDiversificationDamService.getDamEncKey(desfireTag.getDamKeysTagWriteApi(), csn), new byte[16]));
 						} catch (Exception e) {
 							throw new EsupNfcTagException("Load DamEncKey failed", e);
 						}
@@ -699,7 +702,7 @@ public NfcResultBean readUid(String result){
 					} else if (desfireFlowStep.damKeysStep == 2) {
 						log.debug("Load DamMacKey - Step : Load dam keys");
 						try {
-							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x11, (byte) 0x00, KeyType.AES, desfireDiversificationDamService.getDamMacKey(csn), new byte[16]));
+							authResultBean.setFullApdu(desFireEV1Service.changeDamKey((byte) 0x11, (byte) 0x00, KeyType.AES, desfireDiversificationDamService.getDamMacKey(desfireTag.getDamKeysTagWriteApi(), csn), new byte[16]));
 						} catch (Exception e) {
 							throw new EsupNfcTagException("Load DamMacKey failed", e);
 						}
@@ -1156,7 +1159,7 @@ public NfcResultBean readUid(String result){
 				log.debug("Update by " + eppnInit + "with csn : " + csn + " - Step : Create app : " + DesfireUtils.byteArrayToHexString(aid));
 				if (desfireFlowStep.createDamStep == 0) {
 					try {
-						authResultBean = this.authApp(piccAid, result, DesfireUtils.hexStringToByteArray(desfireApp.getTagWriteApi().getDamAuthKey(csn).getDamAuthKey()), (byte) 0x10, KeyType.AES);
+						authResultBean = this.authApp(piccAid, result, DesfireUtils.hexStringToByteArray(desfireApp.getDamTagWriteApi().getDamAuthKey(csn).getDamAuthKey()), (byte) 0x10, KeyType.AES);
 					} catch (NullPointerException e) {
 						throw new EsupNfcTagException("TagWrite not define", e);
 					}
@@ -1194,7 +1197,7 @@ public NfcResultBean readUid(String result){
 							isoNameLen = isoName.length;
 						}
 						log.info(jsonFormCryptogram.toString());
-						JsonResponseCryptogram jsonResponseCryptogram = desfireApp.getTagWriteApi().getCryptogram(jsonFormCryptogram);
+						JsonResponseCryptogram jsonResponseCryptogram = desfireApp.getDamTagWriteApi().getCryptogram(jsonFormCryptogram);
 						String apdu = desFireEV1Service.createDelegatedApplication(DesfireUtils.swapPairsByte(aid), jsonResponseCryptogram.getDamSlotNO(), jsonResponseCryptogram.getDamSlotVersion(), quotaLimit, amks, nok, (byte) 0x00, (byte) 0x00,
 								(byte) 0x00, (byte) 0x00, (byte) 0x00, isoDfId, isoName, isoNameLen, DesfireUtils.hexStringToByteArray(jsonResponseCryptogram.getEncK()),
 								DesfireUtils.hexStringToByteArray(jsonResponseCryptogram.getDammac()));

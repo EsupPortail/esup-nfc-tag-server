@@ -3,6 +3,7 @@ package org.esupportail.nfctag.beans;
 import java.io.Serializable;
 import java.util.List;
 
+import org.esupportail.nfctag.service.api.DamKeysTagWriteApi;
 import org.esupportail.nfctag.service.desfire.DESFireEV1Service.KeyType;
 
 public class DesfireTag implements Serializable {
@@ -31,8 +32,8 @@ public class DesfireTag implements Serializable {
 	 * keyType : AES, DES
 	 */
 	private KeyType keyTypeFinish;
-
-	Boolean loadDamKeys = false;
+	
+	private DamKeysTagWriteApi damKeysTagWriteApi = null;
 	
 	public String getKeyStart() {
 		return keyStart;
@@ -90,12 +91,12 @@ public class DesfireTag implements Serializable {
 		this.formatBeforeWrite = formatBeforeWrite;
 	}
 
-	public Boolean getLoadDamKeys() {
-		return loadDamKeys;
+	public DamKeysTagWriteApi getDamKeysTagWriteApi() {
+		return damKeysTagWriteApi;
 	}
 
-	public void setLoadDamKeys(Boolean loadDamKeys) {
-		this.loadDamKeys = loadDamKeys;
+	public void setDamKeysTagWriteApi(DamKeysTagWriteApi damKeysTagWriteApi) {
+		this.damKeysTagWriteApi = damKeysTagWriteApi;
 	}
 
 	@Override

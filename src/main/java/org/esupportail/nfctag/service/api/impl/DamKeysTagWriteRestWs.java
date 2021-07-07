@@ -19,15 +19,12 @@ package org.esupportail.nfctag.service.api.impl;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
-import org.esupportail.nfctag.service.api.TagWriteApi;
+import org.esupportail.nfctag.service.api.DamKeysTagWriteApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -35,59 +32,81 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public class TagWriteRestWs implements TagWriteApi {
+public class DamKeysTagWriteRestWs implements DamKeysTagWriteApi {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
-	
-	/* cache Ids with FIFO Map 
-	 * This allow faser operation.
-	 * But this allows also that the signature of DEUINFO (ESC) is not altered during the writing !
-	 * */
-	private Map<URI, String> cacheIdsMap = new LinkedHashMap<URI, String>(200) {
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-	    protected boolean removeEldestEntry(Entry<URI, String> eldest) {
-	        return size() > 200;
-	    }
-	};
 
 	@Resource
 	protected RestTemplate restTemplate;
 
-	protected String idFromCsnUrlTemplate;
+	protected String createDamKeysFromCsnUrlTemplate;
 
-	protected String getIdFromCsnUrl(String csn){
-		String url = MessageFormat.format(idFromCsnUrlTemplate, csn);
-		return url;
+	protected String damKeysFromCsnUrlTemplate;
+
+	protected String resetDamKeysUrlTemplate;
+
+
+	public String getCreateDamKeysFromCsnUrl(String csn) {
+		return MessageFormat.format(createDamKeysFromCsnUrlTemplate, csn);
 	}
 
-	public void setIdFromCsnUrlTemplate(String idFromCsnUrlTemplate) {
-		this.idFromCsnUrlTemplate = idFromCsnUrlTemplate;
+	public void setCreateDamKeysFromCsnUrlTemplate(String createDamKeysFromCsnUrlTemplate) {
+		this.createDamKeysFromCsnUrlTemplate = createDamKeysFromCsnUrlTemplate;
+	}
+
+	public String getDamKeysFromCsnUrl(String csn) {
+		return MessageFormat.format(damKeysFromCsnUrlTemplate, csn);
+	}
+
+	public void setDamKeysFromCsnUrlTemplate(String damKeysFromCsnUrlTemplate) {
+		this.damKeysFromCsnUrlTemplate = damKeysFromCsnUrlTemplate;
+	}
+
+	public String getResetDamKeysUrl(String csn) {
+		return MessageFormat.format(resetDamKeysUrlTemplate, csn);
+	}
+
+	public void setResetDamKeysUrlTemplate(String resetDamKeysUrlTemplate) {
+		this.resetDamKeysUrlTemplate = resetDamKeysUrlTemplate;
 	}
 
 
 	@Override
-	public String getIdFromCsn(String csn) {
-		URI targetUrl= UriComponentsBuilder.fromUriString(getIdFromCsnUrl(csn))
-			    .build()
-			    .toUri();	
-		String id = cacheIdsMap.get(targetUrl);
-		if(id == null) {
-			log.trace("Call " + getIdFromCsnUrl(csn) + " with csn = " + csn);
-			id = callUrlGetForObject(targetUrl);
-		} else {
-			log.trace("Cache for " + getIdFromCsnUrl(csn) + " with csn = " + csn + " -> " + id);
-		}
-		return id;
+	public String createDiversDamKey(String csn) throws EsupNfcTagException {
+		URI targetUrl= UriComponentsBuilder.fromUriString(getCreateDamKeysFromCsnUrl(csn))
+				.build()
+				.toUri();
+
+		log.trace("Call " + getCreateDamKeysFromCsnUrl(csn) + " with csn = " + csn);
+		return callUrlGetForObject(targetUrl);
 	}
+
+	@Override
+	public String getDiversDamKey(String csn) throws EsupNfcTagException {
+		URI targetUrl= UriComponentsBuilder.fromUriString(getDamKeysFromCsnUrl(csn))
+				.build()
+				.toUri();
+
+		log.trace("Call " + getDamKeysFromCsnUrl(csn) + " with csn = " + csn);
+		return callUrlGetForObject(targetUrl);
+	}
+
+	@Override
+	public String resetDiversDamKey(String csn) throws EsupNfcTagException {
+		URI targetUrl= UriComponentsBuilder.fromUriString(getResetDamKeysUrl(csn))
+				.build()
+				.toUri();
+
+		log.trace("Call " + getResetDamKeysUrl(csn) + " with csn = " + csn);
+
+		return callUrlGetForObject(targetUrl);
+	}
+
 
 	private String callUrlGetForObject(URI targetUrl) {
 		String id;
 		try {
 			id = restTemplate.getForObject(targetUrl, String.class);
-			cacheIdsMap.put(targetUrl, id);
 		} catch(HttpStatusCodeException e){
 			log.warn("tagIdCheck error : " + targetUrl);
 			HttpStatus status = e.getStatusCode();

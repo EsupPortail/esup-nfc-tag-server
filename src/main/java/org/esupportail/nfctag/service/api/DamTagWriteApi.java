@@ -18,9 +18,14 @@
 package org.esupportail.nfctag.service.api;
 
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import org.esupportail.nfctag.web.wsrest.json.JsonDamAuthKey;
+import org.esupportail.nfctag.web.wsrest.json.JsonFormCryptogram;
+import org.esupportail.nfctag.web.wsrest.json.JsonResponseCryptogram;
 
-public interface TagWriteApi {
+public interface DamTagWriteApi {
 
-	String getIdFromCsn(String csn) throws EsupNfcTagException;
+	JsonDamAuthKey getDamAuthKey(String csn) throws EsupNfcTagException;
+
+	JsonResponseCryptogram getCryptogram(JsonFormCryptogram jsonFormCryptogram) throws EsupNfcTagException;
 
 }

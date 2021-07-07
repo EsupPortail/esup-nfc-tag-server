@@ -19,15 +19,15 @@ package org.esupportail.nfctag.service.api.impl;
 
 import java.net.URI;
 import java.text.MessageFormat;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.annotation.Resource;
 
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
-import org.esupportail.nfctag.service.api.TagWriteApi;
+import org.esupportail.nfctag.service.api.DamTagWriteApi;
+import org.esupportail.nfctag.web.wsrest.json.JsonDamAuthKey;
+import org.esupportail.nfctag.web.wsrest.json.JsonFormCryptogram;
+import org.esupportail.nfctag.web.wsrest.json.JsonResponseCryptogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -35,59 +35,57 @@ import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public class TagWriteRestWs implements TagWriteApi {
+public class DamTagWriteRestWs implements DamTagWriteApi {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
-	
-	/* cache Ids with FIFO Map 
-	 * This allow faser operation.
-	 * But this allows also that the signature of DEUINFO (ESC) is not altered during the writing !
-	 * */
-	private Map<URI, String> cacheIdsMap = new LinkedHashMap<URI, String>(200) {
-
-		private static final long serialVersionUID = 1L;
-
-		@Override
-	    protected boolean removeEldestEntry(Entry<URI, String> eldest) {
-	        return size() > 200;
-	    }
-	};
 
 	@Resource
 	protected RestTemplate restTemplate;
 
-	protected String idFromCsnUrlTemplate;
+	protected String damAuthKeyUrlTemplate;
 
-	protected String getIdFromCsnUrl(String csn){
-		String url = MessageFormat.format(idFromCsnUrlTemplate, csn);
-		return url;
+	protected String cryptogramUrlTemplate;
+
+	public String getDamAuthKeyFromCsnUrl(String csn) {
+		return MessageFormat.format(damAuthKeyUrlTemplate, csn);
 	}
 
-	public void setIdFromCsnUrlTemplate(String idFromCsnUrlTemplate) {
-		this.idFromCsnUrlTemplate = idFromCsnUrlTemplate;
+	public void setDamAuthKeyUrlTemplate(String damAuthKeyUrlTemplate) {
+		this.damAuthKeyUrlTemplate = damAuthKeyUrlTemplate;
+	}
+
+	public String getCryptogramUrl() {
+		return cryptogramUrlTemplate;
+	}
+
+	public void setCryptogramUrlTemplateUrlTemplate(String cryptogramUrlTemplate) {
+		this.cryptogramUrlTemplate = cryptogramUrlTemplate;
 	}
 
 
 	@Override
-	public String getIdFromCsn(String csn) {
-		URI targetUrl= UriComponentsBuilder.fromUriString(getIdFromCsnUrl(csn))
-			    .build()
-			    .toUri();	
-		String id = cacheIdsMap.get(targetUrl);
-		if(id == null) {
-			log.trace("Call " + getIdFromCsnUrl(csn) + " with csn = " + csn);
-			id = callUrlGetForObject(targetUrl);
-		} else {
-			log.trace("Cache for " + getIdFromCsnUrl(csn) + " with csn = " + csn + " -> " + id);
-		}
-		return id;
+	public JsonDamAuthKey getDamAuthKey(String csn) throws EsupNfcTagException {
+		URI targetUrl= UriComponentsBuilder.fromUriString(getDamAuthKeyFromCsnUrl(csn))
+				.build()
+				.toUri();
+
+		log.trace("Call " + getDamAuthKeyFromCsnUrl(csn) + " with csn = " + csn);
+
+		return restTemplate.getForObject(targetUrl, JsonDamAuthKey.class);
 	}
 
-	private String callUrlGetForObject(URI targetUrl) {
-		String id;
+	@Override
+	public JsonResponseCryptogram getCryptogram(JsonFormCryptogram jsonFormCryptogram) throws EsupNfcTagException {
+		URI targetUrl= UriComponentsBuilder.fromUriString(getCryptogramUrl())
+				.build()
+				.toUri();
+
+		log.trace("Call " + getCryptogramUrl() + " with form = " + jsonFormCryptogram);
+
 		try {
-			id = restTemplate.getForObject(targetUrl, String.class);
-			cacheIdsMap.put(targetUrl, id);
+			JsonResponseCryptogram jsonResponseCryptogram = restTemplate.postForObject(targetUrl, jsonFormCryptogram, JsonResponseCryptogram.class);
+			log.trace("Got :  " + jsonResponseCryptogram);
+			return jsonResponseCryptogram;
 		} catch(HttpStatusCodeException e){
 			log.warn("tagIdCheck error : " + targetUrl);
 			HttpStatus status = e.getStatusCode();
@@ -97,8 +95,5 @@ public class TagWriteRestWs implements TagWriteApi {
 				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_unknowcard);
 			}
 		}
-		log.trace("Got :  " + id);
-		return id;
 	}
-
 }
