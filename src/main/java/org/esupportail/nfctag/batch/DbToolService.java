@@ -23,7 +23,7 @@ public class DbToolService {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	final static String currentEsupSgcVersion = "2.4.x";
+	final static String currentEsupSgcVersion = "2.5.x";
 		
 	@Resource
 	DataSource dataSource;
