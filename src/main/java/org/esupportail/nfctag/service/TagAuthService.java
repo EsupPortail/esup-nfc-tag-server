@@ -17,22 +17,24 @@
  */
 package org.esupportail.nfctag.service;
 
-import java.util.Date;
-
-import javax.annotation.Resource;
-import javax.transaction.Transactional;
-
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
+import org.esupportail.nfctag.dao.ApplicationDao;
+import org.esupportail.nfctag.dao.DeviceDao;
+import org.esupportail.nfctag.dao.TagLogDao;
 import org.esupportail.nfctag.service.api.AppliExtApi;
 import org.esupportail.nfctag.service.api.TagIdCheckApi;
 import org.esupportail.nfctag.service.api.TagIdCheckApi.TagType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import javax.transaction.Transactional;
+import java.util.Date;
 
 @Transactional
 @Service
@@ -45,14 +47,20 @@ public class TagAuthService {
 
 	@Resource
 	TagIdCheckService tagIdCheckService;
-	
+
 	@Resource
-	ApplicationsService applicationsService;
-	
+	private ApplicationDao applicationDao;
+
+	@Resource
+	private DeviceDao deviceDao;
+
+	@Resource
+	private TagLogDao tagLogDao;
+
 	public TagLog auth(TagType tagType, String tagId, String numeroId, String cardId, String appName, Boolean validate) throws EsupNfcTagException {
-		Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+		Device device = deviceDao.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
 		device.setLastUseDate(new Date());
-		device.merge();
+		deviceDao.merge(device);
 		Application application = device.getApplication();
 		TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(application.getTagIdCheck());
 		if (tagIdCheckApi == null) {
@@ -81,7 +89,7 @@ public class TagAuthService {
 		if(extApi!=null){
 			extApi.isTagable(tagLog);
 		}
-		tagLog.persist();
+		tagLogDao.persist(tagLog);
 		log.info("Enregitrement effectué : " + tagLog.getFirstname() + " " + tagLog.getLastname() + ", avec le terminal :" + numeroId);
 		
 		if(device.isValidateAuthWoConfirmation() && validate){
@@ -105,15 +113,15 @@ public class TagAuthService {
 	
 	public Boolean validateTag(Long tagId, String numeroId) {
 		Boolean result = false;
-		TagLog tagLog = TagLog.findTagLogsByIdAndNumeroIdEquals(tagId, numeroId).getSingleResult();
-		Application app = Application.findApplicationsByNameEquals(tagLog.getApplicationName()).getSingleResult();
+		TagLog tagLog = tagLogDao.findTagLogsByIdAndNumeroIdEquals(tagId, numeroId).getSingleResult();
+		Application app = applicationDao.findApplicationsByNameEquals(tagLog.getApplicationName()).getSingleResult();
 		AppliExtApi extApi = applisExtService.get(app.getAppliExt());
 		if(extApi!=null && tagLog.getStatus().equals(TagLog.Status.none)) {
 			result = extApi.validateTag(tagLog);
 		}
 		if(result){
 			tagLog.setStatus(TagLog.Status.valid);
-			tagLog.merge();
+			tagLogDao.merge(tagLog);
 			log.info("Status change to [" + tagLog.getStatus() + "] for " + tagLog.getEppn() );
 		}else{
 			log.info("Status don't change for " + tagLog.getEppn() );
@@ -123,15 +131,15 @@ public class TagAuthService {
 
 	public Boolean cancelTag(Long tagId, String numeroId) {
 		Boolean cancelTagSuccess = false;
-		TagLog tagLog = TagLog.findTagLogsByIdAndNumeroIdEquals(tagId, numeroId).getSingleResult();
-		Application app = Application.findApplicationsByNameEquals(tagLog.getApplicationName()).getSingleResult();
+		TagLog tagLog = tagLogDao.findTagLogsByIdAndNumeroIdEquals(tagId, numeroId).getSingleResult();
+		Application app = applicationDao.findApplicationsByNameEquals(tagLog.getApplicationName()).getSingleResult();
 		AppliExtApi extApi = applisExtService.get(app.getAppliExt());
 		if(extApi!=null && tagLog.getStatus().equals(TagLog.Status.none)) {
 			cancelTagSuccess = extApi.cancelTag(tagLog);
 		}
 		if(cancelTagSuccess){
 			tagLog.setStatus(TagLog.Status.cancel);
-			tagLog.merge();
+			tagLogDao.merge(tagLog);
 			log.info("Status change to [" + tagLog.getStatus() + "] for " + tagLog.getEppn() );
 		}else{
 			log.info("Status don't change for " + tagLog.getEppn() );
@@ -140,14 +148,14 @@ public class TagAuthService {
 	}
 	
 	public Boolean dismissTag(Long tagId, String numeroId) {
-		TagLog tagLog = TagLog.findTagLogsByIdAndNumeroIdEquals(tagId, numeroId).getSingleResult();
+		TagLog tagLog = tagLogDao.findTagLogsByIdAndNumeroIdEquals(tagId, numeroId).getSingleResult();
 		tagLog.setLiveStatus(TagLog.Status.valid);
-		tagLog.merge();
+		tagLogDao.merge(tagLog);
 		return true;
 	}
 	
 	public String getEppnInit(TagType tagType, String numeroId) throws EsupNfcTagException {
-		Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+		Device device = deviceDao.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
 		Application application = device.getApplication();
 		TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(application.getTagIdCheck());
 		if (tagIdCheckApi == null) {
@@ -157,8 +165,8 @@ public class TagAuthService {
 	}
 	
 	public String getDisplay(Long tagId, String numeroId) throws EsupNfcTagException {
-		TagLog tagLog = TagLog.findTagLogsByIdAndNumeroIdEquals(tagId, numeroId).getSingleResult();
-		Application app = Application.findApplicationsByNameEquals(tagLog.getApplicationName()).getSingleResult();
+		TagLog tagLog = tagLogDao.findTagLogsByIdAndNumeroIdEquals(tagId, numeroId).getSingleResult();
+		Application app = applicationDao.findApplicationsByNameEquals(tagLog.getApplicationName()).getSingleResult();
 		AppliExtApi extApi = applisExtService.get(app.getAppliExt());
 		return extApi.getDisplay(tagLog);
 	}

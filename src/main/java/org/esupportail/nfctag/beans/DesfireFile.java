@@ -1,10 +1,10 @@
 package org.esupportail.nfctag.beans;
 
-import java.io.Serializable;
-
 import org.esupportail.nfctag.service.api.TagWriteApi;
 import org.esupportail.nfctag.service.api.impl.TagWriteNone;
 import org.esupportail.nfctag.service.desfire.DesfireUtils;
+
+import java.io.Serializable;
 
 public class DesfireFile implements Serializable {
 

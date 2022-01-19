@@ -17,14 +17,9 @@
  */
 package org.esupportail.nfctag.web.nfc;
 
-import java.io.IOException;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.transaction.Transactional;
-
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import org.esupportail.nfctag.dao.DeviceDao;
 import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.TagAuthService;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
@@ -41,6 +36,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
+import javax.transaction.Transactional;
+import java.io.IOException;
+import java.util.List;
+
 @RequestMapping("/nfc-ws")
 @Controller
 @Transactional
@@ -53,6 +53,9 @@ public class NfcWsController {
 	
 	@Resource
 	TagAuthService tagAuthService;
+
+	@Resource
+	private DeviceDao deviceDao;
 
 	@RequestMapping(value="/dismiss")
 	@ResponseBody
@@ -89,7 +92,7 @@ public class NfcWsController {
 		String locationName = ""; 
 		try {
 			
-			List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
+			List<Device> devices = deviceDao.findDevicesByNumeroIdEquals(numeroId).getResultList();
 			if(!devices.isEmpty()) {
 				Device device = devices.get(0);
 				locationName = device.getLocation();
@@ -106,7 +109,7 @@ public class NfcWsController {
 	@ResponseBody
 	public String nfcDeviceAuthMethod(@RequestParam String numeroId) throws IOException, EsupNfcTagException {
 		String deviceAuthConfig = null;
-		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
+		List<Device> devices = deviceDao.findDevicesByNumeroIdEquals(numeroId).getResultList();
 		if(devices.size() > 0) {
 			String nfcAuthConfigKey = devices.get(0).getApplication().getNfcConfig(); 
 			NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(nfcAuthConfigKey);

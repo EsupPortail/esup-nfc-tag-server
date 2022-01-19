@@ -17,19 +17,13 @@
  */
 package org.esupportail.nfctag.web.nfc;
 
-import java.io.IOException;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.transaction.Transactional;
-
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import org.esupportail.nfctag.dao.ApplicationDao;
+import org.esupportail.nfctag.dao.DeviceDao;
 import org.esupportail.nfctag.service.ApplicationsService;
 import org.esupportail.nfctag.service.DeviceService;
-import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.VersionApkService;
 import org.esupportail.nfctag.service.VersionJarService;
 import org.slf4j.Logger;
@@ -45,6 +39,12 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.annotation.Resource;
+import javax.transaction.Transactional;
+import java.io.IOException;
+import java.util.Date;
+import java.util.List;
+
 @RequestMapping("/nfc")
 @Controller
 @Transactional
@@ -52,9 +52,6 @@ public class NfcRegisterController {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
-	@Resource
-	NfcAuthConfigService nfcAuthConfigService;
-	
 	@Resource
 	private VersionApkService versionApkService;
 
@@ -66,6 +63,12 @@ public class NfcRegisterController {
 	
 	@Autowired
 	private ApplicationsService applicationsService;
+
+	@Resource
+	private ApplicationDao applicationDao;
+
+	@Resource
+	private DeviceDao deviceDao;
 
 	@RequestMapping("/locations")
 	public String selectedLocationForm(
@@ -109,7 +112,7 @@ public class NfcRegisterController {
 			
 			String numeroId = "?";
 			
-			List<Device> devices = Device.findDevicesByEppnInitAndImeiEquals(eppn, imei).getResultList();
+			List<Device> devices = deviceDao.findDevicesByEppnInitAndImeiEquals(eppn, imei).getResultList();
 			if(!devices.isEmpty()) {
 				Device device = devices.get(0);
 				numeroId = device.getNumeroId();
@@ -138,7 +141,7 @@ public class NfcRegisterController {
 			@RequestParam(required = true) String imei,
 			@RequestParam(required = false) String macAddress, Model uiModel) throws IOException, EsupNfcTagException {
 		
-		Application application = Application.findApplication(applicationId);
+		Application application = applicationDao.findApplication(applicationId);
 
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String eppnInit = auth.getName();
@@ -150,7 +153,7 @@ public class NfcRegisterController {
 		}
 		
 		String numeroId;
-		if (Device.countFindDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)==0) {
+		if (deviceDao.countFindDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)==0) {
 			numeroId = deviceService.generateNumeroId();
 			Device device = new Device();
 			device.setNumeroId(numeroId);
@@ -166,9 +169,9 @@ public class NfcRegisterController {
 				device.setValidateAuthWoConfirmation(false);
 			}
 			device.setCreateDate(new Date());
-			device.persist();
+			deviceDao.persist(device);
 		} else {
-			Device tel = Device.findDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)
+			Device tel = deviceDao.findDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)
 					.getSingleResult();
 			numeroId = tel.getNumeroId();
 		}
@@ -198,7 +201,7 @@ public class NfcRegisterController {
 			throw new AccessDeniedException(eppnInit + " can not register in write sgc");
 		}
 		
-		if (Device.countFindDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)==0) {
+		if (deviceDao.countFindDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)==0) {
 			numeroId = deviceService.generateNumeroId();
 			Device device = new Device();
 			device.setNumeroId(numeroId);
@@ -214,9 +217,9 @@ public class NfcRegisterController {
 				device.setValidateAuthWoConfirmation(false);
 			}
 			device.setCreateDate(new Date());
-			device.persist();
+			deviceDao.persist(device);
 		} else {
-			Device tel = Device.findDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)
+			Device tel = deviceDao.findDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)
 					.getSingleResult();
 			numeroId = tel.getNumeroId();
 		}

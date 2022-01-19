@@ -17,11 +17,10 @@
  */
 package org.esupportail.nfctag.domain;
 
-import org.springframework.roo.addon.javabean.RooJavaBean;
-import org.springframework.roo.addon.tostring.RooToString;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
-@RooJavaBean
-@RooToString
+
 public class ApplisExtApiForm {
 
 	String appliExtKey;
@@ -31,4 +30,40 @@ public class ApplisExtApiForm {
 	String appliExtHeader;
 	
 	String appliExtBackgroundColor;
+
+    public String getAppliExtKey() {
+        return this.appliExtKey;
+    }
+
+    public void setAppliExtKey(String appliExtKey) {
+        this.appliExtKey = appliExtKey;
+    }
+
+    public String getAppliExtDescription() {
+        return this.appliExtDescription;
+    }
+
+    public void setAppliExtDescription(String appliExtDescription) {
+        this.appliExtDescription = appliExtDescription;
+    }
+
+    public String getAppliExtHeader() {
+        return this.appliExtHeader;
+    }
+
+    public void setAppliExtHeader(String appliExtHeader) {
+        this.appliExtHeader = appliExtHeader;
+    }
+
+    public String getAppliExtBackgroundColor() {
+        return this.appliExtBackgroundColor;
+    }
+
+    public void setAppliExtBackgroundColor(String appliExtBackgroundColor) {
+        this.appliExtBackgroundColor = appliExtBackgroundColor;
+    }
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    }
 }

@@ -10,24 +10,15 @@
  */
 package org.esupportail.nfctag.service.desfire;
 
-import java.security.SecureRandom;
-import java.util.Arrays;
-
-import javax.smartcardio.CommandAPDU;
-import javax.smartcardio.ResponseAPDU;
-
-import nfcjlib.core.DESFireEV1;
+import nfcjlib.core.SimpleSCR;
+import nfcjlib.core.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import nfcjlib.core.SimpleSCR;
-import nfcjlib.core.util.AES;
-import nfcjlib.core.util.BitOp;
-import nfcjlib.core.util.CMAC;
-import nfcjlib.core.util.CRC16;
-import nfcjlib.core.util.CRC32;
-import nfcjlib.core.util.Dump;
-import nfcjlib.core.util.TripleDES;
+import javax.smartcardio.CommandAPDU;
+import javax.smartcardio.ResponseAPDU;
+import java.security.SecureRandom;
+import java.util.Arrays;
 
 /**
  * Enables a client to interact with a MIFARE DESFire EV1 smart card.

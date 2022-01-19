@@ -17,26 +17,35 @@
  */
 package org.esupportail.nfctag.web.manager;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.TagLog;
+import org.esupportail.nfctag.dao.ApplicationDao;
+import org.esupportail.nfctag.dao.TagLogDao;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import javax.annotation.Resource;
+import java.util.Arrays;
+import java.util.List;
+
 @RequestMapping("/manager/taglogs")
 @Controller
-@RooWebScaffold(path = "manager/taglogs", formBackingObject = TagLog.class, create=false, delete=false, update=false)
 public class TagLogController {
 
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
-    
+
+    @Resource
+    private ApplicationDao applicationDao;
+
+    @Resource
+    private TagLogDao tagLogDao;
+
 	List<String> listSearchBy = Arrays.asList("authDate", "applicationName", "location", "eppnInit", "numeroId", "csn", "desfireId");
 	
     @RequestMapping(produces = "text/html")
@@ -63,11 +72,11 @@ public class TagLogController {
         int sizeNo = size == null ? 10 : size.intValue();
         final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
       
-        List<TagLog> taglogs = TagLog.findTagLogs(searchString, statusFilter, applicationFilter, sortFieldName, sortOrder).setFirstResult(firstResult).setMaxResults(sizeNo).getResultList();     
-        float nrOfPages = (float) TagLog.countFindTagLogs(searchString, statusFilter, applicationFilter) / sizeNo;
+        List<TagLog> taglogs = tagLogDao.findTagLogs(searchString, statusFilter, applicationFilter, sortFieldName, sortOrder).setFirstResult(firstResult).setMaxResults(sizeNo).getResultList();
+        float nrOfPages = (float) tagLogDao.countFindTagLogs(searchString, statusFilter, applicationFilter) / sizeNo;
         
         uiModel.addAttribute("maxPages", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));
-        uiModel.addAttribute("applications", Application.findAllApplications());
+        uiModel.addAttribute("applications", applicationDao.findAllApplications());
         uiModel.addAttribute("status", TagLog.Status.values());
         uiModel.addAttribute("page", page);
         uiModel.addAttribute("size", size);
@@ -81,4 +90,15 @@ public class TagLogController {
         return "manager/taglogs/list";
     }
 
+    @RequestMapping(value = "/{id}", produces = "text/html")
+    public String show(@PathVariable("id") Long id, Model uiModel) {
+        addDateTimeFormatPatterns(uiModel);
+        uiModel.addAttribute("taglog", tagLogDao.findTagLog(id));
+        uiModel.addAttribute("itemId", id);
+        return "manager/taglogs/show";
+    }
+
+    void addDateTimeFormatPatterns(Model uiModel) {
+        uiModel.addAttribute("tagLog_authdate_date_format", DateTimeFormat.patternForStyle("MM", LocaleContextHolder.getLocale()));
+    }
 }

@@ -17,16 +17,15 @@
  */
 package org.esupportail.nfctag.web.live;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+
 import java.io.Serializable;
 import java.util.Date;
 
-import org.springframework.roo.addon.equals.RooEquals;
-import org.springframework.roo.addon.javabean.RooJavaBean;
-import org.springframework.roo.addon.tostring.RooToString;
 
-@RooJavaBean
-@RooToString
-@RooEquals
 public class LiveQuery implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -46,7 +45,48 @@ public class LiveQuery implements Serializable {
 		this.numeroId = numeroId;
 		this.authDateTimestamp = authDateTimestamp;
 	}
-	
-	
-	
+
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    }
+
+    public String getNumeroId() {
+        return this.numeroId;
+    }
+
+    public void setNumeroId(String numeroId) {
+        this.numeroId = numeroId;
+    }
+
+    public Long getAuthDateTimestamp() {
+        return this.authDateTimestamp;
+    }
+
+    public void setAuthDateTimestamp(Long authDateTimestamp) {
+        this.authDateTimestamp = authDateTimestamp;
+    }
+
+    public Date getLastPollDate() {
+        return this.lastPollDate;
+    }
+
+    public void setLastPollDate(Date lastPollDate) {
+        this.lastPollDate = lastPollDate;
+    }
+
+    public boolean equals(Object obj) {
+        if (!(obj instanceof LiveQuery)) {
+            return false;
+        }
+        if (this == obj) {
+            return true;
+        }
+        LiveQuery rhs = (LiveQuery) obj;
+        return new EqualsBuilder().append(authDateTimestamp, rhs.authDateTimestamp).append(lastPollDate, rhs.lastPollDate).append(numeroId, rhs.numeroId).isEquals();
+    }
+
+    public int hashCode() {
+        return new HashCodeBuilder().append(authDateTimestamp).append(lastPollDate).append(numeroId).toHashCode();
+    }
 }

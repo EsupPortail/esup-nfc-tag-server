@@ -17,15 +17,15 @@
  */
 package org.esupportail.nfctag.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-
 import org.esupportail.nfctag.domain.TagIdCheckApiForm;
 import org.esupportail.nfctag.service.api.TagIdCheckApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 
 @Service
 public class TagIdCheckService {

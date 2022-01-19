@@ -17,14 +17,13 @@
  */
 package org.esupportail.nfctag.logs;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-
+import ch.qos.logback.classic.pattern.ClassicConverter;
+import ch.qos.logback.classic.spi.ILoggingEvent;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import ch.qos.logback.classic.pattern.ClassicConverter;
-import ch.qos.logback.classic.spi.ILoggingEvent;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 public class SessionConverter extends ClassicConverter {
    

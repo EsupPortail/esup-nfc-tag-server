@@ -1,7 +1,5 @@
 package org.esupportail.nfctag.service.desfire.actions;
 
-import java.math.BigInteger;
-
 import org.apache.commons.lang3.StringUtils;
 import org.esupportail.nfctag.beans.NfcResultBean;
 import org.esupportail.nfctag.beans.NfcResultBean.Action;
@@ -18,6 +16,8 @@ import org.esupportail.nfctag.service.desfire.DesfireUtils;
 import org.esupportail.nfctag.web.live.LiveLongPoolController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.math.BigInteger;
 
 public class DesfireDeuinfoActionService extends DesfireActionService {
 

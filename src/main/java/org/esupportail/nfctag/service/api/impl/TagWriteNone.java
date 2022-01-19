@@ -17,11 +17,11 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
-import javax.annotation.Resource;
-
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.api.TagWriteApi;
 import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
 
 public class TagWriteNone implements TagWriteApi {
 	

@@ -17,11 +17,11 @@
  */
 package org.esupportail.nfctag.web;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.handler.SimpleMappingExceptionResolver;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class LoggingExceptionResolver extends SimpleMappingExceptionResolver {
 	

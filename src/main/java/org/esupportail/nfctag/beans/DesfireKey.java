@@ -1,8 +1,8 @@
 package org.esupportail.nfctag.beans;
 
-import java.io.Serializable;
-
 import org.esupportail.nfctag.service.desfire.DesfireKeyService;
+
+import java.io.Serializable;
 
 public class DesfireKey implements Serializable {
 

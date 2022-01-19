@@ -17,11 +17,6 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
-import java.net.URI;
-import java.text.MessageFormat;
-
-import javax.annotation.Resource;
-
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
 import org.esupportail.nfctag.service.api.DamKeysTagWriteApi;
@@ -31,6 +26,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.annotation.Resource;
+import java.net.URI;
+import java.text.MessageFormat;
 
 public class DamKeysTagWriteRestWs implements DamKeysTagWriteApi {
 

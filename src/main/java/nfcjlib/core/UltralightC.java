@@ -10,13 +10,12 @@
  */
 package nfcjlib.core;
 
-import java.security.SecureRandom;
+import nfcjlib.core.util.Dump;
+import nfcjlib.core.util.TripleDES;
 
 import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
-
-import nfcjlib.core.util.Dump;
-import nfcjlib.core.util.TripleDES;
+import java.security.SecureRandom;
 
 /**
  * Eases the manipulation of MIFARE Ultralight C smart cards.

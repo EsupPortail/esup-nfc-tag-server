@@ -17,17 +17,9 @@
  */
 package org.esupportail.nfctag.web.nfc;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.transaction.Transactional;
-
 import org.apache.commons.io.IOUtils;
+import org.esupportail.nfctag.dao.ApplicationDao;
+import org.esupportail.nfctag.dao.DeviceDao;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
@@ -48,6 +40,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriUtils;
 import org.springframework.web.util.WebUtils;
 
+import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.transaction.Transactional;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.List;
+
 @RequestMapping("/nfc-index")
 @Controller
 @Transactional
@@ -63,6 +63,12 @@ public class NfcIndexController {
 	
 	@Autowired
 	private ApplicationsService applicationsService;
+
+	@Resource
+	private ApplicationDao applicationDao;
+
+	@Resource
+	private DeviceDao deviceDao;
 
 	@RequestMapping
 	public String index(@RequestParam(required=false) String numeroId,
@@ -95,7 +101,7 @@ public class NfcIndexController {
 			}
 		}
 		log.info("try to connect with numeroId :" + numeroId);
-		if(numeroId==null || numeroId.isEmpty() || Device.findDevicesByNumeroIdEquals(numeroId).getResultList().isEmpty()) {
+		if(numeroId==null || numeroId.isEmpty() || deviceDao.findDevicesByNumeroIdEquals(numeroId).getResultList().isEmpty()) {
 			return "redirect:/nfc/locations?imei=" + imei + "&macAddress=" + macAddress + "&apkVersion=" + versionApkService.getApkVersion() + "&jarVersion=" + versionJarService.getJarVersion();
 		} else {
 			return "redirect:/live?apkVersion=" + versionApkService.getApkVersion() + "&jarVersion=" + versionJarService.getJarVersion() + "&numeroId=" + numeroId;
@@ -171,7 +177,7 @@ public class NfcIndexController {
 		
 		log.info(numeroId + "access to /nfc-index/locations");
 		
-		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
+		List<Device> devices = deviceDao.findDevicesByNumeroIdEquals(numeroId).getResultList();
 		if(devices.isEmpty()) {
 			return "redirect:/nfc-index";
 		}
@@ -218,7 +224,7 @@ public class NfcIndexController {
 		
 		log.info(numeroId + "access to /nfc-index/locations");
 		
-		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
+		List<Device> devices = deviceDao.findDevicesByNumeroIdEquals(numeroId).getResultList();
 		if(devices.isEmpty()) {
 			return "redirect:/nfc/register/?location=" + encodeUrlPathSegment(location, httpServletRequest) + "&applicationId=" + applicationId + "&imei=" + imei + "&macAddress=" + macAddress + "&apkVersion=" + versionApkService.getApkVersion() + "&jarVersion=" + versionJarService.getJarVersion();
 		}
@@ -226,7 +232,7 @@ public class NfcIndexController {
 		Device device = devices.get(0);
 		String eppnInit = device.getEppnInit();
 		
-		Application application = Application.findApplication(applicationId);
+		Application application = applicationDao.findApplication(applicationId);
 		
 		// check right access ...
 		if(!applicationsService.hasApplicationLocationRightAcces(eppnInit, applicationId, location)) {
@@ -242,7 +248,7 @@ public class NfcIndexController {
 		} else{
 			device.setValidateAuthWoConfirmation(false);
 		}
-		device.merge();
+		deviceDao.merge(device);
 		
 		uiModel.addAttribute("imei", imei);
 		uiModel.addAttribute("macAddress", macAddress);
@@ -265,15 +271,15 @@ public class NfcIndexController {
 		uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
 		uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
 		
-		if(Device.countFindDevicesByNumeroIdEquals(numeroId)>0) {
-			Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+		if(deviceDao.countFindDevicesByNumeroIdEquals(numeroId)>0) {
+			Device device = deviceDao.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
 			if(full) {
-				device.remove();
+				deviceDao.remove(device.getId());
 			} else {
 				device.setLocation(null);
 				device.setApplication(null);
 				device.setValidateAuthWoConfirmation(false);
-				device.merge();
+				deviceDao.merge(device);
 			}
 		 }
 		 
@@ -285,9 +291,7 @@ public class NfcIndexController {
         if (enc == null) {
             enc = WebUtils.DEFAULT_CHARACTER_ENCODING;
         }
-        try {
-            pathSegment = UriUtils.encodePathSegment(pathSegment, enc);
-	} catch (UnsupportedEncodingException uee) {}
+		pathSegment = UriUtils.encodePathSegment(pathSegment, enc);
         return pathSegment;
     }
 

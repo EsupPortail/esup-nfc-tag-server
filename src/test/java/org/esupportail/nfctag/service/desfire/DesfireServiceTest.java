@@ -10,6 +10,7 @@ import org.esupportail.nfctag.beans.DesfireTag;
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
+import org.esupportail.nfctag.dao.TagLogDao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -20,6 +21,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import javax.annotation.Resource;
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -31,15 +33,18 @@ public class DesfireServiceTest {
 	
 	@Autowired
 	DesfireTag desfireComueTagEsupSgc;
-	
+
+	@Resource
+	private TagLogDao tagLogDao;
+
 	@Value("${test.desfire.csn:}") 
 	String csnFromConfig; 
 	
 	@Test
 	public void testWithFistCsnFind() throws Exception {
-		Long nbTagLog = TagLog.countTagLogs();
+		Long nbTagLog = tagLogDao.countTagLogs();
 		if(nbTagLog > 0) {
-			List<TagLog> tagLogs = TagLog.findTagLogEntries(nbTagLog.intValue() - 1, 1);
+			List<TagLog> tagLogs = tagLogDao.findTagLogEntries(nbTagLog.intValue() - 1, 1);
 			log.info("test with " + tagLogs.get(0).getCsn());
 			testParseDesfireConfiguration(tagLogs.get(0).getCsn());
 		}

@@ -17,15 +17,8 @@
  */
 package org.esupportail.nfctag.web.manager;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import javax.annotation.Resource;
-
-import org.esupportail.nfctag.domain.Device;
-import org.esupportail.nfctag.domain.TagLog;
+import org.esupportail.nfctag.dao.DeviceDao;
+import org.esupportail.nfctag.dao.TagLogDao;
 import org.esupportail.nfctag.service.StatsService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,6 +28,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import javax.annotation.Resource;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
 @RequestMapping("/manager/stats")
 @Controller
 public class StatsController {
@@ -43,7 +42,13 @@ public class StatsController {
 	
 	@Resource
 	StatsService statsService;	
-	
+
+	@Resource
+	private DeviceDao deviceDao;
+
+	@Resource
+	private TagLogDao tagLogDao;
+
 	@RequestMapping()
 	public String index(@RequestParam(required = false, value="annee") String annee, Model uiModel) {
 		if(annee==null) {
@@ -56,11 +61,11 @@ public class StatsController {
 	    cal.add(Calendar.HOUR_OF_DAY, -1); // adds one hour
 	    cal.getTime();
 		
-	    Long nbTagLastHour = TagLog.countFindTagLogsByAuthDateBetween(cal.getTime(), new Date());
+	    Long nbTagLastHour = tagLogDao.countFindTagLogsByAuthDateBetween(cal.getTime(), new Date());
 	    
-	    List<String> years = TagLog.findYears();
+	    List<String> years = tagLogDao.findYears();
 	    
-	    uiModel.addAttribute("nbDevice", Device.countDevices());
+	    uiModel.addAttribute("nbDevice", deviceDao.countDevices());
 	    uiModel.addAttribute("nbTagLastHour", nbTagLastHour);
 	    uiModel.addAttribute("years", years);
 	    uiModel.addAttribute("annee", annee);

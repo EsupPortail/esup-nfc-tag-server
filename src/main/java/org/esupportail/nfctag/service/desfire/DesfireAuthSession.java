@@ -17,11 +17,11 @@
  */
 package org.esupportail.nfctag.service.desfire;
 
-import java.io.Serializable;
-
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
+
+import java.io.Serializable;
 
 @Service
 @Scope(value="session")

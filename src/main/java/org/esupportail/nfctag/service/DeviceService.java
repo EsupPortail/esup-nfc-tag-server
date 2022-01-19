@@ -1,17 +1,21 @@
 package org.esupportail.nfctag.service;
 
-import java.util.Random;
-
-import org.esupportail.nfctag.domain.Device;
+import org.esupportail.nfctag.dao.DeviceDao;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.Random;
 
 @Service
 public class DeviceService {
+
+	@Resource
+	private DeviceDao deviceDao;
 	
 	public String generateNumeroId() {
 		while(true) {
 			Long numeroRandom = Math.abs(new Random().nextLong());
-			if(Device.countFindDevicesByNumeroIdEquals(numeroRandom.toString()) == 0){
+			if(deviceDao.countFindDevicesByNumeroIdEquals(numeroRandom.toString()) == 0){
 				return numeroRandom.toString();
 			}
 		}

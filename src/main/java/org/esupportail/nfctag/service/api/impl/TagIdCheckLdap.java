@@ -17,11 +17,11 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
-import java.util.List;
-
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.service.LdapService;
 import org.esupportail.nfctag.service.api.TagIdCheckApi;
+
+import java.util.List;
 
 public class TagIdCheckLdap implements TagIdCheckApi {
 	

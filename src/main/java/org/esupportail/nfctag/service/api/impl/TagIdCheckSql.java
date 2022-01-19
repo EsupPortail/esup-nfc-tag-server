@@ -17,14 +17,14 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
-import javax.sql.DataSource;
-
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.service.api.TagIdCheckApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import javax.sql.DataSource;
 
 public class TagIdCheckSql implements TagIdCheckApi {
 	
@@ -76,7 +76,7 @@ public class TagIdCheckSql implements TagIdCheckApi {
 		
 		TagLog tagLog = null;
 		try {
-			tagLog = (TagLog) jdbcTemplate.queryForObject(authSql, new Object[] { tagId }, new TagLogRowMapper());
+			tagLog = (TagLog) jdbcTemplate.queryForObject(authSql, new TagLogRowMapper(), tagId);
 			log.info("tagId " + tagId + " identifié !");
 		} catch (EmptyResultDataAccessException ex) {
 			log.info("Pas de résultat pour le tagId : " + tagId);

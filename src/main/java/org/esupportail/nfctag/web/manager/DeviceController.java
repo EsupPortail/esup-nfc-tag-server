@@ -16,47 +16,44 @@
  * limitations under the License.
  */
 package org.esupportail.nfctag.web.manager;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Join;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+import org.esupportail.nfctag.dao.ApplicationDao;
+import org.esupportail.nfctag.dao.DeviceDao;
 import org.esupportail.nfctag.service.ApplicationsService;
+import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.roo.addon.web.mvc.controller.scaffold.RooWebScaffold;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriUtils;
+import org.springframework.web.util.WebUtils;
+
+import javax.annotation.Resource;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.criteria.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 @RequestMapping("/manager/devices")
 @Controller
-@RooWebScaffold(path = "manager/devices", formBackingObject = Device.class)
 public class DeviceController {
 	
     protected final Logger log = LoggerFactory.getLogger(this.getClass());
@@ -65,7 +62,16 @@ public class DeviceController {
 	
 	@Autowired
 	private ApplicationsService applicationsService;
-	
+
+    @Resource
+    private ApplicationDao applicationDao;
+
+    @Resource
+    private DeviceDao deviceDao;
+
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @RequestMapping(method = RequestMethod.POST, produces = "text/html")
     public String create(@Valid Device device, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
         if (bindingResult.hasErrors()) {
@@ -74,14 +80,14 @@ public class DeviceController {
         }
         uiModel.asMap().clear();
         device.setCreateDate(new Date());
-        device.persist();
+        deviceDao.persist(device);
         return "redirect:/manager/devices/" + encodeUrlPathSegment(device.getId().toString(), httpServletRequest);
     }
     
     @RequestMapping(value = "/numeroid/{numeroId}", produces = "text/html")
     public String numeroId(@PathVariable("numeroId") String numeroId, Model uiModel) {
     	try{
-    		Device device = Device.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+    		Device device = deviceDao.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
             uiModel.addAttribute("device", device);
             uiModel.addAttribute("itemId", device.getId());
     	}catch(EmptyResultDataAccessException e){
@@ -103,9 +109,9 @@ public class DeviceController {
 
         int sizeNo = size == null ? 10 : size.intValue();
         final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
-    	List<Device> devices = Device.findDeviceEntries(firstResult, sizeNo, sortFieldName, sortOrder);
+    	List<Device> devices = deviceDao.findDeviceEntries(firstResult, sizeNo, sortFieldName, sortOrder);
 
-    	EntityManager em = Device.entityManager();
+    	EntityManager em = entityManager;
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<Device> query = criteriaBuilder.createQuery(Device.class);
         Root<Device> c = query.from(Device.class);
@@ -142,7 +148,7 @@ public class DeviceController {
         float nrOfPages = (float) em.createQuery(query).getResultList().size() / sizeNo;
         
         uiModel.addAttribute("maxPages", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));
-        uiModel.addAttribute("applications", Application.findAllApplications());
+        uiModel.addAttribute("applications", applicationDao.findAllApplications());
         uiModel.addAttribute("status", TagLog.Status.values());
         uiModel.addAttribute("page", page);
         uiModel.addAttribute("size", size);
@@ -193,8 +199,61 @@ public class DeviceController {
 	@RequestMapping(value="/getValidateWo", headers = "Accept=application/json; charset=utf-8")
 	@ResponseBody
 	public Boolean getValidateWo(@RequestParam(required = true) Long applicationId) {
-		Application application = Application.findApplication(applicationId);
+		Application application = applicationDao.findApplication(applicationId);
 		return application.getValidateAuthWoConfirmationDefault();
 	}
-    
+
+    @RequestMapping(value = "/{id}", produces = "text/html")
+    public String show(@PathVariable("id") Long id, Model uiModel) {
+        addDateTimeFormatPatterns(uiModel);
+        uiModel.addAttribute("device", deviceDao.findDevice(id));
+        uiModel.addAttribute("itemId", id);
+        return "manager/devices/show";
+    }
+
+    @RequestMapping(method = RequestMethod.PUT, produces = "text/html")
+    public String update(@Valid Device device, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
+        if (bindingResult.hasErrors()) {
+            populateEditForm(uiModel, device);
+            return "manager/devices/update";
+        }
+        uiModel.asMap().clear();
+        deviceDao.merge(device);
+        return "redirect:/manager/devices/" + encodeUrlPathSegment(device.getId().toString(), httpServletRequest);
+    }
+
+    @RequestMapping(value = "/{id}", params = "form", produces = "text/html")
+    public String updateForm(@PathVariable("id") Long id, Model uiModel) {
+        populateEditForm(uiModel, deviceDao.findDevice(id));
+        return "manager/devices/update";
+    }
+
+    @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = "text/html")
+    public String delete(@PathVariable("id") Long id, @RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "size", required = false) Integer size, Model uiModel) {
+        deviceDao.remove(id);
+        uiModel.asMap().clear();
+        uiModel.addAttribute("page", (page == null) ? "1" : page.toString());
+        uiModel.addAttribute("size", (size == null) ? "10" : size.toString());
+        return "redirect:/manager/devices";
+    }
+
+    void addDateTimeFormatPatterns(Model uiModel) {
+        uiModel.addAttribute("device_createdate_date_format", DateTimeFormat.patternForStyle("MM", LocaleContextHolder.getLocale()));
+        uiModel.addAttribute("device_lastusedate_date_format", DateTimeFormat.patternForStyle("MM", LocaleContextHolder.getLocale()));
+    }
+
+    void populateEditForm(Model uiModel, Device device) {
+        uiModel.addAttribute("device", device);
+        addDateTimeFormatPatterns(uiModel);
+        uiModel.addAttribute("applications", applicationDao.findAllApplications());
+    }
+
+    String encodeUrlPathSegment(String pathSegment, HttpServletRequest httpServletRequest) {
+        String enc = httpServletRequest.getCharacterEncoding();
+        if (enc == null) {
+            enc = WebUtils.DEFAULT_CHARACTER_ENCODING;
+        }
+        pathSegment = UriUtils.encodePathSegment(pathSegment, enc);
+        return pathSegment;
+    }
 }

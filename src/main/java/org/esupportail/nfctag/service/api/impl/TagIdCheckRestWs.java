@@ -17,10 +17,6 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
-import java.net.URI;
-
-import javax.annotation.Resource;
-
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
@@ -30,6 +26,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import javax.annotation.Resource;
+import java.net.URI;
 
 public class TagIdCheckRestWs implements TagIdCheckApi {
 

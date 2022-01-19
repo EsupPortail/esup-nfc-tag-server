@@ -17,16 +17,60 @@
  */
 package org.esupportail.nfctag.domain;
 
-import org.springframework.roo.addon.javabean.RooJavaBean;
-import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
-import org.springframework.roo.addon.tostring.RooToString;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.springframework.beans.factory.annotation.Configurable;
 
-@RooJavaBean
-@RooToString
-@RooJpaActiveRecord
+import javax.persistence.*;
+
+@Entity
+@Configurable
+
 public class NfcMessage {
 
     private String csn;
 	private String numeroId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private Long id;
+    @Version
+    @Column(name = "version")
+    private Integer version;
 
+    public String getCsn() {
+        return this.csn;
+    }
+
+    public void setCsn(String csn) {
+        this.csn = csn;
+    }
+
+    public String getNumeroId() {
+        return this.numeroId;
+    }
+
+    public void setNumeroId(String numeroId) {
+        this.numeroId = numeroId;
+    }
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getVersion() {
+        return this.version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
 }

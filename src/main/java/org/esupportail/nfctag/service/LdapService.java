@@ -17,11 +17,6 @@
  */
 package org.esupportail.nfctag.service;
 
-import java.text.MessageFormat;
-import java.util.List;
-
-import javax.naming.directory.Attributes;
-
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.service.api.TagIdCheckApi.TagType;
 import org.slf4j.Logger;
@@ -32,6 +27,10 @@ import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.core.support.LdapContextSource;
+
+import javax.naming.directory.Attributes;
+import java.text.MessageFormat;
+import java.util.List;
 
 public class LdapService {
 
@@ -115,7 +114,7 @@ public class LdapService {
 	
 	public TagLog getTagLogByCardUID(String cardUID, String searchFilter, TagType tagType) {
 		
-		String formattedFilter = MessageFormat.format(searchFilter, new String[] {cardUID});
+		String formattedFilter = MessageFormat.format(searchFilter, cardUID);
 		
 		List<TagLog> tagLogs = ldapTemplate.search("", "(&(objectclass=person)("+formattedFilter+"))",
 				new TagLogLdapAttributMapper(tagType, cardUID));

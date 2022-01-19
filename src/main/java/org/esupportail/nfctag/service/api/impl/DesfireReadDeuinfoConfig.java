@@ -16,6 +16,9 @@
  * limitations under the License.
  */
 package org.esupportail.nfctag.service.api.impl;
+
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.TagAuthService;
 import org.esupportail.nfctag.service.desfire.DesfireDiversification;
@@ -26,11 +29,8 @@ import org.esupportail.nfctag.service.desfire.actions.DesfireDeuinfoActionServic
 import org.esupportail.nfctag.web.live.LiveLongPoolController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.roo.addon.javabean.RooJavaBean;
-import org.springframework.roo.addon.tostring.RooToString;
 
-@RooJavaBean
-@RooToString
+
 public class DesfireReadDeuinfoConfig extends DesfireReadConfig {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
@@ -70,5 +70,12 @@ public class DesfireReadDeuinfoConfig extends DesfireReadConfig {
 		
 		return diversifiedKey;
 	}
-	
+
+    public Logger getLog() {
+        return this.log;
+    }
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    }
 }

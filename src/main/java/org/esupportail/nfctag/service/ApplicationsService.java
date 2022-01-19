@@ -17,15 +17,12 @@
  */
 package org.esupportail.nfctag.service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
+import org.esupportail.nfctag.dao.ApplicationDao;
+import org.esupportail.nfctag.dao.DeviceDao;
 import org.esupportail.nfctag.service.api.AppliExtApi;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
 import org.esupportail.nfctag.service.api.TagIdCheckApi;
@@ -33,6 +30,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class ApplicationsService {
@@ -48,9 +49,15 @@ public class ApplicationsService {
 	@Resource
 	TagIdCheckService tagIdCheckService;
 
+	@Resource
+	private ApplicationDao applicationDao;
+
+	@Resource
+	private DeviceDao deviceDao;
+
 	public Application getApplicationFromNumeroId(String numeroId) throws EsupNfcTagException {
 
-		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
+		List<Device> devices = deviceDao.findDevicesByNumeroIdEquals(numeroId).getResultList();
 		if(devices.isEmpty()) {
 			throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_unknowdevice);
 		}
@@ -64,7 +71,7 @@ public class ApplicationsService {
 	
 	public List<Application> getApplications4Eppn(String eppn, boolean checkActive) throws EsupNfcTagException {
 		List<Application> applications = new ArrayList<Application>();
-		for(Application appli: Application.findAllApplications()) {
+		for(Application appli: applicationDao.findAllApplications()) {
 			AppliExtApi appliExtApi = applisExtService.get(appli.getAppliExt());
 			try {
 				List<String> locations = appliExtApi.getLocations4Eppn(eppn);
@@ -98,7 +105,7 @@ public class ApplicationsService {
 	
 	
 	public Application getSgcClientApplication4Eppn(String eppn) throws EsupNfcTagException {
-		List<Application> applications = Application.findApplicationsBySgcClientApp(true).getResultList();
+		List<Application> applications = applicationDao.findApplicationsBySgcClientApp(true).getResultList();
 		if(applications.isEmpty()) {
 			throw new AccessDeniedException("Pas d'application d'écriture pour esup-sgc-client de trouvé");
 		}
@@ -113,7 +120,7 @@ public class ApplicationsService {
 	
 
 	public boolean hasApplicationLocationRightAcces(String eppn, Long applicationId, String location) {
-		Application appli = Application.findApplication(applicationId);
+		Application appli = applicationDao.findApplication(applicationId);
 		AppliExtApi appliExtApi = applisExtService.get(appli.getAppliExt());
 		try {
 			List<String> locations = appliExtApi.getLocations4Eppn(eppn);
@@ -127,7 +134,7 @@ public class ApplicationsService {
 
 	public boolean checkApplicationFromNumeroId(String numeroId) throws EsupNfcTagException {
 		boolean isDeviceValid = false;
-		List<Device> devices = Device.findDevicesByNumeroIdEquals(numeroId).getResultList();
+		List<Device> devices = deviceDao.findDevicesByNumeroIdEquals(numeroId).getResultList();
 		if(!devices.isEmpty()) {
 			log.trace("device identify :" + numeroId);
 			Application application = devices.get(0).getApplication();
@@ -142,7 +149,7 @@ public class ApplicationsService {
 	
 	public boolean checkApplication(long id) throws EsupNfcTagException {
 		boolean isApplicationValid = false;
-		Application application = Application.findApplication(id);
+		Application application = applicationDao.findApplication(id);
 		if(!application.getAppliExt().isEmpty() && !application.getTagIdCheck().isEmpty() && !application.getNfcConfig().isEmpty()){
 			AppliExtApi extApi = applisExtService.get(application.getAppliExt());
 			NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(application.getNfcConfig());

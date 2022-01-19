@@ -17,20 +17,9 @@
  */
 package org.esupportail.nfctag.service.desfire;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
-import org.esupportail.nfctag.beans.DesfireApplication;
-import org.esupportail.nfctag.beans.DesfireFile;
-import org.esupportail.nfctag.beans.DesfireFlowStep;
+import org.esupportail.nfctag.beans.*;
 import org.esupportail.nfctag.beans.DesfireFlowStep.Action;
-import org.esupportail.nfctag.beans.DesfireKey;
-import org.esupportail.nfctag.beans.DesfireTag;
-import org.esupportail.nfctag.beans.NfcResultBean;
 import org.esupportail.nfctag.beans.NfcResultBean.CODE;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.ApplicationsService;
@@ -46,6 +35,12 @@ import org.esupportail.nfctag.web.wsrest.json.JsonFormCryptogram;
 import org.esupportail.nfctag.web.wsrest.json.JsonResponseCryptogram;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
 
 public class DesfireService {
 

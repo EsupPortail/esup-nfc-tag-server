@@ -17,11 +17,6 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.annotation.Resource;
-
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
@@ -30,6 +25,10 @@ import org.esupportail.nfctag.service.api.AppliExtApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
+
+import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AppliExtLdap implements AppliExtApi {
 

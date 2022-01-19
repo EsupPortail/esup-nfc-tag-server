@@ -1,11 +1,11 @@
 package org.esupportail.nfctag.service.desfire;
 
-import java.util.Random;
-
 import org.esupportail.nfctag.service.api.DamKeysTagWriteApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.Random;
 
 @Service
 public class DesfireDiversificationDamService {

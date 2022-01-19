@@ -17,9 +17,6 @@
  */
 package org.esupportail.nfctag.web.nfc;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
-
 import org.esupportail.nfctag.beans.NfcResultBean;
 import org.esupportail.nfctag.beans.NfcResultBean.CODE;
 import org.esupportail.nfctag.domain.TagError;
@@ -31,7 +28,6 @@ import org.esupportail.nfctag.service.desfire.DESFireEV1Service;
 import org.esupportail.nfctag.service.desfire.DesfireAuthSession;
 import org.esupportail.nfctag.service.desfire.DesfireService;
 import org.esupportail.nfctag.service.desfire.actions.DesfireActionService;
-//import org.esupportail.nfctag.service.desfire.DesfireService;
 import org.esupportail.nfctag.web.live.ErrorLongPoolController;
 import org.esupportail.nfctag.web.live.LiveLongPoolController;
 import org.slf4j.Logger;
@@ -43,6 +39,9 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+
+import javax.annotation.Resource;
+import javax.servlet.http.HttpSession;
 
 @Controller
 @RequestMapping("/desfire-ws")

@@ -1,7 +1,5 @@
 package nfcjlib.core.util;
 
-import java.util.Arrays;
-
 /**
  * CMAC implementation according to NIST 800-38B.
  * 

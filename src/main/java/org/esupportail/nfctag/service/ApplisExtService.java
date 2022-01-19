@@ -17,16 +17,12 @@
  */
 package org.esupportail.nfctag.service;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import org.esupportail.nfctag.domain.ApplisExtApiForm;
 import org.esupportail.nfctag.service.api.AppliExtApi;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.*;
 
 @Service
 public class ApplisExtService {

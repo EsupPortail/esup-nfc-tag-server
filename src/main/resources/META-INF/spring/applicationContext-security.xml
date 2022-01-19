@@ -39,6 +39,7 @@
 	    <intercept-url pattern="/**" access="permitAll" />
 		<access-denied-handler error-page="/denied" />
 		<session-management session-authentication-strategy-ref="sas" />
+		<custom-filter before="FIRST" ref="devClientRequestFilter"/>
 		<custom-filter position="PRE_AUTH_FILTER" ref="shibFilter"/>
 		<custom-filter ref="concurrencyFilter" position="CONCURRENT_SESSION_FILTER" />
 		<logout logout-success-url="/" />

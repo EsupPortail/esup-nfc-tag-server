@@ -17,11 +17,11 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
-
 import org.esupportail.nfctag.domain.TagLog;
 import org.springframework.jdbc.core.RowMapper;
+
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 public class TagLogRowMapper implements RowMapper<TagLog>
 {

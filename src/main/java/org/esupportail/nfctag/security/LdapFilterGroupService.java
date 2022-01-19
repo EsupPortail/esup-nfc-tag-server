@@ -1,18 +1,17 @@
 package org.esupportail.nfctag.security;
 
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import javax.naming.NamingException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.DirContextAdapter;
 import org.springframework.ldap.core.LdapTemplate;
 import org.springframework.ldap.query.LdapQueryBuilder;
+
+import javax.naming.NamingException;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 public class LdapFilterGroupService implements GroupService {
 	
@@ -43,7 +42,7 @@ public class LdapFilterGroupService implements GroupService {
 		
 		for(String ldapFilter: ldapFiltersGroups.keySet()) {
 			
-			String harcodedFilter = MessageFormat.format(memberSearchFilter, new String[] {eppn, ldapFilter});
+			String harcodedFilter = MessageFormat.format(memberSearchFilter, eppn, ldapFilter);
 			
 			List<String> dns = ldapTemplate.search(LdapQueryBuilder.query().filter(harcodedFilter),
 					new ContextMapper<String>() {

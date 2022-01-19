@@ -17,10 +17,7 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
-import java.util.List;
-
-import javax.annotation.Resource;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
@@ -35,7 +32,8 @@ import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.annotation.Resource;
+import java.util.List;
 
 public class AppliExtRestWs implements AppliExtApi {
 

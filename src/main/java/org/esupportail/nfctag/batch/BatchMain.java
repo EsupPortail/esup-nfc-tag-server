@@ -1,9 +1,9 @@
 package org.esupportail.nfctag.batch;
 
+import org.springframework.context.support.ClassPathXmlApplicationContext;
+
 import java.io.IOException;
 import java.sql.SQLException;
-
-import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 public class BatchMain {
 

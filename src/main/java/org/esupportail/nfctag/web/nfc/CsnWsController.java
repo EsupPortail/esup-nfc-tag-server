@@ -17,11 +17,8 @@
  */
 package org.esupportail.nfctag.web.nfc;
 
-import java.io.IOException;
-
-import javax.annotation.Resource;
-import javax.transaction.Transactional;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 import org.esupportail.nfctag.beans.NfcResultBean;
 import org.esupportail.nfctag.beans.NfcResultBean.CODE;
 import org.esupportail.nfctag.domain.NfcMessage;
@@ -41,8 +38,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
+import javax.annotation.Resource;
+import javax.transaction.Transactional;
+import java.io.IOException;
 
 @RequestMapping("/csn-ws")
 @Controller

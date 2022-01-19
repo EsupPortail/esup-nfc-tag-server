@@ -1,15 +1,14 @@
 package org.esupportail.nfctag.beans;
 
-import java.io.Serializable;
-import java.util.List;
-
-import javax.annotation.PostConstruct;
-
 import org.esupportail.nfctag.service.api.DamTagWriteApi;
 import org.esupportail.nfctag.service.api.impl.TagLastUpdateRestWs;
 import org.esupportail.nfctag.service.desfire.DesfireUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import javax.annotation.PostConstruct;
+import java.io.Serializable;
+import java.util.List;
 
 public class DesfireApplication implements Serializable {
 

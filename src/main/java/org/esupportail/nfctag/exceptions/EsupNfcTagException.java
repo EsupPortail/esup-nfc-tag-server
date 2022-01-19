@@ -17,8 +17,6 @@
  */
 package org.esupportail.nfctag.exceptions;
 
-import javax.servlet.http.HttpServletRequest;
-
 import org.esupportail.nfctag.beans.ApplicationContextProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,6 +24,8 @@ import org.springframework.context.support.ReloadableResourceBundleMessageSource
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.LocaleResolver;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class EsupNfcTagException extends RuntimeException {
 	

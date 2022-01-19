@@ -1,9 +1,6 @@
 package org.esupportail.nfctag.postgres;
 
 import org.hibernate.dialect.PostgreSQL9Dialect;
-import org.hibernate.dialect.function.StandardSQLFunction;
-import org.hibernate.type.DoubleType;
-import org.hibernate.type.ObjectType;
 
 public class PgFullTextDialect extends PostgreSQL9Dialect{
 

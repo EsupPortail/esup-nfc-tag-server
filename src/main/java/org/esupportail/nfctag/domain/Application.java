@@ -16,39 +16,23 @@
  * limitations under the License.
  */
 package org.esupportail.nfctag.domain;
-import java.util.ArrayList;
-import java.util.List;
 
-import javax.annotation.Resource;
-import javax.persistence.Column;
-import javax.persistence.Transient;
-import javax.validation.constraints.NotNull;
-import org.esupportail.nfctag.service.ApplisExtService;
-import org.esupportail.nfctag.service.NfcAuthConfigService;
-import org.esupportail.nfctag.service.TagIdCheckService;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.esupportail.nfctag.service.api.AppliExtApi;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
 import org.esupportail.nfctag.service.api.TagIdCheckApi;
-import org.springframework.roo.addon.javabean.RooJavaBean;
-import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
-import org.springframework.roo.addon.tostring.RooToString;
+import org.springframework.beans.factory.annotation.Configurable;
 
-@RooJavaBean
-@RooToString
-@RooJpaActiveRecord(finders = { "findApplicationsByNameEquals", "findApplicationsBySgcClientApp" })
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import java.util.ArrayList;
+import java.util.List;
+
+@Entity
+@Configurable
+
 public class Application {
-
-    @Transient
-    @Resource
-    ApplisExtService applisExtService;
-
-    @Transient
-    @Resource
-    NfcAuthConfigService nfcAuthConfigService;
-
-    @Transient
-    @Resource
-    TagIdCheckService tagIdCheckService;
 
     @NotNull
     private String name;
@@ -78,33 +62,150 @@ public class Application {
     
     @Transient
     private Boolean available = true;
-	
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private Long id;
+    @Version
+    @Column(name = "version")
+    private Integer version;
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    }
+
+    public String getNfcConfig() {
+        return this.nfcConfig;
+    }
+
+    public String getTagIdCheck() {
+        return this.tagIdCheck;
+    }
+
+    public void setNfcConfig(String nfcConfig) {
+        this.nfcConfig = nfcConfig;
+    }
+
+    public void setAvailable(Boolean available) {
+        this.available = available;
+    }
+
+    public void setValidateAuthWoConfirmationDefault(Boolean validateAuthWoConfirmationDefault) {
+        this.validateAuthWoConfirmationDefault = validateAuthWoConfirmationDefault;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Boolean getAvailable() {
+        return this.available;
+    }
+
+    public void setDisplayAppNameBlock(Boolean displayAppNameBlock) {
+        this.displayAppNameBlock = displayAppNameBlock;
+    }
+
+    public String getAppliExt() {
+        return this.appliExt;
+    }
+
+    public void setTagIdCheck(String tagIdCheck) {
+        this.tagIdCheck = tagIdCheck;
+    }
+
+    public Boolean getDisplayAppNameBlock() {
+        return this.displayAppNameBlock;
+    }
+
+    public Boolean getSgcClientApp() {
+        return this.sgcClientApp;
+    }
+
+    public void setLocations(List<String> locations) {
+        this.locations = locations;
+    }
+
+    public String getDescription() {
+        return this.description;
+    }
+
+    public List<String> getLocations() {
+        return this.locations;
+    }
+
+    public void setSgcClientApp(Boolean sgcClientApp) {
+        this.sgcClientApp = sgcClientApp;
+    }
+
+    public void setAppliExt(String appliExt) {
+        this.appliExt = appliExt;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
+    public Boolean getValidateAuthWoConfirmationDefault() {
+        return this.validateAuthWoConfirmationDefault;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isActive() {
+        return this.active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getVersion() {
+        return this.version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
 
     public String getNfcConfigDesc() {
-        NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(this.nfcConfig);
-        if (nfcAuthConfig != null) {
-            return nfcAuthConfig.getDescription();
-        } else {
-            return null;
-        }
+//        NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(this.nfcConfig);
+//        if (nfcAuthConfig != null) {
+//            return nfcAuthConfig.getDescription();
+//        } else {
+//            return null;
+//        }
+        return nfcConfig;
     }
 
     public String getAppliExtDesc() {
-        AppliExtApi extApi = applisExtService.get(this.appliExt);
-        if (extApi != null) {
-            return extApi.getDescription();
-        } else {
-            return null;
-        }
+//        AppliExtApi extApi = applisExtService.get(this.appliExt);
+//        if (extApi != null) {
+//            return extApi.getDescription();
+//        } else {
+//            return null;
+//        }
+        return appliExt;
     }
 
     public String getTagIdCheckDesc() {
-        TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(this.tagIdCheck);
-        if (tagIdCheckApi != null) {
-            return tagIdCheckApi.getDescription();
-        } else {
-            return null;
-        }
+//        TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(this.tagIdCheck);
+//        if (tagIdCheckApi != null) {
+//            return tagIdCheckApi.getDescription();
+//        } else {
+//            return null;
+//        }
+        return tagIdCheck;
     }
 
 }

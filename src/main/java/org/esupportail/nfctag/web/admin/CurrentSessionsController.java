@@ -17,12 +17,6 @@
  */
 package org.esupportail.nfctag.web.admin;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Vector;
-
-import javax.annotation.Resource;
-
 import org.esupportail.nfctag.web.live.LiveLongPoolController;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,6 +24,11 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
+
+import javax.annotation.Resource;
+import java.io.IOException;
+import java.util.List;
+import java.util.Vector;
 
 @RequestMapping("/admin/currentsessions")
 @Controller

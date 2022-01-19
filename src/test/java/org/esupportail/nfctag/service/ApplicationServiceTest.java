@@ -8,7 +8,8 @@ import javax.annotation.Resource;
 
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
-import org.esupportail.nfctag.service.ApplicationsService;
+import org.esupportail.nfctag.dao.ApplicationDao;
+import org.esupportail.nfctag.dao.DeviceDao;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -16,8 +17,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-import org.springframework.web.client.RestTemplate;
-
 
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -26,16 +25,19 @@ import org.springframework.web.client.RestTemplate;
 public class ApplicationServiceTest {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
-	
-	@Resource
-    protected RestTemplate restTemplate;
-	
+
 	@Resource
 	ApplicationsService applicationService;
 
+	@Resource
+	ApplicationDao applicationDao;
+
+	@Resource
+	private DeviceDao deviceDao;
+
 	@Test
 	public void testApplications() throws Exception {
-		List<Application> applications = Application.findAllApplications();
+		List<Application> applications = applicationDao.findAllApplications();
 		int nbAppOK = 0;
 		for(Application application : applications){
 			if(applicationService.checkApplication(application.getId())){
@@ -53,7 +55,7 @@ public class ApplicationServiceTest {
 	//@Test
 	public void testDevices() throws Exception {
 
-		List<Device> devices = Device.findAllDevices();
+		List<Device> devices = deviceDao.findAllDevices();
 		int nbDeviceOK = 0;
 		for(Device device : devices){
 			if(applicationService.checkApplicationFromNumeroId(device.getNumeroId())){

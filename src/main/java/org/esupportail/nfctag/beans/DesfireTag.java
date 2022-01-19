@@ -1,10 +1,10 @@
 package org.esupportail.nfctag.beans;
 
-import java.io.Serializable;
-import java.util.List;
-
 import org.esupportail.nfctag.service.api.DamKeysTagWriteApi;
 import org.esupportail.nfctag.service.desfire.DESFireEV1Service.KeyType;
+
+import java.io.Serializable;
+import java.util.List;
 
 public class DesfireTag implements Serializable {
 

@@ -16,49 +16,128 @@
  * limitations under the License.
  */
 package org.esupportail.nfctag.domain;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.EntityManager;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
+import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.roo.addon.javabean.RooJavaBean;
-import org.springframework.roo.addon.jpa.activerecord.RooJpaActiveRecord;
-import org.springframework.roo.addon.tostring.RooToString;
 
-@RooJavaBean
-@RooToString
-@RooJpaActiveRecord(finders = { 
-		"findTagLogsByCsnEquals", 
-		"findTagLogsByDesfireIdEquals", 
-		"findTagLogsByNumeroIdEquals",
-		"findTagLogsByIdAndNumeroIdEquals",
-		"findTagLogsByNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals", 
-		"findTagLogsByEppnInitLike", 
-		"findTagLogsByCsnEquals", 
-		"findTagLogsByLocationEquals", 
-		"findTagLogsByEppnEquals", 
-		"findTagLogsByApplicationNameEquals", 
-		"findTagLogsByAuthDateBetween", 
-		"findTagLogsByAuthDateGreaterThan", 
-		"findTagLogsByAuthDateGreaterThanAndNumeroIdEquals", 
-		"findTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals" 
-		})
+import javax.persistence.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+@Entity
+@Configurable
 
 public class TagLog {
+
+       @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    @Column(name = "id")
+    private Long id;
+    @Version
+    @Column(name = "version")
+    private Integer version;
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    }
+
+    public Long getId() {
+        return this.id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Integer getVersion() {
+        return this.version;
+    }
+
+    public void setVersion(Integer version) {
+        this.version = version;
+    }
+
+    public void setDesfireId(String desfireId) {
+        this.desfireId = desfireId;
+    }
+
+    public String getDesfireId() {
+        return this.desfireId;
+    }
+
+    public String getCsn() {
+        return this.csn;
+    }
+
+    public void setAuthDate(Date authDate) {
+        this.authDate = authDate;
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
+    }
+
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
+
+    public String getNumeroId() {
+        return this.numeroId;
+    }
+
+    public void setLocation(String location) {
+        this.location = location;
+    }
+
+    public Date getAuthDate() {
+        return this.authDate;
+    }
+
+    public void setCsn(String csn) {
+        this.csn = csn;
+    }
+
+    public String getApplicationName() {
+        return this.applicationName;
+    }
+
+    public void setNumeroId(String numeroId) {
+        this.numeroId = numeroId;
+    }
+
+    public String getEppn() {
+        return this.eppn;
+    }
+
+    public void setEppn(String eppn) {
+        this.eppn = eppn;
+    }
+
+    public String getFirstname() {
+        return this.firstname;
+    }
+
+    public String getLocation() {
+        return this.location;
+    }
+
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
+
+    public String getLastname() {
+        return this.lastname;
+    }
+
+    public String getEppnInit() {
+        return this.eppnInit;
+    }
+
+    public void setEppnInit(String eppnInit) {
+        this.eppnInit = eppnInit;
+    }
 
     public enum Status {
 
@@ -115,76 +194,5 @@ public class TagLog {
     public void setLiveStatus(Status liveStatus) {
         this.liveStatus = liveStatus;
     }
-    
-    public static List<String> findYears() {
-        EntityManager em = TagLog.entityManager();
-        Query q = em.createNativeQuery("select trim(to_char(date_part('year', auth_date),'9999')) as year from tag_log group by year");
-        return q.getResultList();
-    }
-    
-    public static TypedQuery<TagLog> findTagLogs(String searchString, String statusFilter, String applicationFilter, String sortFieldName, String sortOrder) {
-    	EntityManager em = TagLog.entityManager();
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<TagLog> query = criteriaBuilder.createQuery(TagLog.class);
-        Root<TagLog> c = query.from(TagLog.class);
-        final List<Predicate> predicates = new ArrayList<Predicate>();
-        final List<Order> orders = new ArrayList<Order>();
-    	
-        if("DESC".equals(sortOrder.toUpperCase())){
-        	orders.add(criteriaBuilder.desc(c.get(sortFieldName)));
-        }else{
-        	orders.add(criteriaBuilder.asc(c.get(sortFieldName)));
-        }
-        
-        if(applicationFilter != null && applicationFilter != ""){
-        	predicates.add(criteriaBuilder.equal(c.get("applicationName"), applicationFilter));
-        }
-        if(statusFilter != null && statusFilter != ""){
-        	predicates.add(criteriaBuilder.equal(c.get("status"), TagLog.Status.valueOf(statusFilter)));
-        }
-        
-        if(searchString!=null && searchString!=""){
-	        Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal("'"+searchString+"'"));
-	        Expression<Double> fullTestSearchRanking = criteriaBuilder.function("ts_rank", Double.class, criteriaBuilder.literal("'"+searchString+"'"));
-	        predicates.add(criteriaBuilder.isTrue(fullTestSearchExpression));
-	        orders.add(criteriaBuilder.desc(fullTestSearchRanking));
-        }
-        
-        orders.add(criteriaBuilder.desc(c.get(sortFieldName)));        
-        query.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
-        query.orderBy(orders);
-        query.select(c);
-        
-        return em.createQuery(query);
-    }
-    
-    
-    public static long countFindTagLogs(String searchString, String statusFilter, String applicationFilter) {
-    	EntityManager em = TagLog.entityManager();
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<Long> query = criteriaBuilder.createQuery(Long.class);
-        Root<TagLog> c = query.from(TagLog.class);
-        final List<Predicate> predicates = new ArrayList<Predicate>();
 
-        if(applicationFilter != null && applicationFilter != ""){
-        	predicates.add(criteriaBuilder.equal(c.get("applicationName"), applicationFilter));
-        }
-        if(statusFilter != null && statusFilter != ""){
-        	predicates.add(criteriaBuilder.equal(c.get("status"), TagLog.Status.valueOf(statusFilter)));
-        }
-        
-        if(searchString!=null && searchString!=""){
-	        Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal("'"+searchString+"'"));
-	        predicates.add(criteriaBuilder.isTrue(fullTestSearchExpression));
-        }
-             
-        query.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
-        
-        query.select(criteriaBuilder.count(c));
-        return em.createQuery(query).getSingleResult();
-    }
-    
-    
-    
-    
 }

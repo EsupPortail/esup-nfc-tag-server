@@ -17,15 +17,6 @@
  */
 package org.esupportail.nfctag.web.live;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.transaction.Transactional;
-
 import org.esupportail.nfctag.domain.TagError;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,6 +28,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.async.DeferredResult;
+
+import javax.transaction.Transactional;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RequestMapping("/live")
 @Controller

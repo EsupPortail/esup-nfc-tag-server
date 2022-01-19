@@ -17,10 +17,10 @@
  */
 package org.esupportail.nfctag.service.api;
 
-import java.util.List;
-
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
+
+import java.util.List;
 
 public interface AppliExtApi {
 

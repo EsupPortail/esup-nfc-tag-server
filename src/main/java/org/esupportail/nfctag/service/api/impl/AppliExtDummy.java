@@ -17,15 +17,15 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.api.AppliExtApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class AppliExtDummy implements AppliExtApi {
 

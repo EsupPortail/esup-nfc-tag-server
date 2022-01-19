@@ -21,11 +21,11 @@ import ch.qos.logback.classic.PatternLayout;
 
 public class PatternLayoutWithUserContext extends PatternLayout {
     static {
-        PatternLayout.defaultConverterMap.put(
+        PatternLayout.DEFAULT_CONVERTER_MAP.put(
             "user", UserConverter.class.getName());
-        PatternLayout.defaultConverterMap.put(
+        PatternLayout.DEFAULT_CONVERTER_MAP.put(
             "session", SessionConverter.class.getName());
-        PatternLayout.defaultConverterMap.put(
+        PatternLayout.DEFAULT_CONVERTER_MAP.put(
             "remote", RemoteConverter.class.getName());
     }
 }

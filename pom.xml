@@ -8,54 +8,18 @@
 	<version>2.5.1-SNAPSHOT</version>
 	<name>esupNfcTagServer</name>
 	<properties>
-		<aspectj.version>1.8.13</aspectj.version>
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<roo.version>1.3.2.RELEASE</roo.version>
 		<slf4j.version>1.7.5</slf4j.version>
-		<spring.version>4.3.20.RELEASE</spring.version>
-		<spring-security.version>4.2.9.RELEASE</spring-security.version>
+		<spring.version>5.3.14</spring.version>
+		<spring-security.version>5.6.0</spring-security.version>
 		<skipTests>true</skipTests>
 	</properties>
-	<repositories>
-		<repository>
-			<id>spring-maven-release</id>
-			<name>Spring Maven Release Repository</name>
-			<url>https://maven.springframework.org/release</url>
-		</repository>
-		<repository>
-			<id>spring-maven-milestone</id>
-			<name>Spring Maven Milestone Repository</name>
-			<url>https://maven.springframework.org/milestone</url>
-		</repository>
-		<repository>
-			<id>spring-roo-repository</id>
-			<name>Spring Roo Repository</name>
-			<url>https://spring-roo-repository.springsource.org/release</url>
-		</repository>
-	</repositories>
-	<pluginRepositories>
-		<pluginRepository>
-			<id>spring-maven-release</id>
-			<name>Spring Maven Release Repository</name>
-			<url>https://maven.springframework.org/release</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>spring-maven-milestone</id>
-			<name>Spring Maven Milestone Repository</name>
-			<url>https://maven.springframework.org/milestone</url>
-		</pluginRepository>
-		<pluginRepository>
-			<id>spring-roo-repository</id>
-			<name>Spring Roo Repository</name>
-			<url>https://spring-roo-repository.springsource.org/release</url>
-		</pluginRepository>
-	</pluginRepositories>
 	<dependencies>
 		<dependency>
 	      <groupId>javax.servlet</groupId>
 	      <artifactId>javax.servlet-api</artifactId>
-	      <version>3.0.1</version>
+	      <version>3.1.0</version>
 	      <scope>provided</scope>
 	    </dependency>
 
@@ -80,17 +44,7 @@
        <dependency>
 		  <groupId>ch.qos.logback</groupId>
 		  <artifactId>logback-classic</artifactId>
-		  <version>1.2.0</version>
-		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjrt</artifactId>
-			<version>${aspectj.version}</version>
-		</dependency>
-		<dependency>
-			<groupId>org.aspectj</groupId>
-			<artifactId>aspectjweaver</artifactId>
-			<version>${aspectj.version}</version>
+		  <version>1.2.5</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.servlet</groupId>
@@ -107,13 +61,6 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 			<version>3.1</version>
-		</dependency>
-		<!-- ROO dependencies -->
-		<dependency>
-			<groupId>org.springframework.roo</groupId>
-			<artifactId>org.springframework.roo.annotations</artifactId>
-			<version>${roo.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<!-- Spring dependencies -->
 		<dependency>
@@ -181,7 +128,17 @@
 		<dependency>
 			<groupId>org.hibernate.javax.persistence</groupId>
 			<artifactId>hibernate-jpa-2.1-api</artifactId>
-			<version>1.0.0.Final</version>
+			<version>1.0.2.Final</version>
+		</dependency>
+		<dependency>
+			<groupId>jakarta.annotation</groupId>
+			<artifactId>jakarta.annotation-api</artifactId>
+			<version>1.3.5</version>
+		</dependency>
+		<dependency>
+			<groupId>io.github.jnasmartcardio</groupId>
+			<artifactId>jnasmartcardio</artifactId>
+			<version>0.2.7</version>
 		</dependency>
 		<dependency>
 			<groupId>commons-collections</groupId>
@@ -191,12 +148,12 @@
 		<dependency>
 			<groupId>org.hibernate</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>4.3.2.Final</version>
+			<version>5.4.2.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.validation</groupId>
 			<artifactId>validation-api</artifactId>
-			<version>1.0.0.GA</version>
+			<version>1.1.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.transaction</groupId>
@@ -227,7 +184,7 @@
 		<dependency>
 			<groupId>org.springframework.ldap</groupId>
 			<artifactId>spring-ldap-core</artifactId>
-			<version>2.3.1.RELEASE</version>
+			<version>2.3.4.RELEASE</version>
 		</dependency>
 
 		<dependency>
@@ -318,7 +275,7 @@
 		<dependency>
 			<groupId>org.apache.tiles</groupId>
 			<artifactId>tiles-jsp</artifactId>
-			<version>2.2.2</version>
+			<version>3.0.8</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
@@ -354,21 +311,6 @@
 			<version>${spring-security.version}</version>
 		</dependency>
 
-		<dependency>
-			<groupId>org.springframework.security</groupId>
-			<artifactId>spring-security-cas</artifactId>
-			<version>${spring-security.version}</version>
-			<exclusions>
-				<exclusion>
-					<artifactId>bcprov-jdk15</artifactId>
-					<groupId>org.bouncycastle</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>log4j-over-slf4j</artifactId>
-					<groupId>org.slf4j</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
 		<dependency>
 			<groupId>org.springframework.security</groupId>
 			<artifactId>spring-security-ldap</artifactId>
@@ -413,7 +355,7 @@
 		<dependency>
 		    <groupId>org.springframework.webflow</groupId>
 		    <artifactId>spring-webflow</artifactId>
-		    <version>2.4.4.RELEASE</version>
+		    <version>2.5.1.RELEASE</version>
 		</dependency>
 
 	</dependencies>
@@ -422,7 +364,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
-				<version>2.2</version>
+				<version>3.3.2</version>
 				<!-- <configuration> <webXml>target/web.xml</webXml> </configuration> -->
 			</plugin>
 			<plugin>
@@ -433,50 +375,6 @@
 					<source>${java.version}</source>
 					<target>${java.version}</target>
 					<encoding>${project.build.sourceEncoding}</encoding>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>aspectj-maven-plugin</artifactId>
-				<version>1.4</version>
-				<dependencies>
-					<!-- NB: You must use Maven 2.0.9 or above or these are ignored (see 
-						MNG-2972) -->
-					<dependency>
-						<groupId>org.aspectj</groupId>
-						<artifactId>aspectjrt</artifactId>
-						<version>${aspectj.version}</version>
-					</dependency>
-					<dependency>
-						<groupId>org.aspectj</groupId>
-						<artifactId>aspectjtools</artifactId>
-						<version>${aspectj.version}</version>
-					</dependency>
-				</dependencies>
-				<executions>
-					<execution>
-						<phase>process-sources</phase>
-						<goals>
-							<goal>compile</goal>
-							<!-- <goal>test-compile</goal> -->
-						</goals>
-					</execution>
-				</executions>
-				<configuration>
-					<outxml>true</outxml>
-					<aspectLibraries>
-						<aspectLibrary>
-							<groupId>org.springframework</groupId>
-							<artifactId>spring-aspects</artifactId>
-						</aspectLibrary>
-					</aspectLibraries>
-					<source>${java.version}</source>
-					<target>${java.version}</target>
-					<!-- Aspects in src/main/java and src/main/aspects are added as default 
-						in the compile goal. Aspects in src/test/java and src/test/aspects are added 
-						as default in the test-compile goal. Aspects in src/main/java are added in 
-						the test-compile goal if weaveWithAspectsInMainSourceFolder is set to true -->
-					<weaveWithAspectsInMainSourceFolder>false</weaveWithAspectsInMainSourceFolder>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -494,9 +392,6 @@
 				<configuration>
 					<printSummary>false</printSummary>
 					<redirectTestOutputToFile>true</redirectTestOutputToFile>
-					<excludes>
-						<exclude>**/*_Roo_*</exclude>
-					</excludes>
 					<skipTests>${skipTests}</skipTests>
 					<useFile>false</useFile>
 				</configuration>
@@ -528,18 +423,10 @@
 					<wtpversion>2.0</wtpversion>
 					<additionalBuildcommands>
 						<buildCommand>
-							<name>org.eclipse.ajdt.core.ajbuilder</name>
-							<arguments>
-								<aspectPath>org.springframework.aspects</aspectPath>
-							</arguments>
-						</buildCommand>
-						<buildCommand>
 							<name>org.springframework.ide.eclipse.core.springbuilder</name>
 						</buildCommand>
 					</additionalBuildcommands>
 					<additionalProjectnatures>
-						<projectnature>org.eclipse.ajdt.ui.ajnature</projectnature>
-						<projectnature>com.springsource.sts.roo.core.nature</projectnature>
 						<projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
 					</additionalProjectnatures>
 				</configuration>
@@ -554,41 +441,10 @@
 				</configuration>
 			</plugin>
 			<plugin>
-				<groupId>org.mortbay.jetty</groupId>
+				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>jetty-maven-plugin</artifactId>
-				<version>8.1.4.v20120524</version>
-				<configuration>
-					<webAppConfig>
-						<contextPath>/${project.name}</contextPath>
-					</webAppConfig>
-				</configuration>
+				<version>9.4.35.v20201120</version>
 			</plugin>
-
-			<plugin>
-				<groupId>org.apache.tomcat.maven</groupId>
-				<artifactId>tomcat7-maven-plugin</artifactId>
-				<version>2.2</version>
-				<configuration>
-					<contextFile>src/main/webapp/META-INF/context.xml</contextFile>
-					<uriEncoding>UTF-8</uriEncoding>
-					<path>/</path>
-					<ajpPort>7009</ajpPort>
-					<port>8080</port>
-				</configuration>
-				<dependencies>
-					<dependency>
-						<groupId>mysql</groupId>
-						<artifactId>mysql-connector-java</artifactId>
-						<version>5.1.18</version>
-					</dependency>
-					<dependency>
-						<groupId>org.postgresql</groupId>
-						<artifactId>postgresql</artifactId>
-						<version>42.1.4</version>
-					</dependency>
-				</dependencies>
-			</plugin>
-
             <plugin>
                 <groupId>com.mycila.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>

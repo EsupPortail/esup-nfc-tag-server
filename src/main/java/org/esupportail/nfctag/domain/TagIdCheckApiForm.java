@@ -17,15 +17,33 @@
  */
 package org.esupportail.nfctag.domain;
 
-import org.springframework.roo.addon.javabean.RooJavaBean;
-import org.springframework.roo.addon.tostring.RooToString;
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
-@RooJavaBean
-@RooToString
+
 public class TagIdCheckApiForm {
 
 	String tagIdCheckKey;
 	
 	String tagIdCheckDescription;
-	
+
+    public String getTagIdCheckKey() {
+        return this.tagIdCheckKey;
+    }
+
+    public void setTagIdCheckKey(String tagIdCheckKey) {
+        this.tagIdCheckKey = tagIdCheckKey;
+    }
+
+    public String getTagIdCheckDescription() {
+        return this.tagIdCheckDescription;
+    }
+
+    public void setTagIdCheckDescription(String tagIdCheckDescription) {
+        this.tagIdCheckDescription = tagIdCheckDescription;
+    }
+
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    }
 }

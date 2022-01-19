@@ -16,17 +16,17 @@
  * limitations under the License.
  */
 package org.esupportail.nfctag.service.api.impl;
+
+import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.esupportail.nfctag.service.TagAuthService;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
 import org.esupportail.nfctag.service.desfire.DesfireService;
 import org.esupportail.nfctag.service.desfire.actions.DesfireActionService;
 import org.esupportail.nfctag.service.desfire.actions.DesfireReadActionService;
 import org.esupportail.nfctag.web.live.LiveLongPoolController;
-import org.springframework.roo.addon.javabean.RooJavaBean;
-import org.springframework.roo.addon.tostring.RooToString;
 
-@RooJavaBean
-@RooToString
+
 public class DesfireReadConfig extends NfcAuthConfig {
 	
 	private String desfireAppName;
@@ -109,4 +109,7 @@ public class DesfireReadConfig extends NfcAuthConfig {
 		this.desfireFileSize = desfireFileSize;
 	}
 
+    public String toString() {
+        return ReflectionToStringBuilder.toString(this, ToStringStyle.SHORT_PREFIX_STYLE);
+    }
 }

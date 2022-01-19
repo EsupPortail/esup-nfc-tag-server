@@ -1,5 +1,16 @@
 package org.esupportail.nfctag.batch;
 
+import org.esupportail.nfctag.domain.AppliVersion;
+import org.esupportail.nfctag.domain.Application;
+import org.esupportail.nfctag.dao.AppliVersionDao;
+import org.esupportail.nfctag.dao.ApplicationDao;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.annotation.Resource;
+import javax.sql.DataSource;
 import java.io.InputStream;
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -7,35 +18,31 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
 
-import javax.annotation.Resource;
-import javax.sql.DataSource;
-
-import org.esupportail.nfctag.domain.AppliVersion;
-import org.esupportail.nfctag.domain.Application;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 
 @Service
 public class DbToolService {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	final static String currentEsupSgcVersion = "2.5.x";
+	final static String currentEsupSgcVersion = "2.4.x";
 		
 	@Resource
 	DataSource dataSource;
 
+	@Resource
+	private ApplicationDao applicationDao;
+
+	@Resource
+	private AppliVersionDao appliVersionDao;
+
 	@Transactional
 	public void upgrade() {
 		AppliVersion appliVersion = null;
-		List<AppliVersion> appliVersions = AppliVersion.findAllAppliVersions();
+		List<AppliVersion> appliVersions = appliVersionDao.findAllAppliVersions();
 		if(appliVersions.isEmpty()) {
 			appliVersion = new AppliVersion();
 			appliVersion.setEsupNfcTagVersion("0.0.x");
-			appliVersion.persist();
+			appliVersionDao.persist(appliVersion);
 		} else {
 			appliVersion = appliVersions.get(0);
 		}
@@ -87,7 +94,7 @@ public class DbToolService {
 			
 			if ("2.3.x".equals(esupSgcVersion)) {
 				esupSgcVersion = "2.4.x";
-				for(Application app : Application.findAllApplications()) {
+				for(Application app : applicationDao.findAllApplications()) {
 					app.setSgcClientApp(false);
 				}
 				log.warn("Mise à jour de numero de version : 2.4.x");
@@ -99,7 +106,7 @@ public class DbToolService {
 	    				"\n#####\n");
 			
 			appliVersion.setEsupNfcTagVersion(currentEsupSgcVersion);
-			appliVersion.merge();
+			appliVersionDao.merge(appliVersion);
 		} catch(Exception e) {
 			throw new RuntimeException("Erreur durant le mise à jour de la base de données", e);
 		}

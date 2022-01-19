@@ -1,28 +1,33 @@
 package org.esupportail.nfctag.service;
 
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.Query;
-
-import org.apache.commons.lang3.StringUtils;
-import org.esupportail.nfctag.domain.Device;
-import org.esupportail.nfctag.domain.TagLog;
-import org.springframework.stereotype.Service;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import org.apache.commons.lang3.StringUtils;
+import org.esupportail.nfctag.dao.DeviceDao;
+import org.esupportail.nfctag.dao.TagLogDao;
+import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Service
 public class StatsService {
+
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	@Resource
+	private DeviceDao deviceDao;
+
+	@Resource
+	private TagLogDao tagLogDao;
 
 	String[] backgroundColor = { 
 			"rgba(230, 25, 75, 0.5)", 
@@ -71,9 +76,9 @@ public class StatsService {
 	    cal.add(Calendar.HOUR_OF_DAY, -1); // adds one hour
 	    int week = cal.get(Calendar.WEEK_OF_YEAR);
 	    
-		Long nbTagLastHour = TagLog.countFindTagLogsByAuthDateBetween(cal.getTime(), new Date());
+		Long nbTagLastHour = tagLogDao.countFindTagLogsByAuthDateBetween(cal.getTime(), new Date());
 		
-		EntityManager em = Device.entityManager();
+		EntityManager em = entityManager;
 		Query q = em.createNativeQuery(
 				"SELECT count(id) as value FROM tag_log WHERE date_part('year', auth_date) = " + annee + " AND EXTRACT(WEEK FROM auth_date) = " + week + " GROUP By date_trunc('hour', auth_date) ORDER BY value DESC LIMIT 1;");
 		Long max = Long.valueOf(0);
@@ -99,14 +104,14 @@ public class StatsService {
 		
 		
 	public List<Object[]> countNumberDeviceByApplication(String annee) {
-		EntityManager em = Device.entityManager();
+		EntityManager em = entityManager;
 		Query q = em.createNativeQuery(
 				"SELECT a.name as labels, count(d.id) as value FROM device as d, application as a WHERE a.id = d.application GROUP BY a.name ORDER BY value DESC");
 		return q.getResultList();
 	}
 
 	public List<Object[]> countNumberTagByLocation(String annee) {
-		EntityManager em = TagLog.entityManager();
+		EntityManager em = entityManager;
 		Query q = em.createNativeQuery(
 				"SELECT location as labels, count(id) as value FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + "GROUP BY location ORDER BY value DESC LIMIT 25");
 		return q.getResultList();
@@ -115,8 +120,8 @@ public class StatsService {
 	public List<Object[]> countNumberTagByMouth(String annee, List<String> month) {
 		
 		List<Object[]> result = new ArrayList<Object[]>();
-		
-		EntityManager em = TagLog.entityManager();
+
+		EntityManager em = entityManager;
 
 		Query appNamesQuery = em.createNativeQuery("SELECT application_name FROM tag_log WHERE date_part('year', auth_date) = " + annee + " GROUP BY application_name;");
 		
