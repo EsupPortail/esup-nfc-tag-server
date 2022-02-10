@@ -85,7 +85,7 @@
     <bean class="org.springframework.orm.jpa.JpaTransactionManager" id="transactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
     </bean>
-    <tx:annotation-driven mode="aspectj" transaction-manager="transactionManager"/>
+    <tx:annotation-driven transaction-manager="transactionManager"/>
     <bean class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean" id="entityManagerFactory">
         <property name="persistenceUnitName" value="persistenceUnit"/>
         <property name="dataSource" ref="dataSource"/>
@@ -112,7 +112,7 @@
 	           <aop:scoped-proxy/>
 	       </bean>
 	    </property>
-        <property name="applicationsService" ref="applicationsService"/>
+		<property name="applicationsService" ref="applicationsService"/>
 	    <property name="nfcAuthConfigService" ref="nfcAuthConfigService"/>
 	    <property name="desfireDiversificationDamService" ref="desfireDiversificationDamService"/>
     </bean>
