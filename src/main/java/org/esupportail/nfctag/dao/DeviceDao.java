@@ -141,12 +141,8 @@ public class DeviceDao {
     @Transactional
     public void remove(Long id) {
         if (this.entityManager == null) this.entityManager = entityManager();
-        if (this.entityManager.contains(this)) {
-            this.entityManager.remove(this);
-        } else {
-            Device attached = findDevice(id);
-            this.entityManager.remove(attached);
-        }
+        Device attached = findDevice(id);
+        this.entityManager.remove(attached);
     }
 
 }

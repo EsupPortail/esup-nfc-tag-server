@@ -77,12 +77,8 @@ public class ApplicationDao {
     @Transactional
     public void remove(Long id) {
         if (this.entityManager == null) this.entityManager = entityManager();
-        if (this.entityManager.contains(this)) {
-            this.entityManager.remove(this);
-        } else {
-            Application attached = findApplication(id);
-            this.entityManager.remove(attached);
-        }
+        Application attached = findApplication(id);
+        this.entityManager.remove(attached);
     }
 
     @Transactional

@@ -181,12 +181,8 @@ public class TagLogDao {
     @Transactional
     public void remove(Long id) {
         if (this.entityManager == null) this.entityManager = entityManager();
-        if (this.entityManager.contains(this)) {
-            this.entityManager.remove(this);
-        } else {
-            TagLog attached = findTagLog(id);
-            this.entityManager.remove(attached);
-        }
+        TagLog attached = findTagLog(id);
+        this.entityManager.remove(attached);
     }
 
     public List<String> findYears() {

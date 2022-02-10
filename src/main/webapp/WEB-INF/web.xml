@@ -35,7 +35,7 @@
 
     <filter>
         <filter-name>HttpMethodFilter</filter-name>
-        <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
+        <filter-class>org.esupportail.nfctag.web.HiddenHttpMethodFilter</filter-class>
         <async-supported>true</async-supported>
     </filter>
     
@@ -116,22 +116,12 @@
         <session-timeout>60</session-timeout>
         <tracking-mode>COOKIE</tracking-mode>
     </session-config>
-    
-    <servlet>
-        <servlet-name>ServletExceptionHandler</servlet-name>
-        <servlet-class>org.esupportail.nfctag.web.ServletExceptionHandler</servlet-class>
-    </servlet>
-
-     <servlet-mapping>
-        <servlet-name>ServletExceptionHandler</servlet-name>
-        <url-pattern>/ServletExceptionHandler</url-pattern>
-	</servlet-mapping>
-
+        
     <error-page>
         <exception-type>java.lang.Exception</exception-type>
-        <location>/ServletExceptionHandler</location>
+        <location>/uncaughtException</location>
     </error-page>
-    
+
     <error-page>
         <error-code>404</error-code>
         <location>/resourceNotFound</location>

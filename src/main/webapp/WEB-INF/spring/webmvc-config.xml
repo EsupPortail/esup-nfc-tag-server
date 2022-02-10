@@ -35,20 +35,8 @@
 
     <!-- Selects a static view for rendering without the need for an explicit controller -->
     <mvc:view-controller path="/" view-name="index"/>
-    <mvc:view-controller path="/uncaughtException"/>
     <mvc:view-controller path="/resourceNotFound"/>
     <mvc:view-controller path="/dataAccessFailure"/>
-
-    <!-- This bean resolves specific types of exceptions to corresponding logical - view names for error views. 
-    The default behaviour of DispatcherServlet - is to propagate all exceptions to the servlet 
-    container: this will happen - here with all other types of exceptions. -->
-    <bean class="org.esupportail.nfctag.web.LoggingExceptionResolver" p:defaultErrorView="uncaughtException" p:defaultStatusCode="500">
-    	<property name="exceptionMappings">
-    		<props>
-    			<prop key="org.springframework.security.access.AccessDeniedException">accessDenied</prop>
-    		</props>
-    	</property>
-    </bean>
 
     <!-- Enable this for integration of file upload functionality -->
     <bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver" id="multipartResolver"/>

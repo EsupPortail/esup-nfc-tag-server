@@ -52,12 +52,8 @@ public class AppliVersionDao {
     @Transactional
     public void remove(Long id) {
         if (this.entityManager == null) this.entityManager = entityManager();
-        if (this.entityManager.contains(this)) {
-            this.entityManager.remove(this);
-        } else {
-            AppliVersion attached = findAppliVersion(id);
-            this.entityManager.remove(attached);
-        }
+        AppliVersion attached = findAppliVersion(id);
+        this.entityManager.remove(attached);
     }
 
 
