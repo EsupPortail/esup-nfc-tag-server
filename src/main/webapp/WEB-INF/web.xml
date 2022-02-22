@@ -77,24 +77,24 @@
         <filter-name>Spring OpenEntityManagerInViewFilter</filter-name>
         <url-pattern>/nfc/*</url-pattern>
     </filter-mapping>
-    
-    <!-- Creates the Spring Container shared by all Servlets and Filters -->
-    
-    <listener>
-		<listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-	</listener>
-    
+
     <filter-mapping>
         <filter-name>springSecurityFilterChain</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
     <listener>
+        <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+    </listener>
+
+    <listener>
+        <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+    </listener>
+
+    <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
-    
 
-		
     <!-- Handles Spring requests -->
     <servlet>
         <servlet-name>esup-nfc-tag-server</servlet-name>
@@ -126,16 +126,11 @@
         <error-code>404</error-code>
         <location>/resourceNotFound</location>
     </error-page>
-    
-	<listener>
-	  <listener-class>
-	    org.springframework.security.web.session.HttpSessionEventPublisher
-	  </listener-class>
-	</listener> 
 
-	<listener>
-	    <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
-	</listener>
+    <error-page>
+        <error-code>403</error-code>
+        <location>/denied</location>
+    </error-page>
 
 	<mime-mapping>
 	    <extension>jnlp</extension>

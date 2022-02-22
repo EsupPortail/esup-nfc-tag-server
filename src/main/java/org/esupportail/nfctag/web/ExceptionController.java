@@ -76,12 +76,10 @@ public class ExceptionController implements HandlerExceptionResolver {
 	    log.warn("Access Denied for " + ip);
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         avoid405Error(request);
-		return new ModelAndView("accessDeniedException");
+		return new ModelAndView("accessDenied");
     }
 
 	
-
-
 	@RequestMapping("/uncaughtException")
     public ModelAndView uncaughtExceptionView(HttpServletRequest request) {
 	    Throwable exception = (Throwable) request.getAttribute("javax.servlet.error.exception");
