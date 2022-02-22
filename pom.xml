@@ -5,7 +5,7 @@
 	<groupId>org.esupportail.nfctag</groupId>
 	<artifactId>esupNfcTagServer</artifactId>
 	<packaging>war</packaging>
-	<version>2.5.1</version>
+	<version>2.5.2-SNAPSHOT</version>
 	<name>esupNfcTagServer</name>
 	<properties>
 		<java.version>1.8</java.version>
