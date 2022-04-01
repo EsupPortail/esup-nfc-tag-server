@@ -196,6 +196,7 @@ public class NfcIndexController {
 			uiModel.addAttribute("numeroId", numeroId);
 			uiModel.addAttribute("macAddress", device.getMacAddress());
 			uiModel.addAttribute("imei", device.getImei());
+			uiModel.addAttribute("eppnInit", eppn);
 			uiModel.addAttribute("applications", applications);
 			uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
 			uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());

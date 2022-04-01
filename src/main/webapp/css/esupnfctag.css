@@ -308,6 +308,7 @@ span.error {
 		margin-left: 10px;
 	}
 }
+
 /* Portrait tablet to landscape and desktop */
 @media (max-width: 659px){
 	header{
@@ -390,3 +391,15 @@ background-color: #c9302c;
 	height: 100%;
 	max-height: 400px;	
 }
+
+.nfc hr {
+	margin-bottom: 10px;
+	margin-top: 10px;
+}
+.nfc .panel-title {
+	font-weight: bold;
+}
+.nfc .btn {
+	white-space: normal;
+}
+

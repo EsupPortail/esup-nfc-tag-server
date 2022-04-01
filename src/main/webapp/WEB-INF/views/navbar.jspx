@@ -24,7 +24,7 @@
 	      	</ul>
 	    </sec:authorize>
 	    <sec:authorize access="not isAuthenticated()">
-			<ul class="list-inline navbar-right supervisor-nav visible-xs-block visible-lg-block visible-xs-block visible-md-block visible-sm-block"> 
+			<ul class="list-inline navbar-right supervisor-nav visible-xs-block visible-lg-block visible-xs-block visible-md-block visible-sm-block">
 	      		<li><a href="/manager" class="btn btn-success"><spring:message code="button_authentication" /></a></li>
 	      	</ul>
 	    </sec:authorize>
@@ -34,12 +34,14 @@
 				<spring:url value="/nfc-index/unregister?jarVersion=${jarVersion}&amp;numeroId=${numeroId}&amp;imei=${imei}&amp;macAddress=${macAddress}&amp;full=true" var="nfc_unregister_url_full" htmlEscape="false" />
 				<c:choose>
 					<c:when test="${not empty location}">
-						<ul class="list-inline navbar-right visible-xs-block visible-lg-block visible-md-block visible-sm-block text-right"> 
+						<ul class="list-inline navbar-right visible-xs-block visible-lg-block visible-md-block visible-sm-block text-right">
+							<li><h4 style="color:white;">${eppnInit}</h4></li>
 				      		<li><a id="unregister" href="${nfc_unregister_url}" class="btn btn-default navbar-btn btn-success"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a></li>
 				      	</ul>
 					</c:when>
 					<c:otherwise>
-						<ul class="list-inline navbar-right visible-xs-block visible-lg-block visible-md-block visible-sm-block text-right"> 
+						<ul class="list-inline navbar-right visible-xs-block visible-lg-block visible-md-block visible-sm-block text-right">
+							<li><h4 style="color:white;">${eppnInit}</h4></li>
 				      		<li><a id="unregisterfull" href="${nfc_unregister_url_full}" class="btn btn-default navbar-btn btn-danger"><span class="glyphicon glyphicon-off" aria-hidden="true"></span></a></li>
 				      	</ul>
 					</c:otherwise>

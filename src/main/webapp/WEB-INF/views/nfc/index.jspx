@@ -4,7 +4,7 @@
      xmlns:spring="http://www.springframework.org/tags" xmlns:util="urn:jsptagdir:/WEB-INF/tags/util" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:c="http://java.sun.com/jsp/jstl/core" xmlns:sec="http://www.springframework.org/security/tags" xmlns:form="http://www.springframework.org/tags/form">
 	<jsp:directive.page contentType="text/html;charset=UTF-8" />
 	<jsp:output omit-xml-declaration="yes" />
-	<div class="row">
+	<div class="row nfc">
 	<div class="col-lg-12 text-center">
 		<h1><spring:message code="message_location_choice" /></h1>
 		<c:forEach items="${applications}" var = "application">
@@ -28,7 +28,7 @@
 								<spring:param name="jarVersion" value="${jarVersion}"/>
 								<spring:param name="numeroId" value="${numeroId}"/>
 							</spring:url>
-							<a href="${register_url}" class="btn btn-lg btn-success">${location}</a>
+							<a href="${register_url}" class="btn btn-success">${location}</a>
 							<c:if test="${not status.last}">
 								<br/><br/>
 							</c:if>
@@ -48,7 +48,7 @@
 							<spring:param name="jarVersion" value="${jarVersion}" />
 							<spring:param name="numeroId" value="${numeroId}" />
 						</spring:url>
-						<a href="${register_url}" class="btn btn-lg btn-success">${location}</a>
+						<a href="${register_url}" class="btn btn-success">${location}</a>
 						<hr />
                                           </c:forEach>
 					</c:when>

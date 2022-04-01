@@ -4,7 +4,7 @@ import org.esupportail.nfctag.dao.DeviceDao;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.util.Random;
+import java.util.UUID;
 
 @Service
 public class DeviceService {
@@ -14,11 +14,10 @@ public class DeviceService {
 	
 	public String generateNumeroId() {
 		while(true) {
-			Long numeroRandom = Math.abs(new Random().nextLong());
-			if(deviceDao.countFindDevicesByNumeroIdEquals(numeroRandom.toString()) == 0){
+			String numeroRandom = UUID.randomUUID().toString();
+			if(deviceDao.countFindDevicesByNumeroIdEquals(numeroRandom) == 0){
 				return numeroRandom.toString();
 			}
 		}
 	}
-
 }

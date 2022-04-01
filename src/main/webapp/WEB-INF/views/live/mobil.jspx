@@ -5,7 +5,7 @@
 	<c:if test="${application.displayAppNameBlock}">
 	  <div class="panel panel-success">
 	    <div class="panel-heading">
-	      <h2 class="panel-title" onclick="document.getElementById('description').classList.toggle('hide');">${application.name}</h2>
+	      <h3 class="panel-title" onclick="document.getElementById('description').classList.toggle('hide');">${application.name}</h3>
 	   </div>
 	   <div class="panel-body hide" id="description">
 	     <c:if test="${not empty application.description}">
@@ -33,11 +33,11 @@
 	</c:if>
 	<c:choose>
 	<c:when test="${isActiv}">
-	<h2>${location}</h2>
-		<button id="showLogs" style="width:100%;" type="button" class="btn btn-success btn-lg" onclick="document.getElementById('lastleoauth').style.display='block';this.style.display='none';document.getElementById('hideLogs').style.display='block';">
+	<h3>${location}</h3>
+		<button id="showLogs" style="width:100%;" type="button" class="btn btn-success" onclick="document.getElementById('lastleoauth').style.display='block';this.style.display='none';document.getElementById('hideLogs').style.display='block';">
 			<spring:message code="message_tag_view"/>
 		</button>
-		<button id="hideLogs"  type="button" class="btn btn-success btn-lg" style="width:100%;display:none;" onclick="document.getElementById('lastleoauth').style.display='none';this.style.display='none';document.getElementById('showLogs').style.display='block';">
+		<button id="hideLogs"  type="button" class="btn btn-success" style="width:100%;display:none;" onclick="document.getElementById('lastleoauth').style.display='none';this.style.display='none';document.getElementById('showLogs').style.display='block';">
 			<spring:message code="message_tag_hide" />
 		</button>
 		<div id="newLog" class="oldLog"> 
@@ -61,8 +61,8 @@
 	</script>
 	</c:when>
 	<c:otherwise>
-	<h2>${location}</h2>
-			<button id="error" style="width:100%;" type="button" class="btn btn-danger btn-lg" onclick="location.reload();"	>
+	<h3>${location}</h3>
+			<button id="error" style="width:100%;" type="button" class="btn btn-danger" onclick="location.reload();"	>
 			<spring:message code="message_tag_unavailable" />
 		</button>
 	</c:otherwise>
