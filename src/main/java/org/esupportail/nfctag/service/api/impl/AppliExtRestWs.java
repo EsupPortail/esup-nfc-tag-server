@@ -31,8 +31,10 @@ import org.springframework.http.MediaType;
 import org.springframework.web.client.HttpServerErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.annotation.Resource;
+import java.net.URI;
 import java.util.List;
 
 public class AppliExtRestWs implements AppliExtApi {
@@ -100,7 +102,11 @@ public class AppliExtRestWs implements AppliExtApi {
 	public List<String> getLocations4Eppn(String eppn) {
 		log.debug("getLocation for : " + eppn);
 		try {
-			return restTemplate.getForObject(getLocationsUrl + "?eppn=" + eppn, List.class);
+			URI locationUrlWithEppn = UriComponentsBuilder.fromUriString(getLocationsUrl)
+					.queryParam("eppn", eppn)
+					.build()
+					.toUri();
+			return restTemplate.getForObject(locationUrlWithEppn, List.class);
 		} catch(HttpServerErrorException e) {
 			log.error("HttpServerErrorException on "+getLocationsUrl+" - "+ e.getMessage() +" - "+e.getStackTrace());
 			return null;
