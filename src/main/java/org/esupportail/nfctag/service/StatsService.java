@@ -12,6 +12,7 @@ import javax.annotation.Resource;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -19,6 +20,8 @@ import java.util.*;
 
 @Service
 public class StatsService {
+
+	enum ChartType { line, bar};
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -66,36 +69,33 @@ public class StatsService {
 			};
 	
 
-	public List<Object[]> nbTagLastHour(String annee) {
+	public List<Object[]> nbTagThisDay(String annee) {
 		
 		List<Object[]> result = new ArrayList<Object[]>();
 
-		Date today = new Date();
-		Calendar cal = Calendar.getInstance(); // creates calendar
-	    cal.setTime(today); // sets calendar time/date
-	    cal.add(Calendar.HOUR_OF_DAY, -1); // adds one hour
-	    int week = cal.get(Calendar.WEEK_OF_YEAR);
-	    
-		Long nbTagLastHour = tagLogDao.countFindTagLogsByAuthDateBetween(cal.getTime(), new Date());
+		Long nbTagThisDay = tagLogDao.countFindTagLogsThisDay();
 		
 		EntityManager em = entityManager;
 		Query q = em.createNativeQuery(
-				"SELECT count(id) as value FROM tag_log WHERE date_part('year', auth_date) = " + annee + " AND EXTRACT(WEEK FROM auth_date) = " + week + " GROUP By date_trunc('hour', auth_date) ORDER BY value DESC LIMIT 1;");
+				"SELECT count(id) as value, date_trunc('day', auth_date) FROM tag_log WHERE date_part('year', auth_date) = " + annee + " GROUP By date_trunc('day', auth_date) ORDER BY value DESC LIMIT 1;");
 		Long max = Long.valueOf(0);
+		Date maxDay = null;
 		if(q.getResultList().size()>0){
-			max = Long.valueOf(q.getResultList().get(0).toString());
+			Object[] nbAndDay = (Object[])q.getResultList().get(0);
+			max = ((BigInteger)nbAndDay[0]).longValue();
+			maxDay = ((Date)nbAndDay[1]);
 		}
-		if (nbTagLastHour.doubleValue() > max.doubleValue()) max = nbTagLastHour.longValue(); 
-		Double percentNow = (nbTagLastHour.doubleValue() / max.doubleValue()) * 100;
+		if (nbTagThisDay.doubleValue() > max.doubleValue()) max = nbTagThisDay.longValue();
+		Double percentNow = (nbTagThisDay.doubleValue() / max.doubleValue()) * 100;
 		
 		Object[] now = new Object[2];
-		now[0] = "Now : " + nbTagLastHour;
+		now[0] = "Today : " + nbTagThisDay;
 		now[1] = percentNow.intValue();
 		
 		result.add(now);
 		
 		Object[] total = new Object[2];
-		total[0] = "Max in 1 hour this week : " + max;
+		total[0] = String.format("Max in 1 day : %s (%td/%tm/%tY)", max, maxDay, maxDay, maxDay);
 		total[1] = 100 - percentNow.intValue();
 		result.add(total);
 		
@@ -110,10 +110,65 @@ public class StatsService {
 		return q.getResultList();
 	}
 
-	public List<Object[]> countNumberTagByLocation(String annee) {
+	public List<Object[]> countNumberTagByApplication(String annee) {
 		EntityManager em = entityManager;
 		Query q = em.createNativeQuery(
-				"SELECT location as labels, count(id) as value FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + "GROUP BY location ORDER BY value DESC LIMIT 25");
+				"SELECT application_name, count(*) as value FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + "GROUP BY application_name ORDER BY value desc");
+		return q.getResultList();
+	}
+
+	public List<String> findApplications(String annee) {
+		EntityManager em = entityManager;
+		Query appNamesQuery = em.createNativeQuery("SELECT application_name FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + "GROUP BY application_name ORDER BY COUNT(*) DESC;");
+		return appNamesQuery.getResultList();
+	}
+
+	public List<Object[]> countNumberTagByYear() {
+		List<String> years = years();
+
+		List<Object[]> result = new ArrayList<Object[]>();
+
+		EntityManager em = entityManager;
+
+		Query appNamesQuery = em.createNativeQuery("SELECT application_name FROM tag_log WHERE status='valid' GROUP BY application_name ORDER BY COUNT(*) DESC;");
+		List<String> appList = appNamesQuery.getResultList();
+
+		Query q = em.createNativeQuery(
+				"SELECT cast(cast(date_part('year', auth_date) as int) as varchar) as labels, application_name as label, count(*) as data FROM tag_log WHERE status='valid' GROUP BY labels, label ORDER BY label, labels");
+
+		List<Object[]> qResult = q.getResultList();
+		String app = appList.get(0);
+		for (String appName : appList){
+			if(!app.equals(appName)){
+				Object[] saut = {null, null, null};
+				result.add(saut);
+				app = appName;
+			}
+			for (String year: years){
+				Object[] objectToApp = {year, appName, 0};
+				for (Object[] object : qResult) {
+					if(object[0].toString().equals(year) && object[1].toString().equals(appName)){
+						objectToApp = object;
+					}
+				}
+				result.add(objectToApp);
+			}
+		}
+		return result;
+	}
+
+	public List<String> years() {
+		EntityManager em = entityManager;
+		Query q = em.createNativeQuery(
+				"SELECT cast(cast(date_part('year', auth_date) as int) as varchar) as year FROM tag_log WHERE status='valid' GROUP BY year ORDER BY year");
+		return q.getResultList();
+	}
+
+	public List<Object[]> countNumberTagByLocation(String annee, String application) {
+		EntityManager em = entityManager;
+		String sqlApplication = StringUtils.isEmpty(application) ? "" : " AND application_name='" + application + "' ";
+		Query q = em.createNativeQuery(
+				"SELECT location as labels, count(id) as value FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + sqlApplication + "GROUP BY location ORDER BY value DESC LIMIT 25");
 		return q.getResultList();
 	}
 	
@@ -123,7 +178,7 @@ public class StatsService {
 
 		EntityManager em = entityManager;
 
-		Query appNamesQuery = em.createNativeQuery("SELECT application_name FROM tag_log WHERE date_part('year', auth_date) = " + annee + " GROUP BY application_name;");
+		Query appNamesQuery = em.createNativeQuery("SELECT application_name FROM tag_log WHERE date_part('year', auth_date) = " + annee + " GROUP BY application_name ORDER BY COUNT(*) DESC;");
 		
 		List<String> appList = appNamesQuery.getResultList();
 		
@@ -155,28 +210,33 @@ public class StatsService {
 	}	
 
 	
-	public String getnbTagLastHour(String annee) throws JsonProcessingException {
+	public String getnbTagThisDay(String annee) throws JsonProcessingException {
 
 		String[] backgroundColor = { "rgba(230, 25, 75, 0.5)", "rgba(75, 75, 75, 0.5)" };
 		String[] hoverBackgroundColor = { "rgba(230, 25, 75, 1)", "rgba(75, 75, 75, 1)" };
 		
-		return toChartJsonSimple(nbTagLastHour(annee), backgroundColor, hoverBackgroundColor);
+		return toChartJsonSimple(nbTagThisDay(annee), backgroundColor, hoverBackgroundColor);
 	}
 	
-	public String getNumberTagByLocation(String annee) throws JsonProcessingException {
-		
-		return toChartJsonSimple(countNumberTagByLocation(annee),  backgroundColor, hoverBackgroundColor);
+	public String getNumberTagByLocation(String annee, String application) throws JsonProcessingException {
+		return toChartJsonSimple(countNumberTagByLocation(annee, application),  backgroundColor, hoverBackgroundColor);
 	}
 	
 	public String getNumberDeviceByUserAgent(String annee) throws JsonProcessingException {
-		
 		return toChartJsonSimple(countNumberDeviceByApplication(annee), backgroundColor, hoverBackgroundColor);
 	}
 
+	public String getNumberTagByApplication(String annee) throws JsonProcessingException {
+		return toChartJsonSimple(countNumberTagByApplication(annee), backgroundColor, hoverBackgroundColor);
+	}
+
+	public String getNumberTagByYear() throws JsonProcessingException {
+		return toChartJsonComplex(years(), countNumberTagByYear(), backgroundColor, hoverBackgroundColor, ChartType.line);
+	}
+
 	public String getNumberTagByWeek(String annee) throws JsonProcessingException {
-		
 		List<String> month = Arrays.asList("1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12");
-		return toChartJsonComplex(month, countNumberTagByMouth(annee, month), backgroundColor, hoverBackgroundColor);
+		return toChartJsonComplex(month, countNumberTagByMouth(annee, month), backgroundColor, hoverBackgroundColor, ChartType.bar);
 	}
 	
 	public String toChartJsonSimple(List<Object[]> results, String[] backgroundColor, String[] hoverBackgroundColor) throws JsonProcessingException{
@@ -196,7 +256,7 @@ public class StatsService {
 		return jsonOut;
 	}
 	
-	public String toChartJsonComplex(List<String> labels, List<Object[]> results, String[] backgroundColor, String[] hoverBackgroundColor) throws JsonProcessingException{
+	public String toChartJsonComplex(List<String> labels, List<Object[]> results, String[] backgroundColor, String[] hoverBackgroundColor, ChartType chartType) throws JsonProcessingException{
 		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 		String jsonOut = null;
 		ChartJsonComplex chartJson = new ChartJsonComplex();
@@ -226,8 +286,14 @@ public class StatsService {
 		for (Object[] object : results) {
 			if(object[0]==null){
 				colorCount++;
-				chartJson.datasets.add(chartData);
-				//chartJson.datasets.add(chartData2);
+				if(colorCount>=backgroundColor.length) {
+					colorCount=0;
+				}
+				if(ChartType.bar.equals(chartType)) {
+					chartJson.datasets.add(chartData);
+				} else {
+					chartJson.datasets.add(chartData2);
+				}
 				next=true;
 				continue;
 			}
@@ -243,16 +309,21 @@ public class StatsService {
 				chartData2.label = object[1].toString();
 				next=false;
 			}
-			chartData.data.add(object[2].toString());
-			//chartData2.data.add(object[2].toString());
+			if(ChartType.bar.equals(chartType)) {
+				chartData.data.add(object[2].toString());
+			} else {
+				chartData2.data.add(object[2].toString());
+			}
 		}
-		
-		chartJson.datasets.add(chartData);		
-		//chartJson.datasets.add(chartData2);
+
+		if(ChartType.bar.equals(chartType)) {
+			chartJson.datasets.add(chartData);
+		} else {
+			chartJson.datasets.add(chartData2);
+		}
 		jsonOut = ow.writeValueAsString(chartJson);
 		return jsonOut;
 	}
-	
 
 	class ChartJsonSimple {
 		public List<String> labels = new ArrayList<String>();
@@ -289,7 +360,7 @@ public class StatsService {
 		public String borderColor;
 		public String backgroundColor;
 		public String hoverBackgroundColor;
-		public String fill = "false";
+		public Boolean fill = true;
 	}
 	
 	public enum TypeChart{

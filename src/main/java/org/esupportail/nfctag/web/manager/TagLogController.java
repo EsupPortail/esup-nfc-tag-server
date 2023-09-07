@@ -50,24 +50,14 @@ public class TagLogController {
 	
     @RequestMapping(produces = "text/html")
     public String list(
-    		@RequestParam(value = "searchString", required = false) String searchString,
-    		@RequestParam(value = "applicationFilter", required = false) String applicationFilter,
-    		@RequestParam(value = "statusFilter", required = false) String statusFilter,
-    		@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "size", required = false) Integer size, @RequestParam(value = "sortFieldName", required = false) String sortFieldName, @RequestParam(value = "sortOrder", required = false) String sortOrder, Model uiModel) {
-
-    	if(sortFieldName == null){
-    		sortFieldName = "authDate";
-    		sortOrder = "DESC";
-    	}
-    	if(applicationFilter == null) {
-          	applicationFilter = "";
-        }
-        if(statusFilter == null) {
-        	statusFilter = "";
-        }       
-        if(searchString==null) {
-        	searchString="";
-        }
+    		@RequestParam(required = false, defaultValue = "") String searchString,
+    		@RequestParam(required = false, defaultValue = "") String applicationFilter,
+    		@RequestParam(required = false, defaultValue = "") String statusFilter,
+    		@RequestParam(required = false) Integer page,
+            @RequestParam(required = false) Integer size,
+            @RequestParam(required = false, defaultValue = "authDate") String sortFieldName,
+            @RequestParam(required = false, defaultValue = "DESC") String sortOrder,
+            Model uiModel) {
           
         int sizeNo = size == null ? 10 : size.intValue();
         final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
@@ -76,7 +66,7 @@ public class TagLogController {
         float nrOfPages = (float) tagLogDao.countFindTagLogs(searchString, statusFilter, applicationFilter) / sizeNo;
         
         uiModel.addAttribute("maxPages", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));
-        uiModel.addAttribute("applications", applicationDao.findAllApplications());
+        uiModel.addAttribute("applications", tagLogDao.findApplications());
         uiModel.addAttribute("status", TagLog.Status.values());
         uiModel.addAttribute("page", page);
         uiModel.addAttribute("size", size);

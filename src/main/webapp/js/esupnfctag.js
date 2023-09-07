@@ -372,7 +372,72 @@ $(document).ready(function(){
 	Chart.defaults.global.title.display= false;
 	Chart.defaults.global.elements.point.radius=6;
 	Chart.defaults.global.elements.line.tension=0.2;
-	
+
+		$.ajax({
+			url: "chartJson?model=numberTagByApplication&annee="+annee,
+			type: 'GET',
+			dataType : 'json',
+			success : function(data) {
+				var ctx = document.getElementById("tagsByApplication");
+				var repartionComposantesChart = new Chart(ctx, {
+					type: 'pie',
+					data: data,
+					options: {
+						legend:{
+							display:true
+						},
+						animation:{
+							duration: 0,
+						},
+						hover: {
+							animationDuration: 0, // duration of animations when hovering an item
+						},
+						responsiveAnimationDuration: 0,
+						title: {
+							text: "tagsByApplication",
+						},
+						tooltips: {
+							callbacks: {
+								label:function(item, data){
+									console.log(data);
+									var sum = 0;
+									data.datasets[0].data.forEach(
+										function addNumber(value) { sum += parseInt(value); }
+									);
+									pourcent = data.datasets[0].data[item.index] / sum * 100;
+									return data.labels[item.index]+" : "+data.datasets[0].data[item.index] + " - "+ Math.round(pourcent*100)/100 +"%";
+								}
+
+							}
+						}
+					}
+				});
+
+			}
+		});
+
+		$.ajax({
+			url: "chartJson?model=numberTagByYear",
+			type: 'GET',
+			dataType : 'json',
+			success : function(data) {
+				var ctx = document.getElementById("tagByYear");
+				var repartionComposantesChart = new Chart(ctx, {
+					type: 'line',
+					data: data,
+					options: {
+						responsive: true,
+						scales: {
+							yAxes: [{
+								stacked: true
+							}]
+						}
+					}
+				});
+
+			}
+		});
+
 	$.ajax({
         url: "chartJson?model=numberDeviceByUserAgent&annee="+annee,
         type: 'GET',
@@ -417,7 +482,7 @@ $(document).ready(function(){
 	});
 
 	$.ajax({
-        url: "chartJson?model=numberTagByLocation&annee="+annee,
+        url: "chartJson?model=numberTagByLocation&annee="+annee+"&application="+application,
         type: 'GET',
         dataType : 'json',
         success : function(data) {
@@ -460,11 +525,11 @@ $(document).ready(function(){
 	
 	
 	$.ajax({
-        url: "chartJson?model=nbTagLastHour&annee="+annee,
+        url: "chartJson?model=nbTagThisDay&annee="+annee,
         type: 'GET',
         dataType : 'json',
         success : function(data) {
-        	var ctx = document.getElementById("nbTagLastHour").getContext("2d");
+        	var ctx = document.getElementById("nbTagThisDay").getContext("2d");
         	var repartionComposantesChart = new Chart(ctx, {
         		type: 'doughnut',
         		data: data,
@@ -473,7 +538,7 @@ $(document).ready(function(){
         				display:true
         			},
                      title: {
-                    	 text: "nbTagLastHour"
+                    	 text: "nbTagThisDay"
                      },
              		 animation:{
              			 duration: 0,

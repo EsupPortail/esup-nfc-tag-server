@@ -58,6 +58,7 @@ host all all 127.0.0.1/32 password
 create database esupnfctag;
 create USER esupnfctag with password 'esup';
 grant ALL ON DATABASE esupnfctag to esupnfctag;
+ALTER DATABASE esupnfctag OWNER TO esupnfctag;
 ```
 
 ### Paramétrage mémoire JVM :
@@ -90,5 +91,5 @@ mvn exec:java -Dexec.args="dbupgrade"
 
 ## Configuration
 
-Voir la page wiki Esup : https://www.esup-portail.org/wiki/display/ESUPNFC/EsupNfcTagServer
+Voir la page wiki Esup : https://www.esup-portail.org/wiki/display/ESUPNFC/ESUP-NFC-TAG-SERVER
 

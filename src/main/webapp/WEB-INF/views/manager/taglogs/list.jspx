@@ -17,11 +17,11 @@
                     <option value="">-- Application --</option>
                     <c:forEach items="${applications}" var="application">
                         <c:choose>
-                            <c:when test="${applicationFilter eq application.name}">
-                                <option selected="selected" value="${application.name}">${application.name}</option>
+                            <c:when test="${applicationFilter eq application}">
+                                <option selected="selected" value="${application}">${application}</option>
                             </c:when>
                             <c:otherwise>
-                                <option value="${application.name}">${application.name}</option>
+                                <option value="${application}">${application}</option>
                             </c:otherwise>
                         </c:choose>
                     </c:forEach>
@@ -67,16 +67,16 @@
     <page:list id="pl_org_esupportail_nfctag_domain_TagLog" items="${taglogs}" z="user-managed"/>
     <table:table data="${taglogs}" delete="false" id="l_org_esupportail_nfctag_domain_TagLog" path="/manager/taglogs" update="false" view="${isAdmin}" z="user-managed">
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_authDate" property="authDate" sort="true" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_applicationName" property="applicationName" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_location" link="true" linkPrefix="/manager/taglogs?searchBySelected=location&amp;searchString=" property="location" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_eppnInit" link="true" linkPrefix="/manager/taglogs?searchBySelected=eppnInit&amp;searchString=" property="eppnInit" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_numeroId" link="true" linkPrefix="/manager/devices/numeroid/" property="numeroId" render="${isAdmin}" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_status" property="status" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_csn" property="csn" render="${isAdmin}" z="user-managed"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_applicationName" property="applicationName" z="user-managed" sort="true"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_location" link="true" linkPrefix="/manager/taglogs?searchBySelected=location&amp;searchString=" property="location" z="user-managed" sort="true"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_eppnInit" link="true" linkPrefix="/manager/taglogs?searchBySelected=eppnInit&amp;searchString=" property="eppnInit" z="user-managed" sort="true"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_numeroId" link="true" linkPrefix="/manager/devices/numeroid/" property="numeroId" render="${isAdmin}" z="user-managed" sort="true"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_status" property="status" z="user-managed" sort="true"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_csn" property="csn" render="${isAdmin}" z="user-managed" sort="true"/>
         <table:column id="c_org_esupportail_nfctag_domain_TagLog_desfireId" property="desfireId" render="false" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_eppn" property="eppn" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_firstname" property="firstname" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_lastname" property="lastname" z="user-managed"/>
-        <table:column id="c_org_esupportail_nfctag_domain_TagLog_liveStatus" property="liveStatus" z="QxvRbfJuxgEpdVQ4EdAU0FyjHHE="/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_eppn" property="eppn" z="user-managed" sort="true"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_firstname" property="firstname" z="user-managed" sort="true"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_lastname" property="lastname" z="user-managed" sort="true"/>
+        <table:column id="c_org_esupportail_nfctag_domain_TagLog_liveStatus" property="liveStatus" z="QxvRbfJuxgEpdVQ4EdAU0FyjHHE=" sort="true"/>
     </table:table>
 </div>

@@ -1,5 +1,6 @@
 package org.esupportail.nfctag.dao;
 
+import org.apache.commons.lang3.StringUtils;
 import org.esupportail.nfctag.domain.TagLog;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -9,6 +10,7 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.*;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -51,14 +53,10 @@ public class TagLogDao {
         return entityManager().createQuery(jpaQuery, TagLog.class).setFirstResult(firstResult).setMaxResults(maxResults).getResultList();
     }
 
-    public Long countFindTagLogsByAuthDateBetween(Date minAuthDate, Date maxAuthDate) {
-        if (minAuthDate == null) throw new IllegalArgumentException("The minAuthDate argument is required");
-        if (maxAuthDate == null) throw new IllegalArgumentException("The maxAuthDate argument is required");
+    public Long countFindTagLogsThisDay() {
         EntityManager em = entityManager;
-        TypedQuery q = em.createQuery("SELECT COUNT(o) FROM TagLog AS o WHERE o.authDate BETWEEN :minAuthDate AND :maxAuthDate", Long.class);
-        q.setParameter("minAuthDate", minAuthDate);
-        q.setParameter("maxAuthDate", maxAuthDate);
-        return ((Long) q.getSingleResult());
+        Query q = em.createNativeQuery("SELECT COUNT(*) FROM tag_log where date_trunc('day', auth_date) = date_trunc('day', now())");
+        return ((BigInteger) q.getSingleResult()).longValue();
     }
 
     public TypedQuery<TagLog> findTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(Date authDate, String numeroId, String applicationName, String location, String sortFieldName, String sortOrder) {
@@ -187,8 +185,14 @@ public class TagLogDao {
 
     public List<String> findYears() {
         EntityManager em = entityManager;
-        Query q = em.createNativeQuery("select trim(to_char(date_part('year', auth_date),'9999')) as year from tag_log group by year");
+        Query q = em.createNativeQuery("select cast(date_part('year', auth_date) as int) as year from tag_log group by year order by year desc");
         return q.getResultList();
+    }
+
+    public List<String> findApplications() {
+        EntityManager em = entityManager;
+        Query appNamesQuery = em.createNativeQuery("SELECT application_name FROM tag_log GROUP BY application_name ORDER BY COUNT(*) DESC;");
+        return appNamesQuery.getResultList();
     }
 
     public TypedQuery<TagLog> findTagLogs(String searchString, String statusFilter, String applicationFilter, String sortFieldName, String sortOrder) {
@@ -205,14 +209,14 @@ public class TagLogDao {
             orders.add(criteriaBuilder.asc(c.get(sortFieldName)));
         }
 
-        if(applicationFilter != null && applicationFilter != ""){
+        if(!StringUtils.isEmpty(applicationFilter)){
             predicates.add(criteriaBuilder.equal(c.get("applicationName"), applicationFilter));
         }
-        if(statusFilter != null && statusFilter != ""){
+        if(!StringUtils.isEmpty(statusFilter)){
             predicates.add(criteriaBuilder.equal(c.get("status"), TagLog.Status.valueOf(statusFilter)));
         }
 
-        if(searchString!=null && searchString!=""){
+        if(!StringUtils.isEmpty(searchString)){
             Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal("'"+searchString+"'"));
             Expression<Double> fullTestSearchRanking = criteriaBuilder.function("ts_rank", Double.class, criteriaBuilder.literal("'"+searchString+"'"));
             predicates.add(criteriaBuilder.isTrue(fullTestSearchExpression));
@@ -235,14 +239,14 @@ public class TagLogDao {
         Root<TagLog> c = query.from(TagLog.class);
         final List<Predicate> predicates = new ArrayList<Predicate>();
 
-        if(applicationFilter != null && applicationFilter != ""){
+        if(!StringUtils.isEmpty(applicationFilter)){
             predicates.add(criteriaBuilder.equal(c.get("applicationName"), applicationFilter));
         }
-        if(statusFilter != null && statusFilter != ""){
+        if(!StringUtils.isEmpty(statusFilter)){
             predicates.add(criteriaBuilder.equal(c.get("status"), TagLog.Status.valueOf(statusFilter)));
         }
 
-        if(searchString!=null && searchString!=""){
+        if(!StringUtils.isEmpty(searchString)){
             Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal("'"+searchString+"'"));
             predicates.add(criteriaBuilder.isTrue(fullTestSearchExpression));
         }

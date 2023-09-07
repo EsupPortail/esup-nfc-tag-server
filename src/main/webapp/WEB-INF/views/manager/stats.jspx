@@ -24,8 +24,8 @@
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
 	<jsp:output omit-xml-declaration="yes" />
 <SCRIPT type="text/javascript">
-var annee = ${annee};
-var nbTagLastHour = ${nbTagLastHour};
+var annee = '${annee}';
+var application = '${application}';
 </SCRIPT>
    <form action="" method="get">
    <h1>Stats : 
@@ -43,7 +43,7 @@ var nbTagLastHour = ${nbTagLastHour};
  		</c:forEach>
    	</select>
    </h1>
-   </form>
+
 	<div class="row" id="esup-nfc-tag-stats">
 		<div class="col-lg-12" >
 		<div class="panel panel-primary">
@@ -58,9 +58,39 @@ var nbTagLastHour = ${nbTagLastHour};
 		<div class="panel panel-primary">
 		<div class="panel-heading"><h5>Tags by location</h5></div>
 		<div class="panel-body ">
+			<select name="application" onchange="this.form.submit()" class="selectpicker" data-none-selected-text="">
+				<c:forEach items="${apps}" var="app">
+					<c:choose>
+						<c:when test="${application eq app}">
+							<option value="${app}" selected="selected">${app}</option>
+						</c:when>
+						<c:otherwise>
+							<option value="${app}">${app}</option>
+						</c:otherwise>
+					</c:choose>
+				</c:forEach>
+			</select>
 		<canvas height="454" id="tagsByLocation"><!--  --></canvas>
 		</div>
 		</div>
+		</div>
+
+		<div class="col-lg-6" >
+			<div class="panel panel-primary">
+				<div class="panel-heading"><h5>Tags by Application</h5></div>
+				<div class="panel-body ">
+					<canvas height="454" id="tagsByApplication"><!--  --></canvas>
+				</div>
+			</div>
+		</div>
+
+		<div class="col-lg-6" >
+			<div class="panel panel-primary">
+				<div class="panel-heading"><h5>Tags by year</h5></div>
+				<div class="panel-body ">
+					<canvas height="454" id="tagByYear"><!--  --></canvas>
+				</div>
+			</div>
 		</div>
 
 		<div class="col-lg-6" >
@@ -74,12 +104,15 @@ var nbTagLastHour = ${nbTagLastHour};
 
 		<div class="col-lg-6" >
 		<div class="panel panel-primary">
-		<div class="panel-heading"><h5>Tags last hour : ${nbTagLastHour}</h5></div>
+		<div class="panel-heading"><h5>Tags this day : ${nbTagThisDay}</h5></div>
 		<div class="panel-body ">
-		<canvas height="454" id="nbTagLastHour"><!--  --></canvas>
+		<canvas height="454" id="nbTagThisDay"><!--  --></canvas>
 		</div>
 		</div>
 		</div>
 
    </div>
+
+   </form>
+
 </div>

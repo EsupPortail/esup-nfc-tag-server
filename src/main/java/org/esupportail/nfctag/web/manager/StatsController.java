@@ -30,7 +30,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.annotation.Resource;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -50,32 +49,25 @@ public class StatsController {
 	private TagLogDao tagLogDao;
 
 	@RequestMapping()
-	public String index(@RequestParam(required = false, value="annee") String annee, Model uiModel) {
+	public String index(@RequestParam(required = false) String annee, @RequestParam(required = false, defaultValue = "") String application, Model uiModel) {
 		if(annee==null) {
-		SimpleDateFormat df = new SimpleDateFormat("yyyy");
-		annee = df.format(new Date());
+			SimpleDateFormat df = new SimpleDateFormat("yyyy");
+			annee = df.format(new Date());
 		}
-		
-		Calendar cal = Calendar.getInstance(); // creates calendar
-	    cal.setTime(new Date()); // sets calendar time/date
-	    cal.add(Calendar.HOUR_OF_DAY, -1); // adds one hour
-	    cal.getTime();
-		
-	    Long nbTagLastHour = tagLogDao.countFindTagLogsByAuthDateBetween(cal.getTime(), new Date());
-	    
-	    List<String> years = tagLogDao.findYears();
-	    
+		List<String> applications = statsService.findApplications(annee);
+		applications.add(0, "");
 	    uiModel.addAttribute("nbDevice", deviceDao.countDevices());
-	    uiModel.addAttribute("nbTagLastHour", nbTagLastHour);
-	    uiModel.addAttribute("years", years);
+	    uiModel.addAttribute("years", tagLogDao.findYears());
+		uiModel.addAttribute("apps", applications);
 	    uiModel.addAttribute("annee", annee);
+		uiModel.addAttribute("application", application);
 		return "manager/stats";
 	}
 	
 	
 	@RequestMapping(value="/chartJson", headers = "Accept=application/json; charset=utf-8")
 	@ResponseBody 
-	public String getStats(@RequestParam(required = false, value="model") StatsModel model, @RequestParam(required = false, value="annee") String annee) {
+	public String getStats(@RequestParam(required = false) StatsModel model, @RequestParam(required = false) String annee, @RequestParam(required = false, defaultValue = "") String application) {
 		if(annee==null) {
 		SimpleDateFormat df = new SimpleDateFormat("yyyy");
 		annee = df.format(new Date());
@@ -84,20 +76,26 @@ public class StatsController {
 		String json = "Aucune statistique à récupérer";
 		try {
 			switch (model) {
-			case nbTagLastHour :
-				json = statsService.getnbTagLastHour(annee);			
-				break;
-			case numberDeviceByUserAgent :
-				json = statsService.getNumberDeviceByUserAgent(annee);			
-				break;
-			case numberTagByLocation :
-				json = statsService.getNumberTagByLocation(annee);				
-				break;
-			case numberTagByWeek :
-				json = statsService.getNumberTagByWeek(annee);				
-				break;
-			default:
-				break;
+				case nbTagThisDay :
+					json = statsService.getnbTagThisDay(annee);
+					break;
+				case numberDeviceByUserAgent :
+					json = statsService.getNumberDeviceByUserAgent(annee);
+					break;
+				case numberTagByApplication :
+					json = statsService.getNumberTagByApplication(annee);
+					break;
+				case numberTagByYear :
+					json = statsService.getNumberTagByYear();
+					break;
+				case numberTagByLocation :
+					json = statsService.getNumberTagByLocation(annee, application);
+					break;
+				case numberTagByWeek :
+					json = statsService.getNumberTagByWeek(annee);
+					break;
+				default:
+					break;
 			}
 			
 		} catch (Exception e) {
@@ -107,7 +105,7 @@ public class StatsController {
 	}
 	
 	public enum StatsModel{
-		numberDeviceByUserAgent, numberTagByLocation, numberTagByWeek, nbTagLastHour
+		numberDeviceByUserAgent, numberTagByApplication, numberTagByYear, numberTagByLocation, numberTagByWeek, nbTagThisDay
 	}
 	
 }
