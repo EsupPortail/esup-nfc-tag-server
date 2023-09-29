@@ -74,7 +74,8 @@ public class EsupNfcTagException extends RuntimeException {
 	}
 	
 	public EsupNfcTagException(String message, String numeroId) {
-		super(message.toString());
+		super(message);
+		this.message = message;
 		this.numeroId = numeroId;
 	}
 	

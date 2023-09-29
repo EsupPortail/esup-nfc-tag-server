@@ -76,8 +76,8 @@ public class DesfireWsController {
 	@ResponseBody
 	public NfcResultBean process(@RequestParam String numeroId, @RequestParam String cardId, @RequestParam String result, HttpSession session) {
 
-		if(!applicationsService.checkApplicationFromNumeroId(numeroId)){
-			throw new EsupNfcTagException("device error for " + numeroId + " please check configuration", numeroId);
+		if(!applicationsService.checkApplicationFromNumeroId(numeroId)) {
+			throw new EsupNfcTagException("Erreur pour le périphérique avec numeroId= " + numeroId + " - Tentative de badgeage sans salle de sélectionnée ?", numeroId);
 		}
 
 		if(desfireService.getStep()==null) {
