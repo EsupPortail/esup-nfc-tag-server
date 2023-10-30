@@ -113,13 +113,13 @@ public class StatsService {
 	public List<Object[]> countNumberTagByApplication(String annee) {
 		EntityManager em = entityManager;
 		Query q = em.createNativeQuery(
-				"SELECT application_name, count(*) as value FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + "GROUP BY application_name ORDER BY value desc");
+				"SELECT application_name, count(*) as value FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + " GROUP BY application_name ORDER BY value desc");
 		return q.getResultList();
 	}
 
 	public List<String> findApplications(String annee) {
 		EntityManager em = entityManager;
-		Query appNamesQuery = em.createNativeQuery("SELECT application_name FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + "GROUP BY application_name ORDER BY COUNT(*) DESC;");
+		Query appNamesQuery = em.createNativeQuery("SELECT application_name FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + " GROUP BY application_name ORDER BY COUNT(*) DESC;");
 		return appNamesQuery.getResultList();
 	}
 
@@ -168,7 +168,7 @@ public class StatsService {
 		EntityManager em = entityManager;
 		String sqlApplication = StringUtils.isEmpty(application) ? "" : " AND application_name='" + application + "' ";
 		Query q = em.createNativeQuery(
-				"SELECT location as labels, count(id) as value FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + sqlApplication + "GROUP BY location ORDER BY value DESC LIMIT 25");
+				"SELECT location as labels, count(id) as value FROM tag_log WHERE status='valid' AND date_part('year', auth_date) = " + annee + sqlApplication + " GROUP BY location ORDER BY value DESC LIMIT 25");
 		return q.getResultList();
 	}
 	

@@ -100,7 +100,7 @@ public class AppliExtRestWs implements AppliExtApi {
 	
 	@Override
 	public List<String> getLocations4Eppn(String eppn) {
-		log.debug("getLocation for : " + eppn);
+		log.debug("getLocation for {} on {}", eppn, getLocationsUrl);
 		try {
 			URI locationUrlWithEppn = UriComponentsBuilder.fromUriString(getLocationsUrl)
 					.queryParam("eppn", eppn)
@@ -108,11 +108,11 @@ public class AppliExtRestWs implements AppliExtApi {
 					.toUri();
 			return restTemplate.getForObject(locationUrlWithEppn, List.class);
 		} catch(HttpServerErrorException e) {
-			log.error("HttpServerErrorException on "+getLocationsUrl+" - "+ e.getMessage() +" - "+e.getStackTrace());
+			log.error("HttpServerErrorException on {} - {}", getLocationsUrl, e.getMessage(), e);
 			return null;
 		} catch(RestClientException e) {
-			log.error("RestClientException on "+getLocationsUrl + " - "+ e.getMessage() +" - "+e.getStackTrace());
-			return null;			
+			log.error("RestClientException on {} - {}", getLocationsUrl, e.getMessage(), e);
+			return null;
 		}
 	}	
 	

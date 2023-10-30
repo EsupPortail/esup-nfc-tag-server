@@ -64,6 +64,9 @@ public class DesfireService {
 	
 	public String tempFileSize = "";
 
+	/* En session comme tout DesfireService, permet d'itérer sur plusieurs tags à passer en tant que mise à jour */
+	public int updateDesfireTagIdx = 0;
+
 	public void setDesfireAuthSession(DesfireAuthSession desfireAuthSession) {
 		this.desfireAuthSession = desfireAuthSession;
 	}
@@ -301,7 +304,14 @@ public NfcResultBean readUid(String result){
 
 	public DesfireTag getDesfireTagToUpdate() {
 		DesfireUpdateConfig desfireUpdateConfig = (DesfireUpdateConfig) desfireAuthSession.getDesfireAuthConfig();
-		return desfireUpdateConfig.getDesfireTag();
+		if (desfireUpdateConfig.getDesfireTag() != null) {
+			if(updateDesfireTagIdx==0) {
+				return desfireUpdateConfig.getDesfireTag();
+			}
+		} else if (updateDesfireTagIdx<desfireUpdateConfig.getDesfireTags().size()) {
+			return desfireUpdateConfig.getDesfireTags().get(updateDesfireTagIdx);
+		}
+		return null;
 	}
 
 	public DesfireTag getDesfireTagToDamUpdate() {
@@ -729,7 +739,9 @@ public NfcResultBean readUid(String result){
 
 		if(result.length()==0){
 			reset();
-			if(desfireTag.getFormatBeforeWrite()){
+			if(desfireTag == null) {
+				desfireFlowStep.action = Action.END;
+			} else if(desfireTag.getFormatBeforeWrite()){
 				desfireFlowStep.action = Action.FORMAT;
 			}else{
 				desfireFlowStep.action = Action.GET_APPS;
@@ -796,10 +808,12 @@ public NfcResultBean readUid(String result){
 				keyKeyType = appKeyType = KeyType.DES;
 			}
 
-			try {
-				schemaDate = formatter.parse(desfireApp.getUpdateDate());
-			} catch (ParseException e) {
-				log.error(e.getMessage());
+			if(StringUtils.isNotEmpty(desfireApp.getUpdateDate())) {
+				try {
+					schemaDate = formatter.parse(desfireApp.getUpdateDate());
+				} catch (ParseException e) {
+					log.error(e.getMessage());
+				}
 			}
 
 			if(desfireApp.getKeys() != null && desfireApp.getKeys().size() > 0) {
@@ -874,10 +888,13 @@ public NfcResultBean readUid(String result){
 				String appsString = result.substring(0, result.length()-4);
 				// split result : app id on 6 chars (3 bytes)
 				List<String> apps = Arrays.asList(appsString.split("(?<=\\G.{6})"));
-				Date lastUpdate = desfireApp.getTagLastUpdateRestWs().getLastUpdateDateFromCsn(csn);
+				Date lastUpdate = null;
+				if(desfireApp.getTagLastUpdateRestWs() != null) {
+					lastUpdate = desfireApp.getTagLastUpdateRestWs().getLastUpdateDateFromCsn(csn);
+				}
 				if(desfireFlowStep.currentApp < desfireTag.getApplications().size()) {
 					log.debug("Check app dates : schemaDate = " + schemaDate + ", lastUpdate : " + lastUpdate);
-					if(schemaDate!=null && lastUpdate.before(schemaDate)){
+					if(schemaDate!=null && lastUpdate.before(schemaDate) || lastUpdate == null){
 						authResultBean.setAction(NfcResultBean.Action.update);
 						if(!apps.contains(DesfireUtils.byteArrayToHexString(DesfireUtils.swapPairsByte(aid)))) {
 							desfireFlowStep.action = Action.CREATE_APP;
@@ -1019,6 +1036,9 @@ public NfcResultBean readUid(String result){
 					if(desfireFlowStep.currentApp + 1 < desfireTag.getApplications().size()) {
 						desfireFlowStep.currentApp++;
 						desfireFlowStep.action = Action.GET_APPS;
+					} else if(piccKeyFinish != null){
+						desfireFlowStep.currentApp = 0;
+						desfireFlowStep.action = Action.CHANGE_PICC_KEY;
 					} else {
 						desfireFlowStep.currentApp = 0;
 						desfireFlowStep.action = Action.END;
@@ -1037,7 +1057,13 @@ public NfcResultBean readUid(String result){
 				}
 				break;
 			case END:
-				authResultBean.setFullApdu("END");
+				updateDesfireTagIdx++;
+				if(getDesfireTagToUpdate()==null) {
+					authResultBean.setFullApdu("END");
+					updateDesfireTagIdx = 0;
+				} else {
+					return updateCard("", eppnInit, csn);
+				}
 				break;
 			default:
 				break;

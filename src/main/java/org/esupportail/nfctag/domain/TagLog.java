@@ -28,7 +28,9 @@ import java.util.Date;
 
 @Entity
 @Configurable
-
+@Table(indexes = {
+        @Index(name = "tag_log_mm_idx", columnList = "authDate,numeroId,applicationName,location"),
+})
 public class TagLog {
 
        @Id

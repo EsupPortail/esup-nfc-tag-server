@@ -17,17 +17,31 @@
  */
 package org.esupportail.nfctag.service.api.impl;
 
+import org.esupportail.nfctag.beans.DesfireTag;
 import org.esupportail.nfctag.service.TagAuthService;
 import org.esupportail.nfctag.service.desfire.DesfireService;
 import org.esupportail.nfctag.service.desfire.actions.DesfireActionService;
 import org.esupportail.nfctag.service.desfire.actions.DesfireUpdateActionService;
 import org.esupportail.nfctag.web.live.LiveLongPoolController;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class DesfireUpdateConfig extends DesfireWriteConfig {
-	
+
+	private List<DesfireTag> desfireTags = new ArrayList<>();
+
+	public List<DesfireTag> getDesfireTags() {
+		return desfireTags;
+	}
+
+	public void setDesfireTags(List<DesfireTag> desfireTags) {
+		this.desfireTags = desfireTags;
+	}
+
 	@Override
 	public DesfireActionService getDesfireActionService(DesfireService desfireService, TagAuthService tagAuthService, LiveLongPoolController liveController) {
 		return new DesfireUpdateActionService(null, desfireService, tagAuthService, liveController);
 	}
-	
+
 }

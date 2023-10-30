@@ -31,10 +31,14 @@ public class SessionConverter extends ClassicConverter {
 	
 	@Override
     public String convert(ILoggingEvent event) {
-		HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
-		HttpSession httpSession = request.getSession(false);
-        if (httpSession != null) {
-            return httpSession.getId();
+        try {
+            HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
+            HttpSession httpSession = request.getSession(false);
+            if (httpSession != null) {
+                return httpSession.getId();
+            }
+        } catch (Exception e) {
+     	   // do nothing
         }
         return NO_SESSION;
     }

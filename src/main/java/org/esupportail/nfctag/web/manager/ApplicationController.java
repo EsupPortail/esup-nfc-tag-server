@@ -25,9 +25,11 @@ import org.esupportail.nfctag.service.ApplisExtService;
 import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.TagIdCheckService;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
+import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 import org.springframework.web.util.WebUtils;
@@ -68,7 +70,16 @@ public class ApplicationController {
 	public List<NfcAuthConfig> getNfcAuthConfigs() {
 		return nfcAuthConfigService.getNfcAuthConfigs();
 	}
-    
+
+    /*
+     *  Empty strings from web forms are nullified
+     */
+    @InitBinder
+    public void initBinder(WebDataBinder dataBinder) {
+        StringTrimmerEditor stringTrimmerEditor = new StringTrimmerEditor(true);
+        dataBinder.registerCustomEditor(String.class, stringTrimmerEditor);
+    }
+
     @RequestMapping(method = RequestMethod.POST, produces = "text/html")
     public String create(@Valid Application application, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
         if (bindingResult.hasErrors()) {

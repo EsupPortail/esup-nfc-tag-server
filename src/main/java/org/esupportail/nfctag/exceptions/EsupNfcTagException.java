@@ -18,6 +18,7 @@
 package org.esupportail.nfctag.exceptions;
 
 import org.esupportail.nfctag.beans.ApplicationContextProvider;
+import org.esupportail.nfctag.beans.NfcResultBean;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.ReloadableResourceBundleMessageSource;
@@ -32,7 +33,7 @@ public class EsupNfcTagException extends RuntimeException {
 	private static final long serialVersionUID = 1L;
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
-	
+
 	static public enum EsupNfcTagErrorMessage{
 		error_esupnfctagexception_serviceunavailable,
 		error_esupnfctagexception_unknowcard,
@@ -50,6 +51,8 @@ public class EsupNfcTagException extends RuntimeException {
 	String message;
 	
 	String numeroId;
+
+	NfcResultBean.CODE code = NfcResultBean.CODE.ERROR;
 	
 	public EsupNfcTagException(Throwable cause, EsupNfcTagErrorMessage message, String...params ) {
 		super(message.toString(), cause);
@@ -78,6 +81,13 @@ public class EsupNfcTagException extends RuntimeException {
 		this.message = message;
 		this.numeroId = numeroId;
 	}
+
+	public EsupNfcTagException(String message, String numeroId, NfcResultBean.CODE code) {
+		super(message);
+		this.message = message;
+		this.numeroId = numeroId;
+		this.code = code;
+	}
 	
 	@Override
 	public String getMessage() {
@@ -96,4 +106,7 @@ public class EsupNfcTagException extends RuntimeException {
 		return numeroId;
 	}
 
+	public NfcResultBean.CODE getCode() {
+		return code;
+	}
 }

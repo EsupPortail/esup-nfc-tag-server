@@ -26,7 +26,8 @@ public class NfcResultBean implements Serializable {
 	public static enum CODE {
         ERROR,
         OK,
-        END
+        END,
+		CONTINUE
     }
 	
 	public static enum Action {

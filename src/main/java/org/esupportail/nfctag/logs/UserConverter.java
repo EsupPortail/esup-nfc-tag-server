@@ -28,9 +28,13 @@ public class UserConverter extends ClassicConverter {
 	
 	@Override
     public String convert(ILoggingEvent event) {
-       Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-       if (auth != null) {
-            return auth.getName();
+       try {
+           Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+           if (auth != null) {
+                return auth.getName();
+           }
+       } catch (Exception e) {
+    	   // do nothing
        }
        return NO_USER;
     }

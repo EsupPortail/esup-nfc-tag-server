@@ -26,19 +26,23 @@ import org.esupportail.nfctag.dao.DeviceDao;
 import org.esupportail.nfctag.service.api.AppliExtApi;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
 import org.esupportail.nfctag.service.api.TagIdCheckApi;
+import org.esupportail.nfctag.tools.PrettyStopWatch;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StopWatch;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ApplicationsService {
 	
-    protected final Logger log = LoggerFactory.getLogger(this.getClass());
+    static final Logger log = LoggerFactory.getLogger(ApplicationsService.class);
 
 	@Resource
 	ApplisExtService applisExtService;
@@ -70,22 +74,38 @@ public class ApplicationsService {
 	}
 	
 	public List<Application> getApplications4Eppn(String eppn, boolean checkActive) throws EsupNfcTagException {
-		List<Application> applications = new ArrayList<Application>();
+		StopWatch stopWatch = new PrettyStopWatch();
+		List<Application> dbApplications = applicationDao.findAllApplications();
+		stopWatch.start(String.format("get locations for %s applications", dbApplications.size()));
+		List<Application> applications =  Collections.synchronizedList(new ArrayList<Application>());
+		List<CompletableFuture<Void>> futuresAppliGetLocationsAsync = new ArrayList<CompletableFuture<Void>>();
 		for(Application appli: applicationDao.findAllApplications()) {
-			AppliExtApi appliExtApi = applisExtService.get(appli.getAppliExt());
-			try {
-				List<String> locations = appliExtApi.getLocations4Eppn(eppn);
-				if(locations.size()>0 && (appli.isActive() || !checkActive)) { 
-					appli.setLocations(locations);
-				}
-			} catch(Exception e) {
-				log.error("Exception on" + appli.getName() + "!");
-				appli.setAvailable(false);
-			}
-			if(!appli.getLocations().isEmpty() || !appli.getAvailable()) {
-				applications.add(appli);
-			}
+			CompletableFuture<Void> appliGetLocationsAsync = CompletableFuture.supplyAsync(
+					() -> {
+						log.trace(String.format("get locations for %s for %s ...", appli.getName(), eppn));
+						AppliExtApi appliExtApi = applisExtService.get(appli.getAppliExt());
+						try {
+							List<String> locations = appliExtApi.getLocations4Eppn(eppn);
+							if (locations.size() > 0 && (appli.isActive() || !checkActive)) {
+								appli.setLocations(locations);
+							}
+							log.debug(String.format("get locations for %s for %s : %s", appli.getName(), eppn, locations));
+						} catch (Exception e) {
+							log.error(String.format("Exception on getting locations for %s for %s : %s", appli.getName(), eppn, e.getMessage()), e);
+							appli.setAvailable(false);
+						}
+						if (!appli.getLocations().isEmpty() || !appli.getAvailable()) {
+							synchronized (applications) {
+								applications.add(appli);
+							}
+						};
+						return null;
+					});
+			futuresAppliGetLocationsAsync.add(appliGetLocationsAsync);
 		}
+		CompletableFuture<Void> allFutures = CompletableFuture.allOf(futuresAppliGetLocationsAsync.toArray(new CompletableFuture[futuresAppliGetLocationsAsync.size()]));
+		allFutures.toCompletableFuture().join();
+		stopWatch.start("sort applications ...");
 		applications.sort((a1, a2) -> { 
 			int cmp = a2.getAvailable().compareTo(a1.getAvailable());
 			if(cmp==0) {
@@ -100,6 +120,8 @@ public class ApplicationsService {
 			}
 			return cmp;
 		});
+		stopWatch.stop();
+		log.debug(stopWatch.prettyPrint());
 		return applications;
 	}
 	

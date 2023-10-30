@@ -97,7 +97,13 @@ public class DesfireWsController {
 			response = DESFireEV1Service.Response.getResponse(Integer.parseInt(msg, 16));
 			log.debug("return is : " + result + " with Desfire Response : " + response.toString());
 			if(!response.equals(DESFireEV1Service.Response.OPERATION_OK) && !response.equals(DESFireEV1Service.Response.ADDITIONAL_FRAME)) {
-				throw new EsupNfcTagException("Error desfire response : " + response.toString(), numeroId);
+				// si plusieurs update on indique au client de continuer ...
+				desfireService.updateDesfireTagIdx++;
+				if(desfireService.getDesfireTagToUpdate() != null) {
+					throw new EsupNfcTagException("Error desfire response : " + response.toString() + " for cardId : " + cardId + " and numeroId : " + numeroId + " - try to update next tag", numeroId, CODE.CONTINUE);
+				} else {
+					throw new EsupNfcTagException("Error desfire response : " + response.toString(), numeroId);
+				}
 			}
 		}
 
@@ -121,7 +127,7 @@ public class DesfireWsController {
 		log.error("desfire error",  e);
 		nfcResultBean.setMsg(e.getMessage());		
 		errorLongPoolController.handleError(tagError);
-		nfcResultBean.setCode(CODE.ERROR);
+		nfcResultBean.setCode(e.getCode());
 		return nfcResultBean;
 	}
 
