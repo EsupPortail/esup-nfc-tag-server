@@ -889,7 +889,7 @@ public NfcResultBean readUid(String result){
 				// split result : app id on 6 chars (3 bytes)
 				List<String> apps = Arrays.asList(appsString.split("(?<=\\G.{6})"));
 				Date lastUpdate = null;
-				if(desfireApp.getTagLastUpdateRestWs() != null) {
+				if(desfireApp!=null && desfireApp.getTagLastUpdateRestWs() != null) {
 					lastUpdate = desfireApp.getTagLastUpdateRestWs().getLastUpdateDateFromCsn(csn);
 				}
 				if(desfireFlowStep.currentApp < desfireTag.getApplications().size()) {
