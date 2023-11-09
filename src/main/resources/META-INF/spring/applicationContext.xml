@@ -127,6 +127,7 @@
 		<property name="requestFactory">
 			<bean class="org.springframework.http.client.SimpleClientHttpRequestFactory">
 				<property name="readTimeout" value="5000" />
+                <property name="connectTimeout" value="5000" />
 			</bean>	
 		</property>
 		<property name="messageConverters">
