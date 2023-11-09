@@ -298,18 +298,23 @@ public NfcResultBean readUid(String result){
 	}
 
 	public DesfireTag getDesfireTagToWrite() {
-		DesfireWriteConfig desfireWriteConfig = (DesfireWriteConfig) desfireAuthSession.getDesfireAuthConfig();
-		return desfireWriteConfig.getDesfireTag();
+		if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireWriteConfig) {
+			DesfireWriteConfig desfireWriteConfig = (DesfireWriteConfig) desfireAuthSession.getDesfireAuthConfig();
+			return desfireWriteConfig.getDesfireTag();
+		}
+		return null;
 	}
 
 	public DesfireTag getDesfireTagToUpdate() {
-		DesfireUpdateConfig desfireUpdateConfig = (DesfireUpdateConfig) desfireAuthSession.getDesfireAuthConfig();
-		if (desfireUpdateConfig.getDesfireTag() != null) {
-			if(updateDesfireTagIdx==0) {
-				return desfireUpdateConfig.getDesfireTag();
+		if(desfireAuthSession.getDesfireAuthConfig() instanceof DesfireUpdateConfig) {
+			DesfireUpdateConfig desfireUpdateConfig = (DesfireUpdateConfig) desfireAuthSession.getDesfireAuthConfig();
+			if (desfireUpdateConfig.getDesfireTag() != null) {
+				if (updateDesfireTagIdx == 0) {
+					return desfireUpdateConfig.getDesfireTag();
+				}
+			} else if (updateDesfireTagIdx < desfireUpdateConfig.getDesfireTags().size()) {
+				return desfireUpdateConfig.getDesfireTags().get(updateDesfireTagIdx);
 			}
-		} else if (updateDesfireTagIdx<desfireUpdateConfig.getDesfireTags().size()) {
-			return desfireUpdateConfig.getDesfireTags().get(updateDesfireTagIdx);
 		}
 		return null;
 	}
@@ -743,8 +748,10 @@ public NfcResultBean readUid(String result){
 				desfireFlowStep.action = Action.END;
 			} else if(desfireTag.getFormatBeforeWrite()){
 				desfireFlowStep.action = Action.FORMAT;
-			}else{
+			}else if(desfireTag.getApplications().size()>0){
 				desfireFlowStep.action = Action.GET_APPS;
+			}else {
+				desfireFlowStep.action = Action.CHANGE_PICC_KEY;
 			}
 		}
 		byte[] piccAid = DesfireUtils.hexStringToByteArray("000000");

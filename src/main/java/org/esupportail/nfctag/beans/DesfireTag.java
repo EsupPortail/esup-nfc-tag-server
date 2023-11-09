@@ -4,13 +4,14 @@ import org.esupportail.nfctag.service.api.DamKeysTagWriteApi;
 import org.esupportail.nfctag.service.desfire.DESFireEV1Service.KeyType;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class DesfireTag implements Serializable {
 
 	private static final long serialVersionUID = 1L;
 
-	private List<DesfireApplication> applications;
+	private List<DesfireApplication> applications = new ArrayList<>();
 	
 	Boolean formatBeforeWrite = false;
 	
