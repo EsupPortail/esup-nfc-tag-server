@@ -147,7 +147,7 @@
                       <fmt:formatDate value="${item[column].time}" pattern="${fn:escapeXml(columnDatePattern)}" var="colTxt" />
                     </spring:escapeBody>
                   </c:when>
-                  <c:when test="${columnType eq 'link'}">
+                  <c:when test="${columnType eq 'link' and not fn:contains(item[column], '/')}">
                     <c:set var="colTxt">
                       <a href="${columnLinkPrefixe}${item[column]}"> ${item[column]} </a>
                     </c:set>
