@@ -43,6 +43,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.async.DeferredResult;
 
 import javax.annotation.Resource;
+import javax.persistence.NoResultException;
 import javax.transaction.Transactional;
 import java.util.*;
 import java.util.Map.Entry;
@@ -239,10 +240,14 @@ public class LiveLongPoolController {
 		for (Entry<DeferredResult<List<TagLog>>, LiveQuery> entry : this.suspendedLeoAuthsRequests.entrySet()) {
 			String numeroId = entry.getValue().getNumeroId();
 			if(numeroId != null && !numeroId.isEmpty()) {
-				Device device = deviceDao.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
-				Date lastPollDate = entry.getValue().getLastPollDate();
-				device.setLastPollDate(lastPollDate);
-				devices.add(device);
+				try {
+					Device device = deviceDao.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
+					Date lastPollDate = entry.getValue().getLastPollDate();
+					device.setLastPollDate(lastPollDate);
+					devices.add(device);
+				} catch (NoResultException nre) {
+					log.warn("No Device found for thid numeroId : " + numeroId);
+				}
 			}
 		}
 		Collections.sort(devices, (Device c1, Device c2) -> c2.getLastPollDate().compareTo(c1.getLastPollDate()));
