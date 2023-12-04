@@ -1066,6 +1066,7 @@ public NfcResultBean readUid(String result){
 			case END:
 				updateDesfireTagIdx++;
 				if(getDesfireTagToUpdate()==null) {
+					authResultBean.setAction(NfcResultBean.Action.update);
 					authResultBean.setFullApdu("END");
 					updateDesfireTagIdx = 0;
 				} else {
