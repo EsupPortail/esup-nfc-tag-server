@@ -17,7 +17,7 @@ L'application EsupNfcTagServer, elle est développée en Spring et tourne sur To
 ## Installation
 
 ### Pré-requis
-* Java - JDK : OpenJDK 8 ou 11 : le mieux est de l'installer via le système de paquets de votre linux.
+* Java - JDK : OpenJDK 8 ou 11 ou 17 : le mieux est de l'installer via le système de paquets de votre linux.
 * Maven : le mieux est de l'installer via le système de paquets de votre linux.
 * Postgresql 9 ou > : le mieux est de l'installer via le système de paquets de votre linux.
 * Tomcat (Tomcat 9)
