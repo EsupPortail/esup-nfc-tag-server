@@ -145,7 +145,7 @@ public class LiveLongPoolController {
 
 		LiveQuery liveQuery = new LiveQuery(authDateTimestamp, numeroId);
 		
-		final DeferredResult<List<TagLog>> tagLogs = new DeferredResult<List<TagLog>>(null, Collections.emptyList());
+		final DeferredResult<List<TagLog>> tagLogs = new DeferredResult<List<TagLog>>(1200000l, Collections.emptyList());
 		this.suspendedLeoAuthsRequests.put(tagLogs, liveQuery);
 
 		tagLogs.onCompletion(new Runnable() {

@@ -55,7 +55,7 @@ public class ErrorLongPoolController {
 			return null;
 		}
 		LiveQuery liveQuery = new LiveQuery(errorDateTimestamp, numeroId);
-		final DeferredResult<List<TagError>> tagErrors = new DeferredResult<List<TagError>>(null, Collections.emptyList());
+		final DeferredResult<List<TagError>> tagErrors = new DeferredResult<List<TagError>>(1200000l, Collections.emptyList());
 		
 		this.suspendedTagErrorsRequests.put(tagErrors, liveQuery);
 
