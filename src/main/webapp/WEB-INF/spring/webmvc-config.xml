@@ -26,7 +26,17 @@
     
 
     <!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources -->
-    <mvc:resources location="/, classpath:/META-INF/web-resources/" mapping="/resources/**"/>
+    <mvc:resources location="/, classpath:/META-INF/web-resources/" mapping="/resources/**">
+		<mvc:cache-control cache-public="true" max-age="86400"/>
+		<mvc:resource-chain resource-cache="true">
+			<mvc:resolvers>
+				<mvc:version-resolver>
+					<mvc:content-version-strategy patterns="/**"/>
+				</mvc:version-resolver>
+				<bean class="org.springframework.web.servlet.resource.PathResourceResolver"/>
+			</mvc:resolvers>
+		</mvc:resource-chain>
+	</mvc:resources>
 
     <!-- Allows for mapping the DispatcherServlet to "/" by forwarding static resource 
     requests to the container's default Servlet -->

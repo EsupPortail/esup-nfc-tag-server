@@ -26,7 +26,9 @@
              					 http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
                                  http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
     
-    
+
+	<http security="none" pattern="/resources/**" />
+
     <!-- HTTP security configurations -->
     <http disable-url-rewriting="true" use-expressions="true" entry-point-ref="http403EntryPoint">
 		<intercept-url pattern="/wsrest/**" access="hasIpAddress('127.0.0.1')" /> <!-- Esup-SGC IP Address -->
@@ -42,10 +44,13 @@
 		<custom-filter before="FIRST" ref="devClientRequestFilter"/>
 		<custom-filter position="PRE_AUTH_FILTER" ref="shibFilter"/>
 		<custom-filter ref="concurrencyFilter" position="CONCURRENT_SESSION_FILTER" />
+		<custom-filter ref="resourceUrlEncodingFilter" position="LAST"/>
 		<logout logout-success-url="/" />
 	    	<csrf disabled="true"/>
     </http>
 
+	<beans:bean id="resourceUrlEncodingFilter" class="org.springframework.web.servlet.resource.ResourceUrlEncodingFilter"/>
+	
     <beans:bean id="http403EntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
     
     <beans:bean id="authEntryPoint" class="org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint">
