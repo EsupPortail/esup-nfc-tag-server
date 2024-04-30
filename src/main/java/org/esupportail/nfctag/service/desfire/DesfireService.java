@@ -342,6 +342,7 @@ public NfcResultBean readUid(String result){
 
 		byte[] piccKeyStart = DesfireUtils.hexStringToByteArray(desfireTag.getKeyStart());
 
+		byte[] appDefaultKey = null;
 		byte[] defaultKey = null;
 
 		byte[] piccAid = DesfireUtils.hexStringToByteArray("000000");
@@ -385,26 +386,26 @@ public NfcResultBean readUid(String result){
 			amks= DesfireUtils.hexStringToByte(desfireApp.getAmks());
 			nok = DesfireUtils.hexStringToByte(desfireApp.getNok());
 				
-				/* nok build :
-				b1 : 10 for AES 
+			/* nok build :
+				b1 : 10 for AES, 00 for (T)DES, 01 for TKTDES
 				b2:  10 for ISO ID, 00 else
 				b3-b4 : number of keys
-				*/
-			if(desfireApp.getNok().substring(0, 1).equals("8") || desfireApp.getNok().substring(0, 1).equals("A")){
-				defaultKey = DesfireUtils.hexStringToByteArray("00000000000000000000000000000000");
-				appDefaultKeyType = KeyType.AES;
-				appKey = DesfireUtils.hexStringToByteArray("00000000000000000000000000000000");
-				appKeyNo = DesfireUtils.hexStringToByte("00");
-				appKeyVer = DesfireUtils.hexStringToByte("00");
-				keyKeyType = appKeyType = KeyType.AES;
-			}else{
-				defaultKey = DesfireUtils.hexStringToByteArray("0000000000000000");
-				appDefaultKeyType = KeyType.DES;
-				appKey = DesfireUtils.hexStringToByteArray("0000000000000000");
-				appKeyNo = DesfireUtils.hexStringToByte("00");
-				appKeyVer = DesfireUtils.hexStringToByte("00");
-				keyKeyType = appKeyType = KeyType.DES;
-			}
+			*/
+			appKeyNo = DesfireUtils.hexStringToByte("00");
+			appKeyVer = DesfireUtils.hexStringToByte("00");
+			keyKeyType = desfireApp.getNok().substring(0, 1).equals("8") || desfireApp.getNok().substring(0, 1).equals("A") ? KeyType.AES :
+					desfireApp.getKeys().get(0).getKey().length() == 24*2 ? KeyType.TKTDES :
+							desfireApp.getKeys().get(0).getKey().length() == 16*2 ? KeyType.TDES : KeyType.DES;
+			defaultKey = keyKeyType == KeyType.AES || keyKeyType == KeyType.TDES ? DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",16*2)) :
+					keyKeyType == KeyType.TKTDES ? DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",24*2)) :
+							DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",8*2));
+			appKeyType = keyKeyType;
+			// for TDES, the default key is actually DES key - TDES and DES have the same nok (00) but TDES length is 16 and DES length is 8
+			appDefaultKeyType = keyKeyType == KeyType.TDES ? KeyType.DES : keyKeyType;
+			appDefaultKey = keyKeyType == KeyType.AES ? DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",16*2)) :
+					keyKeyType == KeyType.TKTDES ? DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",24*2)) :
+							DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",8*2));
+			appKey = defaultKey;
 
 			if(desfireApp.getKeys() != null && desfireApp.getKeys().size() > 0) {
 				DesfireKey desfireAppKey = desfireApp.getKeys().get(0);
@@ -555,10 +556,10 @@ public NfcResultBean readUid(String result){
 				break;
 			case CHANGE_APP_MASTER_KEY:
 				log.debug("Write by " + eppnInit + " - Step : Change app key : " + DesfireUtils.byteArrayToHexString(aid));
-				authResultBean = this.authApp(aid, result, defaultKey, appKeyNo, appDefaultKeyType);
+				authResultBean = this.authApp(aid, result, appDefaultKey, appKeyNo, appDefaultKeyType);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
-					authResultBean.setFullApdu(desFireEV1Service.changeKey(appKeyNo, appKeyVer, appKeyType, appKey, defaultKey));
+					authResultBean.setFullApdu(desFireEV1Service.changeKey(appKeyNo, appKeyVer, appKeyType, appKey, appDefaultKey));
 					authResultBean.setSize(16);
 					if(desfireApp.getKeys() != null && desfireApp.getKeys().size() >  1) {
 						desfireFlowStep.currentKey = 1;
@@ -585,7 +586,7 @@ public NfcResultBean readUid(String result){
 				break;
 			case CHANGE_KEYS:
 				log.debug("Write by " + eppnInit + " - Step : Change app key : " + keyNo + " for " + DesfireUtils.byteArrayToHexString(aid));
-				authResultBean = this.authApp(aid, result, appKey, appKeyNo, appDefaultKeyType);
+				authResultBean = this.authApp(aid, result, appKey, appKeyNo, appKeyType);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
 					authResultBean.setFullApdu(desFireEV1Service.changeKey(keyNo, keyVer, keyKeyType, key, defaultKey));
@@ -618,7 +619,7 @@ public NfcResultBean readUid(String result){
 				break;
 			case CREATE_FILE:
 				log.debug("Write by " + eppnInit + " - Step : Create file in " + DesfireUtils.byteArrayToHexString(aid) +" : " + fileNo);
-				authResultBean = this.authApp(aid, result, appKey, appKeyNo, appDefaultKeyType);
+				authResultBean = this.authApp(aid, result, appKey, appKeyNo, appKeyType);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
 					authResultBean.setFullApdu(desFireEV1Service.createStdDataFile(byteWritePayload, (nok|0x20)==nok));
@@ -739,6 +740,7 @@ public NfcResultBean readUid(String result){
 		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm");
 		Date schemaDate = null;
 
+		byte[] appDefaultKey = null;
 		byte[] defaultKey = null;
 		DesfireTag desfireTag =  getDesfireTagToUpdate();
 
@@ -799,21 +801,26 @@ public NfcResultBean readUid(String result){
 			amks= DesfireUtils.hexStringToByte(desfireApp.getAmks());
 			nok = DesfireUtils.hexStringToByte(desfireApp.getNok());
 
-			if(desfireApp.getNok().substring(0, 1).equals("8") || desfireApp.getNok().substring(0, 1).equals("A")){
-				defaultKey = DesfireUtils.hexStringToByteArray("00000000000000000000000000000000");
-				appDefaultKeyType = KeyType.AES;
-				appKey = DesfireUtils.hexStringToByteArray("00000000000000000000000000000000");
-				appKeyNo = DesfireUtils.hexStringToByte("00");
-				appKeyVer = DesfireUtils.hexStringToByte("00");
-				keyKeyType = appKeyType = KeyType.AES;
-			}else{
-				defaultKey = DesfireUtils.hexStringToByteArray("0000000000000000");
-				appDefaultKeyType = KeyType.DES;
-				appKey = DesfireUtils.hexStringToByteArray("0000000000000000");
-				appKeyNo = DesfireUtils.hexStringToByte("00");
-				appKeyVer = DesfireUtils.hexStringToByte("00");
-				keyKeyType = appKeyType = KeyType.DES;
-			}
+			/* nok build :
+				b1 : 10 for AES, 00 for (T)DES, 01 for TKTDES
+				b2:  10 for ISO ID, 00 else
+				b3-b4 : number of keys
+			*/
+			appKeyNo = DesfireUtils.hexStringToByte("00");
+			appKeyVer = DesfireUtils.hexStringToByte("00");
+			keyKeyType = desfireApp.getNok().substring(0, 1).equals("8") || desfireApp.getNok().substring(0, 1).equals("A") ? KeyType.AES :
+					desfireApp.getKeys().get(0).getKey().length() == 24*2 ? KeyType.TKTDES :
+							desfireApp.getKeys().get(0).getKey().length() == 16*2 ? KeyType.TDES : KeyType.DES;
+			defaultKey = keyKeyType == KeyType.AES || keyKeyType == KeyType.TDES ? DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",16*2)) :
+					keyKeyType == KeyType.TKTDES ? DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",24*2)) :
+							DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",8*2));
+			appKeyType = keyKeyType;
+			// for TDES, the default key is actually DES key - TDES and DES have the same nok (00) but TDES length is 16 and DES length is 8
+			appDefaultKeyType = keyKeyType == KeyType.TDES ? KeyType.DES : keyKeyType;
+			appDefaultKey = keyKeyType == KeyType.AES ? DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",16*2)) :
+					keyKeyType == KeyType.TKTDES ? DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",24*2)) :
+							DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",8*2));
+			appKey = defaultKey;
 
 			if(StringUtils.isNotEmpty(desfireApp.getUpdateDate())) {
 				try {
@@ -921,7 +928,7 @@ public NfcResultBean readUid(String result){
 				break;
 			case DELETE_APP:
 				log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Delete App");
-				authResultBean = this.authApp(aid, result, appKey, (byte) 0x00, KeyType.AES);
+				authResultBean = this.authApp(aid, result, appKey, (byte) 0x00, appKeyType);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
 					authResultBean.setFullApdu(desFireEV1Service.deleteApplication(DesfireUtils.swapPairsByte(aid)));
@@ -944,10 +951,10 @@ public NfcResultBean readUid(String result){
 				break;
 			case CHANGE_APP_MASTER_KEY:
 				log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change app key : " + DesfireUtils.byteArrayToHexString(aid));
-				authResultBean = this.authApp(aid, result, defaultKey, appKeyNo, appDefaultKeyType);
+				authResultBean = this.authApp(aid, result, appDefaultKey, appKeyNo, appDefaultKeyType);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
-					authResultBean.setFullApdu(desFireEV1Service.changeKey(appKeyNo, appKeyVer, appKeyType, appKey, defaultKey));
+					authResultBean.setFullApdu(desFireEV1Service.changeKey(appKeyNo, appKeyVer, appKeyType, appKey, appDefaultKey));
 					authResultBean.setSize(16);
 					if(desfireApp.getKeys() != null && desfireApp.getKeys().size() >  1) {
 						desfireFlowStep.currentKey = 1;
@@ -971,7 +978,7 @@ public NfcResultBean readUid(String result){
 				break;
 			case CHANGE_KEYS:
 				log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change app key : " + keyNo + " for " + DesfireUtils.byteArrayToHexString(aid));
-				authResultBean = this.authApp(aid, result, appKey, appKeyNo, appDefaultKeyType);
+				authResultBean = this.authApp(aid, result, appKey, appKeyNo, appKeyType);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
 					authResultBean.setFullApdu(desFireEV1Service.changeKey(keyNo, keyVer, keyKeyType, key, defaultKey));
@@ -1084,6 +1091,7 @@ public NfcResultBean readUid(String result){
 		authResultBean.setAction(NfcResultBean.Action.none);
 		authResultBean.setCode(CODE.OK);
 
+		byte[] appDefaultKey = null;
 		byte[] defaultKey = null;
 		DesfireTag desfireTag =  getDesfireTagToDamUpdate();
 
@@ -1129,21 +1137,21 @@ public NfcResultBean readUid(String result){
 			amks= DesfireUtils.hexStringToByte(desfireApp.getAmks());
 			nok = DesfireUtils.hexStringToByte(desfireApp.getNok());
 
-			if(desfireApp.getNok().substring(0, 1).equals("8") || desfireApp.getNok().substring(0, 1).equals("A")){
-				defaultKey = DesfireUtils.hexStringToByteArray("00000000000000000000000000000000");
-				appDefaultKeyType = KeyType.AES;
-				appKey = DesfireUtils.hexStringToByteArray("00000000000000000000000000000000");
-				appKeyNo = DesfireUtils.hexStringToByte("00");
-				appKeyVer = DesfireUtils.hexStringToByte("00");
-				keyKeyType = appKeyType = KeyType.AES;
-			}else{
-				defaultKey = DesfireUtils.hexStringToByteArray("0000000000000000");
-				appDefaultKeyType = KeyType.DES;
-				appKey = DesfireUtils.hexStringToByteArray("0000000000000000");
-				appKeyNo = DesfireUtils.hexStringToByte("00");
-				appKeyVer = DesfireUtils.hexStringToByte("00");
-				keyKeyType = appKeyType = KeyType.DES;
-			}
+			appKeyNo = DesfireUtils.hexStringToByte("00");
+			appKeyVer = DesfireUtils.hexStringToByte("00");
+			keyKeyType = desfireApp.getNok().substring(0, 1).equals("8") || desfireApp.getNok().substring(0, 1).equals("A") ? KeyType.AES :
+					desfireApp.getKeys().get(0).getKey().length() == 24*2 ? KeyType.TKTDES :
+							desfireApp.getKeys().get(0).getKey().length() == 16*2 ? KeyType.TDES : KeyType.DES;
+			defaultKey = keyKeyType == KeyType.AES || keyKeyType == KeyType.TDES ? DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",16*2)) :
+					keyKeyType == KeyType.TKTDES ? DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",24*2)) :
+							DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",8*2));
+			appKeyType = keyKeyType;
+			// for TDES, the default key is actually DES key - TDES and DES have the same nok (00) but TDES length is 16 and DES length is 8
+			appDefaultKeyType = keyKeyType == KeyType.TDES ? KeyType.DES : keyKeyType;
+			appDefaultKey = keyKeyType == KeyType.AES ? DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",16*2)) :
+					keyKeyType == KeyType.TKTDES ? DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",24*2)) :
+							DesfireUtils.hexStringToByteArray(StringUtils.repeat("0",8*2));
+			appKey = defaultKey;
 
 			if(desfireApp.getKeys() != null && desfireApp.getKeys().size() > 0) {
 				DesfireKey desfireAppKey = desfireApp.getKeys().get(0);
@@ -1188,7 +1196,7 @@ public NfcResultBean readUid(String result){
 				log.debug("Update by " + eppnInit + "with csn : " + csn + " - Step : Create app : " + DesfireUtils.byteArrayToHexString(aid));
 				if (desfireFlowStep.createDamStep == 0) {
 					try {
-						authResultBean = this.authApp(piccAid, result, DesfireUtils.hexStringToByteArray(desfireApp.getDamTagWriteApi().getDamAuthKey(csn).getDamAuthKey()), (byte) 0x10, KeyType.AES);
+						authResultBean = this.authApp(piccAid, result, DesfireUtils.hexStringToByteArray(desfireApp.getDamTagWriteApi().getDamAuthKey(csn).getDamAuthKey()), (byte) 0x10, appKeyType);
 					} catch (NullPointerException e) {
 						throw new EsupNfcTagException("TagWrite not define", e);
 					}
@@ -1245,10 +1253,10 @@ public NfcResultBean readUid(String result){
 				break;
 			case CHANGE_APP_MASTER_KEY:
 				log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change app key : " + DesfireUtils.byteArrayToHexString(aid));
-				authResultBean = this.authApp(aid, result, defaultKey, appKeyNo, appDefaultKeyType);
+				authResultBean = this.authApp(aid, result, appDefaultKey, appKeyNo, appDefaultKeyType);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
-					authResultBean.setFullApdu(desFireEV1Service.changeKey(appKeyNo, appKeyVer, appKeyType, appKey, defaultKey));
+					authResultBean.setFullApdu(desFireEV1Service.changeKey(appKeyNo, appKeyVer, appKeyType, appKey, appDefaultKey));
 					authResultBean.setSize(16);
 					if(desfireApp.getKeys() != null && desfireApp.getKeys().size() >  1) {
 						desfireFlowStep.currentKey = 1;
@@ -1269,7 +1277,7 @@ public NfcResultBean readUid(String result){
 				break;
 			case CHANGE_KEYS:
 				log.debug("Update by " + eppnInit + " with csn : " + csn + " - Step : Change app key : " + keyNo + " for " + DesfireUtils.byteArrayToHexString(aid));
-				authResultBean = this.authApp(aid, result, appKey, appKeyNo, appDefaultKeyType);
+				authResultBean = this.authApp(aid, result, appKey, appKeyNo, appKeyType);
 				if(authResultBean.getFullApdu() == null) {
 					desfireFlowStep.authStep = 1;
 					authResultBean.setFullApdu(desFireEV1Service.changeKey(keyNo, keyVer, keyKeyType, key, defaultKey));
