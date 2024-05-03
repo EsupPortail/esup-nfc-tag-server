@@ -312,9 +312,9 @@ public class DESFireEV1Service extends SimpleSCR {
 		switch (ktype) {
 		case DES:
 		case TDES:
+		case TKTDES:
 			plaintext = type == KeyType.TKTDES ? new byte[32] : new byte[24];
 			break;
-		case TKTDES:
 		case AES:
 			plaintext = new byte[32];
 			break;
