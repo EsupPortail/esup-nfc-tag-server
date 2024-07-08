@@ -42,6 +42,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import javax.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -200,8 +201,9 @@ public class NfcRegisterController {
 			log.warn(eppnInit + " can not register in write sgc");
 			throw new AccessDeniedException(eppnInit + " can not register in write sgc");
 		}
-		
-		if (deviceDao.countFindDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)==0) {
+
+		long nbDevices = deviceDao.countFindDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress);
+		if (nbDevices==0) {
 			numeroId = deviceService.generateNumeroId();
 			Device device = new Device();
 			device.setNumeroId(numeroId);
@@ -218,10 +220,19 @@ public class NfcRegisterController {
 			}
 			device.setCreateDate(new Date());
 			deviceDao.persist(device);
-		} else {
+		} else if (nbDevices==1) {
 			Device tel = deviceDao.findDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress)
 					.getSingleResult();
 			numeroId = tel.getNumeroId();
+		} else {
+			log.warn("more than one device for " + eppnInit + " in " + location + " with macAddress " + macAddress +
+					" we should have only one device, so we remove the oldest");
+			List<Device> devices = deviceDao.findDevicesByLocationAndEppnInitAndMacAddressEquals(location, eppnInit, macAddress).getResultList();
+			Collections.sort(devices, (d1, d2) -> d1.getLastUseDate()==null ? -1 : d2.getLastUseDate()==null ? 1 : d1.getLastUseDate().compareTo(d2.getLastUseDate()));
+			for(int i = 0; i < devices.size()-1; i++) {
+				deviceDao.remove(devices.get(i).getId());
+			}
+			numeroId = devices.get(devices.size()-1).getNumeroId();
 		}
 
 		String redir = "redirect:/nfc-index?numeroId=" + numeroId + "&imei=" + imei + "&macAddress=" + macAddress + "&apkVersion=" + versionApkService.getApkVersion() +
