@@ -41,5 +41,26 @@
 		   </c:forEach>
 		</ul>
 	</div>
+
+	<div class="jumbotron well">
+		<p>Ensemble des Sessions HTTP</p>
+		<div>
+			${fn:length(allSessions)} session(s) active(s)
+[ sessionId - createdDate - remoteIp - originRequestUri - eppn ]
+		</div>
+		<div class="well">
+			<ul class="list">
+				<c:forEach items="${allSessions}" var="session">
+					<li>
+						${session.sessionId}
+						- ${session.createdDate}
+						- ${session.remoteIp}
+						- ${session.originRequestUri}
+						- ${session.userEppn}
+					</li>
+				</c:forEach>
+			</ul>
+		</div>
+	</div>
 		
 </div>

@@ -17,7 +17,10 @@
  */
 package org.esupportail.nfctag.web.admin;
 
+import org.esupportail.nfctag.domain.NfcHttpSession;
+import org.esupportail.nfctag.security.NfcHttpSessionsListenerService;
 import org.esupportail.nfctag.web.live.LiveLongPoolController;
+import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
@@ -28,6 +31,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import javax.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.Vector;
 
 @RequestMapping("/admin/currentsessions")
@@ -39,6 +43,9 @@ public class CurrentSessionsController {
 	
 	@Resource
 	private LiveLongPoolController liveLongPoolController;
+
+	@Resource
+	NfcHttpSessionsListenerService nfcHttpSessionsListenerService;
 		
 	@ModelAttribute("active")
 	String getCurrentMenu() {
@@ -48,16 +55,24 @@ public class CurrentSessionsController {
 	@RequestMapping
 	public String getCurrentSessions(Model uiModel) throws IOException {
 
+		Map<String, NfcHttpSession> allSessions = nfcHttpSessionsListenerService.getSessions();
 		List<String> sessions = new Vector<String>();
 		List<Object> principals = sessionRegistry.getAllPrincipals();
 		
 		for(Object p: principals) {
-			sessions.add(((UserDetails) p).getUsername());
+			String eppn = ((UserDetails) p).getUsername();
+			sessions.add(eppn);
+			for(SessionInformation sessionInformation: sessionRegistry.getAllSessions(p, false)) {
+				if(allSessions.containsKey(sessionInformation.getSessionId())) {
+					allSessions.get(sessionInformation.getSessionId()).setUserEppn(eppn);
+				}
+			}
 		}
 		
 		uiModel.addAttribute("sessions", sessions);
 		uiModel.addAttribute("devices", liveLongPoolController.getDevices());
-		uiModel.addAttribute("active", "sessions");		
+		uiModel.addAttribute("active", "sessions");
+		uiModel.addAttribute("allSessions", allSessions.values());
 		
 		return "admin/currentsessions";
 	}
