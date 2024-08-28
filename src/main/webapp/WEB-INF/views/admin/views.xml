@@ -25,4 +25,7 @@
     <definition extends="admin" name="admin/currentsessions">
         <put-attribute name="body" value="/WEB-INF/views/admin/currentsessions.jspx"/>
     </definition>
+    <definition extends="admin" name="admin/javaperf">
+        <put-attribute name="body" value="/WEB-INF/views/admin/javaperf.jspx"/>
+    </definition>
 </tiles-definitions>

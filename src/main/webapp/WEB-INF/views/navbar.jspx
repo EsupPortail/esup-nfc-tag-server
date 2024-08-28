@@ -14,6 +14,7 @@
 
 		    <sec:authorize access="hasRole('ROLE_ADMIN')">          
   				<menu:item id="adminview" label="Sessions" url="/admin/currentsessions" activeMenu="${active=='sessions'}"/>
+				<menu:item id="adminview" label="JavaPerf" url="/admin/javaperf" activeMenu="${active=='javaperf'}"/>
           </sec:authorize>
 
 		</menu:menu>
