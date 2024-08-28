@@ -81,6 +81,8 @@
 		<property name="numTestsPerEvictionRun" value="3" />
 		<property name="minEvictableIdleTimeMillis" value="1800000" />
 		<property name="validationQuery" value="SELECT version();" />
+		<property name="maxActive" value="50"/>
+		<property name="maxIdle" value="10"/>
 	</bean>
     <bean class="org.springframework.orm.jpa.JpaTransactionManager" id="transactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory"/>
