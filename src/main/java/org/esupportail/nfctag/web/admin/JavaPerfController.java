@@ -2,6 +2,7 @@ package org.esupportail.nfctag.web.admin;
 
 import org.apache.commons.dbcp.BasicDataSource;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.ldap.core.support.LdapContextSource;
 import org.springframework.ldap.pool.factory.PoolingContextSource;
 import org.springframework.stereotype.Controller;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.lang.management.ManagementFactory;
 import java.lang.management.ThreadInfo;
 import java.lang.management.ThreadMXBean;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -28,8 +30,8 @@ public class JavaPerfController {
 	@Resource
 	List<BasicDataSource> basicDataSources;
 
-	@Resource
-	List<PoolingContextSource> poolingContextSources;
+	@Autowired(required = false)
+	List<PoolingContextSource> poolingContextSources = new ArrayList<>();
 	
 	@ModelAttribute("active")
 	public String getActiveMenu() {
