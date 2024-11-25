@@ -43,7 +43,7 @@ public class ApplicationServiceTest {
 			if(applicationService.checkApplication(application.getId())){
 				nbAppOK++;
 			} else {
-				log.error("device " + application.getName() + " KO");
+				log.error("Application " + application.getName() + " KO");
 			}
 		}
 		if(nbAppOK < applications.size()){
