@@ -113,7 +113,12 @@ public class LdapService {
 	}
 	
 	public TagLog getTagLogByCardUID(String cardUID, String searchFilter, TagType tagType) {
-		
+
+		// Avoid Ldap Injection - cardUID must be alphanumeric only - if not throw exception
+		if(!cardUID.matches("^[a-zA-Z0-9]*$")) {
+			throw new IllegalArgumentException("On LdapService.getTagLogByCardUID - cardUID must be alphanumeric only : " + cardUID);
+		}
+
 		String formattedFilter = MessageFormat.format(searchFilter, cardUID);
 		
 		List<TagLog> tagLogs = ldapTemplate.search("", "(&(objectclass=person)("+formattedFilter+"))",
