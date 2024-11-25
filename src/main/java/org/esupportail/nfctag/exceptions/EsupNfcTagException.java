@@ -43,7 +43,8 @@ public class EsupNfcTagException extends RuntimeException {
 		error_esupnfctagexception_locationnotfound,
 		error_esupnfctagexception_tagidchecknotdefine,
 		error_esupnfctagexception_tagvalidationerror,
-		error_esupnfctagexception_httperror
+		error_esupnfctagexception_httperror,
+		error_esupnfctagexception_desfireerror
 	}
 	
 	String[] params;

@@ -12,6 +12,7 @@ package org.esupportail.nfctag.service.desfire;
 
 import nfcjlib.core.SimpleSCR;
 import nfcjlib.core.util.*;
+import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -173,12 +174,12 @@ public class DESFireEV1Service extends SimpleSCR {
 				ciphertext.length - iv0.length, ciphertext.length);
 		byte[] randAr = recv(key, result, type, iv2);
 		if (randAr == null)
-			return null;
+			throw new EsupNfcTagException(EsupNfcTagException.EsupNfcTagErrorMessage.error_esupnfctagexception_desfireerror, "Error on DESFireEV1Service.authenticate3 : randAr is null");
 		byte[] randAr2 = rotateLeft(randA);
 		
 		for (int i = 0; i < randAr2.length; i++)
 			if (randAr[i] != randAr2[i])
-				return null;
+				throw new EsupNfcTagException(EsupNfcTagException.EsupNfcTagErrorMessage.error_esupnfctagexception_desfireerror, "Error on DESFireEV1Service.authenticate3 : randAr != randAr2");
 
 		// step 6
 		byte[] skey = generateSessionKey(randA, randBDec, type);
