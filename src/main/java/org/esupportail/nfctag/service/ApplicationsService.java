@@ -176,7 +176,7 @@ public class ApplicationsService {
 			AppliExtApi extApi = applisExtService.get(application.getAppliExt());
 			NfcAuthConfig nfcAuthConfig = nfcAuthConfigService.get(application.getNfcConfig());
 			TagIdCheckApi tagIdCheckApi = tagIdCheckService.get(application.getTagIdCheck());
-			if(extApi.getDescription() != null && nfcAuthConfig.getAuthType() != null && tagIdCheckApi.getDescription() != null) {
+			if(extApi!=null && nfcAuthConfig!=null && tagIdCheckApi!=null && extApi.getDescription() != null && nfcAuthConfig.getAuthType() != null && tagIdCheckApi.getDescription() != null) {
 				isApplicationValid = true;
 			}
 		}
