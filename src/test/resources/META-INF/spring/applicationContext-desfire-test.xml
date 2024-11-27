@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!--
+
+    Licensed to ESUP-Portail under one or more contributor license
+    agreements. See the NOTICE file distributed with this work for
+    additional information regarding copyright ownership.
+
+    ESUP-Portail licenses this file to you under the Apache License,
+    Version 2.0 (the "License"); you may not use this file except in
+    compliance with the License. You may obtain a copy of the License at:
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+    See the License for the specific language governing permissions and
+    limitations under the License.
+
+-->
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+                   http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd">
+
+    <bean id="testDesfireTagEsupSgc" class="org.esupportail.nfctag.beans.DesfireTag" p:formatBeforeWrite="true" p:keyStart="0000000000000000" p:keyTypeStart="DES" p:keyFinish="0000000000000000" p:keyTypeFinish="DES" p:keyVersionFinish="00">
+
+        <property name="applications">
+            <util:list>
+
+                <bean class="org.esupportail.nfctag.beans.DesfireApplication"
+                      p:desfireAppId="111111" p:amks="0B" p:nok="84">
+                    <property name="files">
+                        <util:list>
+                            <bean class="org.esupportail.nfctag.beans.DesfireFile"
+                                  p:fileNumber="00" p:communicationSettings="03" p:accessRights="1223" p:fileSize="1F0000"/>
+                        </util:list>
+                    </property>
+                    <property name="keys">
+                        <util:list>
+                            <bean class="org.esupportail.nfctag.beans.DesfireKey"
+                                  p:keyNo="00" p:keyVer="01" p:key="00000000000000000000000000000000"/>
+                            <bean class="org.esupportail.nfctag.beans.DesfireKey"
+                                  p:keyNo="01" p:keyVer="01" p:key="00000000000000000000000000000000"/>
+                            <bean class="org.esupportail.nfctag.beans.DesfireKey"
+                                  p:keyNo="02" p:keyVer="01" p:key="00000000000000000000000000000000"/>
+                            <bean class="org.esupportail.nfctag.beans.DesfireKey"
+                                  p:keyNo="03" p:keyVer="01" p:key="00000000000000000000000000000000"/>
+                        </util:list>
+                    </property>
+                </bean>
+
+            </util:list>
+        </property>
+    </bean>
+
+
+    <bean id="testDesfireAuthConfigWriteEsupSgc" class="org.esupportail.nfctag.service.api.impl.DesfireWriteConfig">
+        <property name="desfireTag" ref="testDesfireTagEsupSgc" />
+        <property name="description" value="Test Ecriture ESUP SGC"/>
+    </bean>
+
+</beans>
