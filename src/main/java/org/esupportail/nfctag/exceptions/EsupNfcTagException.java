@@ -27,6 +27,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.servlet.LocaleResolver;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Locale;
 
 public class EsupNfcTagException extends RuntimeException {
 	
@@ -95,6 +96,9 @@ public class EsupNfcTagException extends RuntimeException {
 		try {
 			ReloadableResourceBundleMessageSource messageSource = ApplicationContextProvider.getApplicationContext().getBean("messageSource", ReloadableResourceBundleMessageSource.class);
 			LocaleResolver localeResolver = (LocaleResolver)ApplicationContextProvider.getApplicationContext().getBean("localeResolver");
+			if(RequestContextHolder.getRequestAttributes() == null) {
+				return this.message;
+			}
 			HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
 			return messageSource.getMessage(this.message, this.params, localeResolver.resolveLocale(request));
 		} catch(Exception e) {
