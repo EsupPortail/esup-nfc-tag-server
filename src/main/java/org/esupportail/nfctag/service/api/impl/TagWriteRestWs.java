@@ -93,7 +93,7 @@ public class TagWriteRestWs implements TagWriteApi {
 			if (!HttpStatus.NOT_FOUND.equals(status)) {
 				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable);
 			} else {
-				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_unknowcard);
+				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_unknowcard, targetUrl.toString());
 			}
 		}
 		log.trace("Got :  " + id);
