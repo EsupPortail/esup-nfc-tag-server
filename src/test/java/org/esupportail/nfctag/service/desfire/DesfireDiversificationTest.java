@@ -12,7 +12,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 
 /**
-* ESC DEUINFO use AES128 key for diversification. 
+* Use AES128 key for diversification.
 * Please refer to [AN10922] NXP document to retrieve the way for generation diversified key from a base key.
 * We use here example data from 2.2.1 chapter of this [AN10922] NXP document : "AES-128 key diversification example"
 */

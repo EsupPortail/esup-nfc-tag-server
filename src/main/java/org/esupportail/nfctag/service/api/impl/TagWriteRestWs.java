@@ -39,8 +39,8 @@ public class TagWriteRestWs implements TagWriteApi {
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
 	/* cache Ids with FIFO Map 
-	 * This allow faser operation.
-	 * But this allows also that the signature of DEUINFO (ESC) is not altered during the writing !
+	 * This allow faster operation.
+	 * But this allows also that big data (multiple frames) is not altered during the writing !
 	 * */
 	private Map<URI, String> cacheIdsMap = new LinkedHashMap<URI, String>(200) {
 
