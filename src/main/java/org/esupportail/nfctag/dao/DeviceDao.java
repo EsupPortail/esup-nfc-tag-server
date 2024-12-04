@@ -1,5 +1,6 @@
 package org.esupportail.nfctag.dao;
 
+import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -145,4 +146,11 @@ public class DeviceDao {
         this.entityManager.remove(attached);
     }
 
+    public List<Device> findDevicesByApplication(Application application) {
+        if (application == null) throw new IllegalArgumentException("The application argument is required");
+        EntityManager em = entityManager;
+        TypedQuery<Device> q = em.createQuery("SELECT o FROM Device AS o WHERE o.application = :application", Device.class);
+        q.setParameter("application", application);
+        return q.getResultList();
+    }
 }

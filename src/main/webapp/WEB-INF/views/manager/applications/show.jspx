@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page" xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:spring="http://www.springframework.org/tags" version="2.0">
+<div xmlns:field="urn:jsptagdir:/WEB-INF/tags/form/fields" xmlns:jsp="http://java.sun.com/JSP/Page"
+     xmlns:page="urn:jsptagdir:/WEB-INF/tags/form" xmlns:spring="http://www.springframework.org/tags" version="2.0"
+     xmlns:c="http://java.sun.com/jsp/jstl/core">
     <jsp:directive.page contentType="text/html;charset=UTF-8"/>
     <jsp:output omit-xml-declaration="yes"/>
     <h1>
         <spring:message code="label_org_esupportail_nfctag_domain_application"/> : ${application.name}</h1>
-    <page:show id="ps_org_esupportail_nfctag_domain_Application" object="${application}" path="/manager/applications" z="user-managed">
+    <page:show id="ps_org_esupportail_nfctag_domain_Application" object="${application}" path="/manager/applications" z="user-managed" delete="${empty devices}">
         <dl class="dl-horizontal">
             <field:display field="name" id="s_org_esupportail_nfctag_domain_Application_name" object="${application}" z="user-managed"/>
             <field:display field="nfcConfig" id="s_org_esupportail_nfctag_domain_Application_nfcConfig" object="${application}" z="user-managed"/>
@@ -21,6 +23,12 @@
         </dl>
         <field:display field="locations" id="s_org_esupportail_nfctag_domain_Application_locations" object="${application}" render="false" z="user-managed"/>
         <field:display field="available" id="s_org_esupportail_nfctag_domain_Application_available" object="${application}" render="false" z="user-managed"/>
+
+        <c:if test="${not empty devices}">
+            <c:url value="/manager/devices?applicationFilter=${application.name}" var="devicesUrl"/>
+            <i>Cette application est utilisée par <a href="${devicesUrl}">${devices.size()} périphérique(s)</a>, vous ne pouvez pas la supprimer.</i>
+            <br/>
+        </c:if>
 
     </page:show>
 </div>

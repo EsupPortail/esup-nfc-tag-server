@@ -17,6 +17,7 @@
  */
 package org.esupportail.nfctag.web.manager;
 
+import org.esupportail.nfctag.dao.DeviceDao;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.ApplisExtApiForm;
 import org.esupportail.nfctag.domain.TagIdCheckApiForm;
@@ -25,6 +26,7 @@ import org.esupportail.nfctag.service.ApplisExtService;
 import org.esupportail.nfctag.service.NfcAuthConfigService;
 import org.esupportail.nfctag.service.TagIdCheckService;
 import org.esupportail.nfctag.service.api.NfcAuthConfig;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -55,8 +57,10 @@ public class ApplicationController {
 
     @Resource
     private ApplicationDao applicationDao;
-	
-	@ModelAttribute("extApis")
+    @Autowired
+    private DeviceDao deviceDao;
+
+    @ModelAttribute("extApis")
 	public List<ApplisExtApiForm> getApplisExtApiForms() {
 		return applisExtService.getApplisExtApiForms();
 	}
@@ -100,8 +104,10 @@ public class ApplicationController {
 
     @RequestMapping(value = "/{id}", produces = "text/html")
     public String show(@PathVariable("id") Long id, Model uiModel) {
-        uiModel.addAttribute("application", applicationDao.findApplication(id));
+        Application application = applicationDao.findApplication(id);
+        uiModel.addAttribute("application",application);
         uiModel.addAttribute("itemId", id);
+        uiModel.addAttribute("devices", deviceDao.findDevicesByApplication(application));
         return "manager/applications/show";
     }
 
