@@ -11,7 +11,7 @@
 		<java.version>1.8</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>2.0.11</slf4j.version>
-		<spring.version>5.3.39</spring.version>
+		<spring.version>6.1.13</spring.version>
 		<spring-security.version>5.8.16</spring-security.version>
 		<skipTests>true</skipTests>
 	</properties>
