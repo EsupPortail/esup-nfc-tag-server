@@ -112,7 +112,7 @@ public NfcResultBean readUid(String result){
 				authResultBean.setFullApdu(desFireEV1Service.getVersion1());
 				desfireFlowStep.action = Action.MORE;
 			case MORE:
-				if(result.endsWith("AF")){
+				if(result.toUpperCase().endsWith("AF")){
 					tempRead += result.substring(0, result.length() - 4);
 					authResultBean.setFullApdu(desFireEV1Service.readMore());
 					authResultBean.setSize(32);
@@ -230,7 +230,7 @@ public NfcResultBean readUid(String result){
 				}
 				break;
 			case MORE:
-				if(result.endsWith("AF")){
+				if(result.toUpperCase().endsWith("AF")){
 					tempRead += result.substring(0, result.length() - 4);
 					authResultBean.setFullApdu(desFireEV1Service.readMore());
 					authResultBean.setSize(32);
@@ -281,7 +281,7 @@ public NfcResultBean readUid(String result){
 				desfireFlowStep.action = Action.MORE;
 				break;
 			case MORE:
-				if(result.endsWith("AF")){
+				if(result.toUpperCase().endsWith("AF")){
 					tempRead += result.substring(0, result.length() - 4);
 					authResultBean.setFullApdu(desFireEV1Service.readMore());
 					authResultBean.setSize(32);
@@ -636,7 +636,7 @@ public NfcResultBean readUid(String result){
 						authResultBean.setFullApdu(desFireEV1Service.writeData(fileNo, desfireId));
 						authResultBean.setSize(16);
 						desfireFlowStep.writeStep++;
-					}else if(desfireFlowStep.writeStep > 0 && result.endsWith("AF")){
+					}else if(desfireFlowStep.writeStep > 0 && result.toUpperCase().endsWith("AF")){
 						authResultBean.setFullApdu(desFireEV1Service.writeMore(desfireId));
 						authResultBean.setSize(16);
 					} else {
@@ -1026,7 +1026,7 @@ public NfcResultBean readUid(String result){
 						authResultBean.setFullApdu(desFireEV1Service.writeData(fileNo, desfireId));
 						authResultBean.setSize(16);
 						desfireFlowStep.writeStep++;
-					}else if(desfireFlowStep.writeStep > 0 && result.endsWith("AF")){
+					}else if(desfireFlowStep.writeStep > 0 && result.toUpperCase().endsWith("AF")){
 						authResultBean.setFullApdu(desFireEV1Service.writeMore(desfireId));
 						authResultBean.setSize(16);
 						log.debug("Update by " + eppnInit + " - Write in file " + fileNo +" : " + desfireId);
@@ -1322,7 +1322,7 @@ public NfcResultBean readUid(String result){
 						authResultBean.setFullApdu(desFireEV1Service.writeData(fileNo, desfireId));
 						authResultBean.setSize(16);
 						desfireFlowStep.writeStep++;
-					}else if(desfireFlowStep.writeStep > 0 && result.endsWith("AF")){
+					}else if(desfireFlowStep.writeStep > 0 && result.toUpperCase().endsWith("AF")){
 						authResultBean.setFullApdu(desFireEV1Service.writeMore(desfireId));
 						authResultBean.setSize(16);
 						log.debug("Update by " + eppnInit + " - Write in file " + fileNo +" : " + desfireId);
