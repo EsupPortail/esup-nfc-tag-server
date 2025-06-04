@@ -33,7 +33,7 @@ public class DesfireReadUidWithAuthActionService extends DesfireActionService {
 	
 	@Override
 	TagType getTagType() {
-		return TagType.DESFIRE;
+		return TagType.CSN;
 	}
 	
 	@Override
