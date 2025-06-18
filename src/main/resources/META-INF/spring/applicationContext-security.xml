@@ -99,6 +99,8 @@
       <beans:property name="dirContextValidator" ref="dirContextValidator"/>
       <beans:property name="testWhileIdle" value="true"/>
       <beans:property name="testOnBorrow" value="true"/>
+      <beans:property name="timeBetweenEvictionRunsMillis" value="30000"/>
+      <beans:property name="minEvictableIdleTimeMillis" value="60000"/>
    </beans:bean>
    
    <beans:bean id="dirContextValidator"
