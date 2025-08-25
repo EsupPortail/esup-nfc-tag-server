@@ -1,0 +1,10 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     th:fragment="footer">
+    <div class="hidden-print">
+        <div id="footer">
+            EsupPortail - <th:block th:text="${#dates.format(#dates.createNow(), 'yyyy')}"></th:block>
+        </div>
+    </div>
+</div>

@@ -17,15 +17,13 @@
  */
 package org.esupportail.nfctag.web.nfc;
 
+import org.esupportail.nfctag.dao.ApplicationDao;
+import org.esupportail.nfctag.dao.DeviceDao;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
-import org.esupportail.nfctag.dao.ApplicationDao;
-import org.esupportail.nfctag.dao.DeviceDao;
 import org.esupportail.nfctag.service.ApplicationsService;
 import org.esupportail.nfctag.service.DeviceService;
-import org.esupportail.nfctag.service.VersionApkService;
-import org.esupportail.nfctag.service.VersionJarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,13 +32,13 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.annotation.Resource;
-import org.springframework.transaction.annotation.Transactional;
+import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
@@ -52,12 +50,6 @@ import java.util.List;
 public class NfcRegisterController {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
-
-	@Resource
-	private VersionApkService versionApkService;
-
-	@Resource
-	private VersionJarService versionJarService;
 	
     @Resource
     private DeviceService deviceService;
@@ -75,30 +67,7 @@ public class NfcRegisterController {
 	public String selectedLocationForm(
 			@RequestParam(required = true) String imei, 
 			@RequestParam(required = true) String macAddress,
-			@RequestParam(required = false) String apkVersion,
-			@RequestParam(required = false) String jarVersion,
 			Model uiModel) {
-		
-		if(apkVersion == null) {
-			apkVersion = "ok";
-		}
-		if(jarVersion == null) {
-			jarVersion = "ok";
-		}
-		
-		if(imei.equals("appliJava")) {
-			if(!versionJarService.isSkipJarVersion()) {
-				if(!versionJarService.isUserJarVersionUp2Date(jarVersion)){
-					return "redirect:/nfc-index/download?jarVersion=" + versionJarService.getJarVersion();
-				}
-			}
-		}else{
-			if(!versionApkService.isSkipApkVersion()) {
-				if(!versionApkService.isUserApkVersionUp2Date(apkVersion)) {
-					return "redirect:/nfc-index/download?apkVersion=" + versionApkService.getApkVersion();
-				}
-			}
-		}
 		
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String eppn = auth.getName();
@@ -123,15 +92,13 @@ public class NfcRegisterController {
 			uiModel.addAttribute("macAddress", macAddress);
 			uiModel.addAttribute("imei", imei);
 			uiModel.addAttribute("applications", applications);
-			uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
-			uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
 		} catch (EmptyResultDataAccessException ex) {
 			log.info(eppn + " is not manager");
 			throw new AccessDeniedException(eppn + " is not manager");
 		} catch (EsupNfcTagException e) {
 			log.error("can't get locations", e);
 		}
-		return "nfc";
+		return "templates/nfc/index";
 	}
 
 	@RequestMapping(value = "/register")
@@ -179,9 +146,7 @@ public class NfcRegisterController {
 		uiModel.addAttribute("imei", imei);
 		uiModel.addAttribute("macAddress", macAddress);
 		uiModel.addAttribute("numeroId", numeroId);
-		uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
-		uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
-		return "nfc/register";
+		return "templates/nfc/register";
 	}
 	
 	@RequestMapping(value = "/register-sgc")
@@ -235,8 +200,7 @@ public class NfcRegisterController {
 			numeroId = devices.get(devices.size()-1).getNumeroId();
 		}
 
-		String redir = "redirect:/nfc-index?numeroId=" + numeroId + "&imei=" + imei + "&macAddress=" + macAddress + "&apkVersion=" + versionApkService.getApkVersion() +
-                 "&jarVersion=" + versionJarService.getJarVersion();
+		String redir = "redirect:/nfc-index?numeroId=" + numeroId + "&imei=" + imei + "&macAddress=" + macAddress;
  		log.info("register done : " + redir);
 		return redir;
 	}

@@ -1,0 +1,64 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     th:fragment="message">
+    <div id="messageModal" class="modal fade" tabindex="-1"
+         role="dialog" aria-labelledby="myModalLabel" aria-hidden="true"
+         th:if="${messageSuccess != null or param.messageSuccess != null
+                or messageWarning != null or param.messageWarning != null
+                or messageError != null or param.messageError != null
+                or messageInfo != null or param.messageInfo != null}">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>Message</h3>
+                </div>
+                <div class="modal-body">
+                    <div th:if="${messageSuccess != null or param.messageSuccess != null}">
+                        <div id="dialog" title="Information" class="text-danger">
+                            <div class="alert alert-success">
+                                <span th:text="#{${messageSuccess} ?: ${param.messageSuccess}}"></span>
+                                <span th:text="${messageAddon} ?: ${param.messageAddon}"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${messageWarning != null or param.messageWarning != null}">
+                        <div id="dialog" title="Information" class="text-danger">
+                            <div class="alert alert-warning">
+                                <span th:text="#{${messageWarning} ?: ${param.messageWarning}}"></span>
+                                <span th:text="${messageAddon} ?: ${param.messageAddon}"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${messageError != null or param.messageError != null}">
+                        <div id="dialog" title="Information" class="text-danger">
+                            <div class="alert alert-danger">
+                                <span th:text="#{${messageError} ?: ${param.messageError}}"></span>
+                                <span th:text="${messageAddon} ?: ${param.messageAddon}"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div th:if="${messageInfo != null or param.messageInfo != null}">
+                        <div id="dialog" title="Information" class="text-danger">
+                            <div class="alert alert-info">
+                                <span th:text="#{${messageInfo} ?: ${param.messageInfo}}"></span>
+                                <span th:text="${messageAddon} ?: ${param.messageAddon}"></span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Fermer</button>
+                </div>
+            </div>
+        </div>
+        <script th:inline="javascript">
+            /*<![CDATA[*/
+            $('#messageModal').modal({
+                resizable: false,
+                modal: true
+            });
+            /*]]>*/
+        </script>
+    </div>
+</div>

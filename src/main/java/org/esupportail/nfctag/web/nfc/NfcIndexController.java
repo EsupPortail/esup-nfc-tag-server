@@ -17,22 +17,19 @@
  */
 package org.esupportail.nfctag.web.nfc;
 
-import org.apache.commons.io.IOUtils;
 import org.esupportail.nfctag.dao.ApplicationDao;
 import org.esupportail.nfctag.dao.DeviceDao;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.service.ApplicationsService;
-import org.esupportail.nfctag.service.VersionApkService;
-import org.esupportail.nfctag.service.VersionJarService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -40,11 +37,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.util.UriUtils;
 import org.springframework.web.util.WebUtils;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import org.springframework.transaction.annotation.Transactional;
-import java.io.FileNotFoundException;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
@@ -54,12 +48,6 @@ import java.util.List;
 public class NfcIndexController {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
-	
-	@Resource
-	private VersionApkService versionApkService;
-
-	@Resource
-	private VersionJarService versionJarService;
 	
 	@Autowired
 	private ApplicationsService applicationsService;
@@ -73,100 +61,20 @@ public class NfcIndexController {
 	@RequestMapping
 	public String index(@RequestParam(required=false) String numeroId,
 			@RequestParam(required=false) String imei,
-			@RequestParam(required=false) String macAddress,
-			@RequestParam(required=false) String apkVersion,
-			@RequestParam(required=false) String jarVersion) {
+			@RequestParam(required=false) String macAddress) {
 
-		if(imei.equals("esupSgcClient") && (numeroId == null || numeroId.equals(""))) {		
+		if(imei!=null && imei.equals("esupSgcClient") && (numeroId == null || numeroId.equals(""))) {
 			return "redirect:/nfc/register-sgc?userAgent=esup-sgc-client&imei=" + imei + "&macAddress=" + macAddress;
 		}
-		
-		if(apkVersion == null) {
-			apkVersion = "ok";
-		}
-		if(jarVersion == null) {
-			jarVersion = "ok";
-		}
-		if(imei.equals("appliJava")) {
-			if(!versionJarService.isSkipJarVersion()) {
-				if(!versionJarService.isUserJarVersionUp2Date(jarVersion)){
-					return "redirect:/nfc-index/download?jarVersion=" + versionJarService.getJarVersion();
-				}
-			}
-		} else {
-			if(!versionApkService.isSkipApkVersion()) {
-				if(!versionApkService.isUserApkVersionUp2Date(apkVersion)){
-					return "redirect:/nfc-index/download?apkVersion=" + versionApkService.getApkVersion();
-				}
-			}
-		}
+
 		log.info("try to connect with numeroId :" + numeroId);
 		if(numeroId==null || numeroId.isEmpty() || deviceDao.findDevicesByNumeroIdEquals(numeroId).getResultList().isEmpty()) {
-			return "redirect:/nfc/locations?imei=" + imei + "&macAddress=" + macAddress + "&apkVersion=" + versionApkService.getApkVersion() + "&jarVersion=" + versionJarService.getJarVersion();
+			return "redirect:/nfc/locations?imei=" + imei + "&macAddress=" + macAddress;
 		} else {
-			return "redirect:/live?apkVersion=" + versionApkService.getApkVersion() + "&jarVersion=" + versionJarService.getJarVersion() + "&numeroId=" + numeroId;
-		}
-
-	}
-	
-	@RequestMapping(value = "/download")
-	public String download(@RequestParam(required=false) String apkVersion,
-						@RequestParam(required=false) String jarVersion, 
-						Model uiModel, HttpServletRequest request) throws IOException {
-		uiModel.addAttribute("apkVersion", apkVersion);
-		uiModel.addAttribute("jarVersion", jarVersion);
-		uiModel.addAttribute("requestUrl", request.getScheme() + "://" + request.getHeader("host"));
-		return "nfc/download";
-	}
-	
-	@RequestMapping(value = "/download-apk")
-	public String downloadApk(Model uiModel, HttpServletRequest request, HttpServletResponse response) throws IOException {
-		try {
-			String contentType = "application/vnd.android.package-archive";
-	        response.setContentType(contentType);
-	        ClassPathResource archiveFile = new ClassPathResource("apk/esupnfctagdroid.apk");
-	        response.setContentLength((int)archiveFile.contentLength());
-	        response.setHeader("Content-Disposition", "attachment; filename=\"" + archiveFile.getFilename() + "\"");
-	        IOUtils.copy(archiveFile.getInputStream(), response.getOutputStream());
-	        return null;
-		} catch(FileNotFoundException e) {
-			uiModel.addAttribute("notAvailableMessage", "L'application APK Android n'est actuellement pas disponible");
-			return "apkJarNotAvailable";
+			return "redirect:/live?numeroId=" + numeroId;
 		}
 	}
 
-	@RequestMapping(value = "/download-jar")
-	public String downloadJar(Model uiModel, HttpServletRequest request, HttpServletResponse response) throws IOException {
-		try {
-			String contentType = "application/java-archive";
-	        response.setContentType(contentType);
-	        ClassPathResource archiveFile = new ClassPathResource("jar/esupnfctagdesktop.jar");
-	        response.setContentLength((int)archiveFile.contentLength());
-	        response.setHeader("Content-Disposition", "attachment; filename=\"" + archiveFile.getFilename() + "\"");
-	        IOUtils.copy(archiveFile.getInputStream(), response.getOutputStream());
-	        return null;
-		} catch(FileNotFoundException e) {
-			uiModel.addAttribute("notAvailableMessage", "L'application Java n'est actuellement pas disponible");
-			return "apkJarNotAvailable";
-		}
-	}
-
-	@RequestMapping(value = "/download-keyb")
-	public String downloadKeyb(Model uiModel, HttpServletRequest request, HttpServletResponse response) throws IOException {
-		try {
-			String contentType = "application/java-archive";
-	        response.setContentType(contentType);
-	        ClassPathResource archiveFile = new ClassPathResource("jar/esupnfctagkeyboard.jar");
-	        response.setContentLength((int)archiveFile.contentLength());
-	        response.setHeader("Content-Disposition", "attachment; filename=\"" + archiveFile.getFilename() + "\"");
-	        IOUtils.copy(archiveFile.getInputStream(), response.getOutputStream());
-	        return null;
-		} catch(FileNotFoundException e) {
-			uiModel.addAttribute("notAvailableMessage", "L'application Java n'est actuellement pas disponible");
-			return "apkJarNotAvailable";
-		}
-	}
-	
 	/**
 	 *  get Locations form without need to be authenticated ; but numeroId is needed
 	 */
@@ -198,15 +106,13 @@ public class NfcIndexController {
 			uiModel.addAttribute("imei", device.getImei());
 			uiModel.addAttribute("eppnInit", eppn);
 			uiModel.addAttribute("applications", applications);
-			uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
-			uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
 		} catch (EmptyResultDataAccessException ex) {
 			log.info(eppn + " is not manager");
 			throw new AccessDeniedException(eppn + " is not manager");
 		} catch (EsupNfcTagException e) {
 			log.error("can't get locations", e);
 		}
-		return "nfc";
+		return "templates/nfc/index";
 	}
 	
 	
@@ -227,7 +133,7 @@ public class NfcIndexController {
 		
 		List<Device> devices = deviceDao.findDevicesByNumeroIdEquals(numeroId).getResultList();
 		if(devices.isEmpty()) {
-			return "redirect:/nfc/register/?location=" + encodeUrlPathSegment(location, httpServletRequest) + "&applicationId=" + applicationId + "&imei=" + imei + "&macAddress=" + macAddress + "&apkVersion=" + versionApkService.getApkVersion() + "&jarVersion=" + versionJarService.getJarVersion();
+			return "redirect:/nfc/register?location=" + encodeUrlPathSegment(location, httpServletRequest) + "&applicationId=" + applicationId + "&imei=" + imei + "&macAddress=" + macAddress;
 		}
 
 		Device device = devices.get(0);
@@ -254,9 +160,7 @@ public class NfcIndexController {
 		uiModel.addAttribute("imei", imei);
 		uiModel.addAttribute("macAddress", macAddress);
 		uiModel.addAttribute("numeroId", numeroId);
-		uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
-		uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
-		return "nfc/register";
+		return "templates/nfc/register";
 	}
 
 	@RequestMapping(value = "/unregister")
@@ -266,11 +170,6 @@ public class NfcIndexController {
 			@RequestParam(required = true) String macAddress,
 			@RequestParam(required = true) Boolean full,
 			Model uiModel) throws IOException {
-		uiModel.addAttribute("imei", imei);
-		uiModel.addAttribute("macAddress", macAddress);
-		uiModel.addAttribute("numeroId", numeroId);
-		uiModel.addAttribute("apkVersion", versionApkService.getApkVersion());
-		uiModel.addAttribute("jarVersion", versionJarService.getJarVersion());
 		
 		if(deviceDao.countFindDevicesByNumeroIdEquals(numeroId)>0) {
 			Device device = deviceDao.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
@@ -284,7 +183,7 @@ public class NfcIndexController {
 			}
 		 }
 		 
-		return "nfc/unregister";
+		return String.format("redirect:/nfc-index?numeroId=%s&imei=%s&macAddress=%s", numeroId, imei, macAddress);
 	}
 	
     String encodeUrlPathSegment(String pathSegment, HttpServletRequest httpServletRequest) {

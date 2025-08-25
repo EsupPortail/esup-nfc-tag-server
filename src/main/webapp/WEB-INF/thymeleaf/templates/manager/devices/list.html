@@ -1,0 +1,88 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:sd="http://www.thymeleaf.org/spring-data"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{./layouts/user.html}"
+     layout:fragment="content">
+
+    <h1>
+        <span th:text="#{label_org_esupportail_nfctag_domain_device_plural}"></span>
+        &nbsp;
+        <div class="btn-group">
+            <a class="btn btn-info pull-left" th:href="@{/manager/devices(form=true)}">
+                <span class="glyphicon glyphicon-plus"></span>
+                <span th:text="#{button_add_device}"></span>
+            </a>
+        </div>
+    </h1>
+
+    <form th:action="@{/manager/devices}" method="get" class="form-inline">
+        <div class="input-group">
+            <div class="input-group-addon" th:text="#{title_filter}"></div>
+            <div class="input-group-btn">
+                <select class="selectpicker" id="searchAttribut" onchange="submit()" name="applicationFilter">
+                    <option value="">-- Application --</option>
+                    <option th:each="app : ${applications}"
+                            th:value="${app.id}"
+                            th:text="${app.name}"
+                            th:selected="${applicationFilter!=null and app.id == applicationFilter.id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-group-addon" th:text="#{title_search}"></div>
+            <div class="input-group-btn">
+                <input class="form-control" id="multiSearch" name="searchText" type="text" th:value="${searchText}" />
+            </div>
+            <div class="input-group-btn">
+                <input class="btn btn-success" id="proceed" title="Search" type="submit" th:value="#{button_search}" />
+            </div>
+        </div>
+        <div class="input-group">
+            <input class="btn btn-danger" onclick="window.location.href='/manager/devices';" id="deviceCancelFilters" title="Cancel filters" type="button" th:value="#{button_cancel}" />
+        </div>
+    </form>
+
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th th:text="#{label_org_esupportail_nfctag_domain_device_numeroid}"></th>
+                <th th:text="#{label_org_esupportail_nfctag_domain_device_eppninit}"></th>
+                <th th:text="#{label_org_esupportail_nfctag_domain_device_imei}"></th>
+                <th th:text="#{label_org_esupportail_nfctag_domain_device_macaddress}"></th>
+                <th th:text="#{label_org_esupportail_nfctag_domain_device_application}"></th>
+                <th th:text="#{label_org_esupportail_nfctag_domain_device_location}"></th>
+                <th th:text="#{label_org_esupportail_nfctag_domain_device_validateauthwoconfirmation}"></th>
+                <th th:text="#{label_org_esupportail_nfctag_domain_device_createdate}"></th>
+                <th th:text="#{label_org_esupportail_nfctag_domain_device_lastusedate}"></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="device : ${devices}">
+                <td th:text="${device.numeroId}"></td>
+                <td th:text="${device.eppnInit}"></td>
+                <td th:text="${device.imei}"></td>
+                <td th:text="${device.macAddress}"></td>
+                <td th:text="${device.applicationName}"></td>
+                <td th:text="${device.location}"></td>
+                <td th:text="${device.validateAuthWoConfirmation}"></td>
+                <td th:text="${#dates.format(device.createDate, device_createdate_date_format)}"></td>
+                <td th:text="${#dates.format(device.lastUseDate, device_lastusedate_date_format)}"></td>
+                <td>
+                    <a th:href="@{/manager/devices/{id}(id=${device.id})}" class="btn btn-info">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="text-center">
+        <nav>
+            <div class="btn-group">
+                <div class="btn-group dropup" sd:page-size-selector="dropdown" style="margin-top: 20px"></div>
+                <ul class="btn-group pagination" sd:pagination="full"></ul>
+            </div>
+        </nav>
+    </div>
+</div>

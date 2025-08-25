@@ -1,0 +1,90 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{./layouts/user.html}"
+     layout:fragment="content">
+
+    <script type="text/javascript">
+        var annee = "[[${annee}]]";
+        var application = "[[${app}]]";
+        var statsUrl = "[[@{/manager/stats}]]";
+    </script>
+
+    <form th:action="@{/manager/stats}" method="get">
+        <h1>
+            Stats :
+            <select name="annee" onchange="this.form.submit()" class="selectpicker">
+                <option th:each="year : ${years}"
+                        th:value="${year}"
+                        th:text="${year}"
+                        th:selected="${annee} == ${year}"></option>
+            </select>
+        </h1>
+
+        <div class="row" id="esup-nfc-tag-stats">
+            <div class="col-lg-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading"><h5>Tags by month</h5></div>
+                    <div class="panel-body">
+                        <canvas id="tagsByWeek" height="454"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-12">
+                <div class="panel panel-primary">
+                    <div class="panel-heading"><h5>Tags by location</h5></div>
+                    <div class="panel-body">
+                        <select name="application" onchange="this.form.submit()" class="selectpicker" data-none-selected-text="">
+                            <option th:each="a : ${apps}"
+                                    th:value="${a}"
+                                    th:text="${a}"
+                                    th:selected="${a} == ${app}"></option>
+                        </select>
+                        <canvas id="tagsByLocation" height="454"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading"><h5>Tags by Application</h5></div>
+                    <div class="panel-body">
+                        <canvas id="tagsByApplication" height="454"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading"><h5>Tags by year</h5></div>
+                    <div class="panel-body">
+                        <canvas id="tagByYear" height="454"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h5>Devices by Application : <span th:text="${nbDevice}"></span></h5>
+                    </div>
+                    <div class="panel-body">
+                        <canvas id="deviceByUserAgent" height="454"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+                <div class="panel panel-primary">
+                    <div class="panel-heading">
+                        <h5>Tags this day : <span th:text="${nbTagThisDay}"></span></h5>
+                    </div>
+                    <div class="panel-body">
+                        <canvas id="nbTagThisDay" height="454"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

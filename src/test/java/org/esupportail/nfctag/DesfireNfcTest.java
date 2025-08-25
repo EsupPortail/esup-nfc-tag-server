@@ -8,16 +8,16 @@ import org.esupportail.nfctag.service.desfire.DESFireEV1Service;
 import org.esupportail.nfctag.service.desfire.DesfireAuthSession;
 import org.esupportail.nfctag.service.desfire.DesfireService;
 import org.esupportail.nfctag.service.desfire.actions.DesfireActionService;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 
-@Ignore
-@RunWith(SpringJUnit4ClassRunner.class)
+@Disabled
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations={"classpath*:META-INF/spring/applicationContext*.xml"})
 public class DesfireNfcTest {
 

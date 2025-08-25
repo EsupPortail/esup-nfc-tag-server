@@ -28,7 +28,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +74,7 @@ public class CurrentSessionsController {
 		uiModel.addAttribute("active", "sessions");
 		uiModel.addAttribute("allSessions", allSessions.values());
 		
-		return "admin/currentsessions";
+		return "templates/admin/currentsessions";
 	}
 	
 	

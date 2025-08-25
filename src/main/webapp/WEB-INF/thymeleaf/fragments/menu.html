@@ -1,0 +1,36 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+     th:fragment="menu" id="menu" >
+    <th:block th:if="${#strings.isEmpty(param.numeroId) and #strings.isEmpty(numeroId)}">
+        <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+      <span class="icon-bar">
+        <!--  -->
+      </span> <span class="icon-bar">
+        <!--  -->
+      </span> <span class="icon-bar">
+        <!--  -->
+      </span>
+        </button>
+        <a class="navbar-brand" th:href="@{/}"></a>
+        <div class="navbar-collapse collapse navbar-default">
+            <ul class="nav navbar-nav">
+                <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')" th:classappend="${active} == 'index' ? 'active'">
+                    <a th:href="@{/}" th:text="#{button_home}"></a>
+                </li>
+                <li sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${active} == 'applications' ? 'active'">
+                    <a th:href="@{/manager/applications}" th:text="#{menu_item_application_list_label}"></a>
+                </li>
+                <li sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${active} == 'devices' ? 'active'">
+                    <a th:href="@{/manager/devices}" th:text="#{menu_item_device_list_label}"></a>
+                </li>
+                <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')" th:classappend="${active} == 'taglogs' ? 'active'">
+                    <a th:href="@{/manager/taglogs}" th:text="'Logs'"></a>
+                </li>
+                <li sec:authorize="hasRole('ROLE_ADMIN') or hasRole('ROLE_SUPERVISOR')" th:classappend="${active} == 'stats' ? 'active'">
+                    <a th:href="@{/manager/stats}" th:text="'Stats'"></a>
+                </li>
+            </ul>
+        </div>
+    </th:block>
+</div>

@@ -25,13 +25,16 @@ import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.dao.ApplicationDao;
 import org.esupportail.nfctag.dao.DeviceDao;
 import org.esupportail.nfctag.service.ApplicationsService;
-import org.joda.time.format.DateTimeFormat;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.propertyeditors.StringTrimmerEditor;
 import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -43,12 +46,12 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 import org.springframework.web.util.WebUtils;
 
-import javax.annotation.Resource;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.criteria.*;
-import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
+import jakarta.annotation.Resource;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.criteria.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.Valid;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -75,7 +78,12 @@ public class DeviceController {
     @PersistenceContext
     private EntityManager entityManager;
 
-    /*
+    @ModelAttribute("active")
+    public String getActiveMenu() {
+        return "devices";
+    }
+
+        /*
     *  Empty strings from web forms are nullified
      */
     @InitBinder
@@ -88,12 +96,12 @@ public class DeviceController {
     public String create(@Valid Device device, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
         if (bindingResult.hasErrors()) {
             populateEditForm(uiModel, device);
-            return "manager/devices/create";
+            return "templates/manager/devices/create";
         }
         uiModel.asMap().clear();
         device.setCreateDate(new Date());
         deviceDao.persist(device);
-        return "redirect:/manager/devices/" + encodeUrlPathSegment(device.getId().toString(), httpServletRequest);
+        return "redirect:/manager/devices";
     }
     
     @RequestMapping(value = "/numeroid/{numeroId}", produces = "text/html")
@@ -105,72 +113,22 @@ public class DeviceController {
     	}catch(EmptyResultDataAccessException e){
     		log.debug("No device with id " + numeroId);
     	}
-        return "manager/devices/show";
+        return "templates/manager/devices/update";
     }
  
     @RequestMapping(produces = "text/html")
-    public String list(
-    		@RequestParam(value = "searchString", required = false) String searchString,
-    		@RequestParam(value = "applicationFilter", required = false) String applicationFilter,
-    		@RequestParam(value = "page", required = false) Integer page, @RequestParam(value = "size", required = false) Integer size, @RequestParam(value = "sortFieldName", required = false) String sortFieldName, @RequestParam(value = "sortOrder", required = false) String sortOrder, Model uiModel) {
-
-    	if(sortFieldName == null){
-    		sortFieldName = "lastUseDate";
-    		sortOrder = "DESC";
-    	}
-
-        int sizeNo = size == null ? 10 : size.intValue();
-        final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
-    	List<Device> devices = deviceDao.findDeviceEntries(firstResult, sizeNo, sortFieldName, sortOrder);
-
-    	EntityManager em = entityManager;
-        CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
-        CriteriaQuery<Device> query = criteriaBuilder.createQuery(Device.class);
-        Root<Device> c = query.from(Device.class);
-        final List<Predicate> predicates = new ArrayList<Predicate>();
-        final List<Order> orders = new ArrayList<Order>();
-        
-        if("DESC".equals(sortOrder.toUpperCase())){
-        	orders.add(criteriaBuilder.desc(c.get(sortFieldName)));
-        }else{
-        	orders.add(criteriaBuilder.asc(c.get(sortFieldName)));
-        }
-        
-        if(applicationFilter != null && applicationFilter != ""){
-        	Join<Device, Application> u = c.join("application");
-        	predicates.add(criteriaBuilder.equal(u.get("name"), applicationFilter));
-        }else{
-        	applicationFilter="";
-        }
-        
-        if(!StringUtils.isEmpty(searchString)){
-	        Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal("'"+searchString+"'"));
-	        Expression<Double> fullTestSearchRanking = criteriaBuilder.function("ts_rank", Double.class, criteriaBuilder.literal("'"+searchString+"'"));
-	        predicates.add(criteriaBuilder.isTrue(fullTestSearchExpression));
-	        orders.add(criteriaBuilder.desc(fullTestSearchRanking));
-        }else{
-        	searchString="";
-        }
-        
-        query.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
-        query.orderBy(orders);
-        query.select(c);
-        devices = em.createQuery(query).setFirstResult(firstResult).setMaxResults(sizeNo).getResultList();
-        
-        float nrOfPages = (float) em.createQuery(query).getResultList().size() / sizeNo;
-        
-        uiModel.addAttribute("maxPages", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));
+    public String list(@RequestParam(required = false) Application applicationFilter,
+                       @RequestParam(required = false) String searchText,
+                       @PageableDefault(size = 10) Pageable pageable,
+                       Model uiModel) {
+    	Page<Device> devices = deviceDao.findDeviceEntries(applicationFilter, searchText, pageable);
         uiModel.addAttribute("applications", applicationDao.findAllApplications());
         uiModel.addAttribute("status", TagLog.Status.values());
-        uiModel.addAttribute("page", page);
-        uiModel.addAttribute("size", size);
     	uiModel.addAttribute("devices", devices);
-    	uiModel.addAttribute("searchString", searchString);
         uiModel.addAttribute("applicationFilter", applicationFilter);
-        uiModel.addAttribute("listSearchBy", listSearchBy);
-        uiModel.addAttribute("queryUrl", "?applicationFilter="+applicationFilter+"&searchString="+searchString);
+        uiModel.addAttribute("searchText", searchText);
         addDateTimeFormatPatterns(uiModel);
-        return "manager/devices/list";
+        return "templates/manager/devices/list";
     }
     
     @RequestMapping(params = "form", produces = "text/html")
@@ -179,7 +137,7 @@ public class DeviceController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String eppn = auth.getName();
         uiModel.addAttribute("eppn", eppn);
-        return "manager/devices/create";
+        return "templates/manager/devices/create";
     }
     
 	@RequestMapping(value="/locationsJson", headers = "Accept=application/json; charset=utf-8")
@@ -217,27 +175,19 @@ public class DeviceController {
 
     @RequestMapping(value = "/{id}", produces = "text/html")
     public String show(@PathVariable("id") Long id, Model uiModel) {
-        addDateTimeFormatPatterns(uiModel);
-        uiModel.addAttribute("device", deviceDao.findDevice(id));
-        uiModel.addAttribute("itemId", id);
-        return "manager/devices/show";
+        populateEditForm(uiModel, deviceDao.findDevice(id));
+        return "templates/manager/devices/update";
     }
 
     @RequestMapping(method = RequestMethod.PUT, produces = "text/html")
     public String update(@Valid Device device, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
         if (bindingResult.hasErrors()) {
             populateEditForm(uiModel, device);
-            return "manager/devices/update";
+            return "templates/manager/devices/update";
         }
         uiModel.asMap().clear();
         deviceDao.merge(device);
-        return "redirect:/manager/devices/" + encodeUrlPathSegment(device.getId().toString(), httpServletRequest);
-    }
-
-    @RequestMapping(value = "/{id}", params = "form", produces = "text/html")
-    public String updateForm(@PathVariable("id") Long id, Model uiModel) {
-        populateEditForm(uiModel, deviceDao.findDevice(id));
-        return "manager/devices/update";
+        return "redirect:/manager/devices";
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE, produces = "text/html")
@@ -250,8 +200,8 @@ public class DeviceController {
     }
 
     void addDateTimeFormatPatterns(Model uiModel) {
-        uiModel.addAttribute("device_createdate_date_format", DateTimeFormat.patternForStyle("MM", LocaleContextHolder.getLocale()));
-        uiModel.addAttribute("device_lastusedate_date_format", DateTimeFormat.patternForStyle("MM", LocaleContextHolder.getLocale()));
+        uiModel.addAttribute("device_createdate_date_format",  "dd/MM/yyyy HH:mm:ss");
+        uiModel.addAttribute("device_lastusedate_date_format", "dd/MM/yyyy HH:mm:ss");
     }
 
     void populateEditForm(Model uiModel, Device device) {

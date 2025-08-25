@@ -1,30 +1,29 @@
 package org.esupportail.nfctag.service.desfire;
 
-import static org.junit.Assert.fail;
-
-import java.util.List;
-
+import jakarta.annotation.Resource;
 import org.esupportail.nfctag.beans.DesfireApplication;
 import org.esupportail.nfctag.beans.DesfireFile;
 import org.esupportail.nfctag.beans.DesfireTag;
+import org.esupportail.nfctag.dao.TagLogDao;
 import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
-import org.esupportail.nfctag.dao.TagLogDao;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
 
-import javax.annotation.Resource;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.fail;
 
 
-@RunWith(SpringJUnit4ClassRunner.class)
+@ExtendWith(SpringExtension.class)
 @ContextConfiguration(locations={"classpath*:META-INF/spring/applicationContext*.xml"})
 @WebAppConfiguration
 public class DesfireServiceTest {

@@ -17,23 +17,22 @@
  */
 package org.esupportail.nfctag.web.manager;
 
-import org.esupportail.nfctag.domain.TagLog;
+import jakarta.annotation.Resource;
 import org.esupportail.nfctag.dao.ApplicationDao;
 import org.esupportail.nfctag.dao.TagLogDao;
-import org.joda.time.format.DateTimeFormat;
+import org.esupportail.nfctag.domain.TagLog;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.propertyeditors.StringTrimmerEditor;
-import org.springframework.context.i18n.LocaleContextHolder;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.WebDataBinder;
-import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.List;
 
@@ -51,36 +50,31 @@ public class TagLogController {
 
 	List<String> listSearchBy = Arrays.asList("authDate", "applicationName", "location", "eppnInit", "numeroId", "csn", "desfireId");
 
+    @ModelAttribute("active")
+    public String getActiveMenu() {
+        return "taglogs";
+    }
+
     @RequestMapping(produces = "text/html")
     public String list(
     		@RequestParam(required = false, defaultValue = "") String searchString,
     		@RequestParam(required = false, defaultValue = "") String applicationFilter,
     		@RequestParam(required = false, defaultValue = "") String statusFilter,
-    		@RequestParam(required = false) Integer page,
-            @RequestParam(required = false) Integer size,
-            @RequestParam(required = false, defaultValue = "authDate") String sortFieldName,
-            @RequestParam(required = false, defaultValue = "DESC") String sortOrder,
+            @PageableDefault(size = 10) Pageable pageable,
             Model uiModel) {
-          
-        int sizeNo = size == null ? 10 : size.intValue();
-        final int firstResult = page == null ? 0 : (page.intValue() - 1) * sizeNo;
-      
-        List<TagLog> taglogs = tagLogDao.findTagLogs(searchString, statusFilter, applicationFilter, sortFieldName, sortOrder).setFirstResult(firstResult).setMaxResults(sizeNo).getResultList();
-        float nrOfPages = (float) tagLogDao.countFindTagLogs(searchString, statusFilter, applicationFilter) / sizeNo;
-        
-        uiModel.addAttribute("maxPages", (int) ((nrOfPages > (int) nrOfPages || nrOfPages == 0.0) ? nrOfPages + 1 : nrOfPages));
+
+        Page<TagLog> taglogs = tagLogDao.findTagLogs(searchString, statusFilter, applicationFilter, pageable);
+
         uiModel.addAttribute("applications", tagLogDao.findApplications());
-        uiModel.addAttribute("status", TagLog.Status.values());
-        uiModel.addAttribute("page", page);
-        uiModel.addAttribute("size", size);
+        List<String> statuses = Arrays.stream(TagLog.Status.values()).map(Enum::name).toList();
+        uiModel.addAttribute("status", statuses);
     	uiModel.addAttribute("taglogs", taglogs);
     	uiModel.addAttribute("searchString", searchString);
         uiModel.addAttribute("applicationFilter", applicationFilter);
         uiModel.addAttribute("statusFilter", statusFilter);
-        uiModel.addAttribute("listSearchBy", listSearchBy);
-        uiModel.addAttribute("queryUrl", "?statusFilter="+statusFilter+"&applicationFilter="+applicationFilter+"&searchString="+searchString);
         addDateTimeFormatPatterns(uiModel);
-        return "manager/taglogs/list";
+
+        return "templates/manager/taglogs/list";
     }
 
     @RequestMapping(value = "/{id}", produces = "text/html")
@@ -88,10 +82,10 @@ public class TagLogController {
         addDateTimeFormatPatterns(uiModel);
         uiModel.addAttribute("taglog", tagLogDao.findTagLog(id));
         uiModel.addAttribute("itemId", id);
-        return "manager/taglogs/show";
+        return "templates/manager/taglogs/show";
     }
 
     void addDateTimeFormatPatterns(Model uiModel) {
-        uiModel.addAttribute("tagLog_authdate_date_format", DateTimeFormat.patternForStyle("MM", LocaleContextHolder.getLocale()));
+        uiModel.addAttribute("tagLog_authdate_date_format", "dd/MM/yyyy HH:mm:ss");
     }
 }

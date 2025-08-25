@@ -22,7 +22,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.format.annotation.DateTimeFormat;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.util.Date;
 
 @Entity
@@ -30,35 +30,50 @@ import java.util.Date;
 
 public class Device {
 
+    @Column(name = "numero_id")
     private String numeroId;
-   
+
+    @Column(name = "validate_auth_wo_confirmation")
     private boolean validateAuthWoConfirmation = false;
 
+    @Column(name = "eppn_init")
     private String eppnInit;
     
     private String imei;
-    
+
+    @Column(name = "mac_address")
     private String macAddress;
-    
+
+    @Column(name = "user_agent")
     private String userAgent;
     
     private String location;
     
     @DateTimeFormat(style = "MM")
+    @Column(name = "create_date")
     private Date createDate;
     
     @DateTimeFormat(style = "MM")
+    @Column(name = "last_use_date")
     private Date lastUseDate;
     
     @ManyToOne
+    @JoinColumn(name = "application")
     private Application application;
     
     @Transient
     private Date lastPollDate;
+
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_seq")
+@SequenceGenerator(
+        name = "my_seq",
+        sequenceName = "hibernate_sequence",
+        allocationSize = 1
+)
     @Column(name = "id")
     private Long id;
+
     @Version
     @Column(name = "version")
     private Integer version;

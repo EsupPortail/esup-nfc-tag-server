@@ -24,11 +24,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -48,6 +49,11 @@ public class StatsController {
 	@Resource
 	private TagLogDao tagLogDao;
 
+    @ModelAttribute("active")
+    public String getActiveMenu() {
+        return "stats";
+    }
+
 	@RequestMapping()
 	public String index(@RequestParam(required = false) String annee, @RequestParam(required = false, defaultValue = "") String application, Model uiModel) {
 		if(annee==null) {
@@ -60,8 +66,8 @@ public class StatsController {
 	    uiModel.addAttribute("years", tagLogDao.findYears());
 		uiModel.addAttribute("apps", applications);
 	    uiModel.addAttribute("annee", annee);
-		uiModel.addAttribute("application", application);
-		return "manager/stats";
+		uiModel.addAttribute("app", application);
+		return "templates/manager/stats";
 	}
 	
 	

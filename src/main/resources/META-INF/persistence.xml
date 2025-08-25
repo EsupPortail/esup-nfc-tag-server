@@ -21,12 +21,22 @@
 <persistence xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="2.0" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd">
 <persistence-unit name="persistenceUnit" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.jpa.HibernatePersistenceProvider</provider>
+        <class>org.esupportail.nfctag.domain.Application</class>
+        <class>org.esupportail.nfctag.domain.AppliVersion</class>
+        <class>org.esupportail.nfctag.domain.Device</class>
+        <class>org.esupportail.nfctag.domain.EsupNfcTagDridLog</class>
+        <class>org.esupportail.nfctag.domain.NfcMessage</class>
+        <class>org.esupportail.nfctag.domain.TagError</class>
+        <class>org.esupportail.nfctag.domain.TagLog</class>
         <properties>
 	        <property name="hibernate.dialect" value="org.esupportail.nfctag.postgres.PgFullTextDialect"/>
             <!-- value="create" to build a new database on each run; value="update" to modify an existing database; value="create-drop" means the same as "create" but also drops tables when Hibernate closes; value="validate" makes no changes to the database -->
             <property name="hibernate.hbm2ddl.auto" value="update" />
-            <property name="hibernate.ejb.naming_strategy" value="org.hibernate.cfg.ImprovedNamingStrategy"/>
+            <property name="hibernate.physical_naming_strategy" value="org.hibernate.boot.model.naming.CamelCaseToUnderscoresNamingStrategy"/>
+            <property name="hibernate.id.new_generator_mappings" value="false"/>
             <property name="hibernate.connection.charSet" value="UTF-8"/>
+            <property name="hibernate.jdbc.use_streams_for_binary" value="true"/>
+            <property name="hibernate.hbm2ddl.import_files_sql_extractor" value="org.hibernate.tool.hbm2ddl.SingleLineSqlCommandExtractor"/>
             <!-- Uncomment the following two properties for JBoss only -->
             <!-- property name="hibernate.validator.apply_to_ddl" value="false" /-->
             <!-- property name="hibernate.validator.autoregister_listeners" value="false" /-->

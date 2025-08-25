@@ -40,11 +40,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
-import javax.servlet.http.HttpSession;
+import jakarta.annotation.Resource;
+import jakarta.servlet.http.HttpSession;
 
 @Controller
-@RequestMapping("/desfire-ws")
+@RequestMapping(path = {"/desfire-ws", "/desfire-ws/"})
 @Scope(value="session")
 public class DesfireWsController {
 
