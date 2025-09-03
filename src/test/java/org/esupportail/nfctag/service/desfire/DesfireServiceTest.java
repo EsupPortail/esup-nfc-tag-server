@@ -10,6 +10,7 @@ import org.esupportail.nfctag.exceptions.EsupNfcTagException;
 import org.esupportail.nfctag.exceptions.EsupNfcTagException.EsupNfcTagErrorMessage;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +31,7 @@ public class DesfireServiceTest {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	@Autowired
+	@Autowired(required = false)
 	DesfireTag desfireComueTagEsupSgc;
 
 	@Resource
@@ -51,6 +52,8 @@ public class DesfireServiceTest {
 	
 	@Test
 	public void testWithConfigCsn() throws Exception {
+        assumeTrue(!csnFromConfig.isEmpty(), "no test.desfire.csn configured");
+        assumeTrue(desfireComueTagEsupSgc != null, "no desfireComueTagEsupSgc configured");
 		log.info("test with " + csnFromConfig);
 		testParseDesfireConfiguration(csnFromConfig);
 	}
