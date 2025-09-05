@@ -79,7 +79,7 @@ $(document).ready(function() {
 	  
 	/* MUSTACHE TEMPLATES */
 	if(typeof numeroId != 'undefined'){
-		if(numeroId!=""){
+		if(numeroId!==""){
 			$.Mustache.add('leoauth-template', '{{#leoauths}} \
 					<tr id="row_{{id}}"> \
 						<td class="td-live-text">{{firstname}} {{lastname}} <br/> {{authDateString}}<br/></td> \
