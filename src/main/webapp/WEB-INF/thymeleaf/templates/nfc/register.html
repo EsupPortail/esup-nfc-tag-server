@@ -7,9 +7,9 @@
     <div id="debug"><!--  --></div>
     <script type="text/javascript">
         document.addEventListener("DOMContentLoaded", function() {
-            getEsupNfcStorage().setItem("numeroId", /*[[${numeroId}]]*/ '');
+            getEsupNfcStorage().setItem("numeroId", "[[${numeroId}]]");
             // document.getElementById("debug").innerHTML = getEsupNfcStorage().getItem("numeroId");
-            window.location.href = "[[@{/nfc-index(numeroId=${numeroId},imei=${imei},macAddress=${macAddress},apkVersion=${apkVersion},jarVersion=${jarVersion})}]]";
+            window.location.href = "[[@{/nfc-index}]]?numeroId=[[${numeroId}]]&imei=[[${imei}]]&macAddress=[[${macAddress}]]";
         });
     </script>
 </div>
