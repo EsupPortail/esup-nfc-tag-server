@@ -9,7 +9,7 @@
         <span th:text="${device.imei}"></span>
     </h1>
 
-    <form th:action="@{/manager/devices}" th:object="${device}" th:method="${device.id == null} ? POST : PUT" class="form-horizontal">
+    <form id="device" th:action="@{/manager/devices}" th:object="${device}" th:method="${device.id == null} ? POST : PUT" class="form-horizontal">
         <input type="hidden" th:field="*{id}"/>
         <input type="hidden" th:field="*{version}"/>
 
@@ -44,7 +44,7 @@
         <div class="form-group">
             <label th:for="*{application}" th:text="#{label_org_esupportail_nfctag_domain_device_application}" class="col-lg-4 control-label"></label>
             <div class="col-lg-6">
-                <select class="form-control" th:field="*{application}">
+                <select class="form-control" th:field="*{application}" id="application">
                     <option th:each="app : ${applications}"
                             th:value="${app.id}"
                             th:text="${app.name}"></option>
@@ -75,7 +75,7 @@
         <div class="form-group">
             <label th:for="*{validateAuthWoConfirmation}" th:text="#{label_org_esupportail_nfctag_domain_device_validateauthwoconfirmation}" class="col-lg-4 control-label"></label>
             <div class="col-lg-6">
-                <input type="checkbox" th:field="*{validateAuthWoConfirmation}" />
+                <input type="checkbox" th:field="*{validateAuthWoConfirmation}" id="validateAuthWoConfirmation"/>
             </div>
         </div>
 

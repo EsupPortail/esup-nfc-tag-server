@@ -9,7 +9,7 @@
         <span th:text="${app.name}" th:if="${app.id != null}"></span>
     </h1>
 
-    <form th:action="@{/manager/applications}" th:object="${app}" th:method="${app.id == null} ? POST : PUT" class="form-horizontal">
+    <form id="application" th:action="@{/manager/applications}" th:object="${app}" th:method="${app.id == null} ? POST : PUT" class="form-horizontal">
         <input type="hidden" th:field="*{id}"/>
         <input type="hidden" th:field="*{version}"/>
 
@@ -56,7 +56,7 @@
         <div class="form-group">
             <label th:for="*{validateAuthWoConfirmationDefault}" th:text="#{label_org_esupportail_nfctag_domain_application_validateauthwoconfirmationdefault}" class="col-lg-4 control-label"></label>
             <div class="col-lg-6">
-            <input type="checkbox" th:field="*{validateAuthWoConfirmationDefault}" />
+            <input type="checkbox" th:field="*{validateAuthWoConfirmationDefault}" id="validateAuthWoConfirmationDefault"/>
             </div>
         </div>
 

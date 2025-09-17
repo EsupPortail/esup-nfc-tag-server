@@ -673,30 +673,20 @@ $(document).ready(function() {
 	});
 	
 	$(function(){
-		
-		$('[id^=_application_id]').each(function() {
-			$(this).click(function(){
-				checkLocations();
-			})
+
+		$("#application").focusout(function(){
+			checkLocations();
 		});
 		$("#eppnInit").focusout(function(){
 			checkLocations();
 		});
-		/*
-		$("#location").focusin(function(){
-			checkLocations();
-		});	
-*/
 		
 		function checkLocations(){
 			$('#location').val('');
 			$('#location').find('option').remove().end();
-			var eppn = $('#eppnInit').val();			
-			var idApp;
-			$("input[id^=_application_id]:checked").each(function() {
-		        idApp = $(this).val();
-		    });
-    		$('#_validateAuthWoConfirmation_id').prop('checked', false);
+			var eppn = $('#eppnInit').val();
+			var idApp = $('#application').val();
+    		$('#validateAuthWoConfirmation').prop('checked', false);
 			var url = '/manager/devices/getValidateWo?applicationId='+idApp;
 			$.ajax({
 			    url: url,
@@ -704,7 +694,7 @@ $(document).ready(function() {
 			    dataType: 'json',
 			    success: function( json ) {
 			    	if(json == true){
-			    		$('#_validateAuthWoConfirmation_id').prop('checked', true);
+			    		$('#validateAuthWoConfirmation').prop('checked', true);
 			    	}
 			    }
 			});
