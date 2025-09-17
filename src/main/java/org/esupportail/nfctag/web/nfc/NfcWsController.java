@@ -105,7 +105,7 @@ public class NfcWsController {
 		return "{"+locationName+"}";
 	}
 	
-	@RequestMapping(value = "/deviceAuthConfig", method=RequestMethod.GET)
+	@RequestMapping(value = {"/deviceAuthConfig", "/deviceAuthConfig/"}, method=RequestMethod.GET)
 	@ResponseBody
 	public String nfcDeviceAuthMethod(@RequestParam String numeroId) throws IOException, EsupNfcTagException {
 		String deviceAuthConfig = null;
