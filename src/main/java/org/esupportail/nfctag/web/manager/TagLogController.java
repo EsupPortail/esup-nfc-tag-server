@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -60,7 +61,7 @@ public class TagLogController {
     		@RequestParam(required = false, defaultValue = "") String searchString,
     		@RequestParam(required = false, defaultValue = "") String applicationFilter,
     		@RequestParam(required = false, defaultValue = "") String statusFilter,
-            @PageableDefault(size = 10) Pageable pageable,
+            @PageableDefault(size = 10, sort = "authDate", direction = Sort.Direction.DESC) Pageable pageable,
             Model uiModel) {
 
         Page<TagLog> taglogs = tagLogDao.findTagLogs(searchString, statusFilter, applicationFilter, pageable);

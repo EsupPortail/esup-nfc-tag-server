@@ -46,15 +46,15 @@
     <table class="table table-bordered table-hover">
         <thead>
             <tr>
-                <th th:text="#{label_org_esupportail_nfctag_domain_device_numeroid}"></th>
-                <th th:text="#{label_org_esupportail_nfctag_domain_device_eppninit}"></th>
-                <th th:text="#{label_org_esupportail_nfctag_domain_device_imei}"></th>
-                <th th:text="#{label_org_esupportail_nfctag_domain_device_macaddress}"></th>
-                <th th:text="#{label_org_esupportail_nfctag_domain_device_application}"></th>
-                <th th:text="#{label_org_esupportail_nfctag_domain_device_location}"></th>
-                <th th:text="#{label_org_esupportail_nfctag_domain_device_validateauthwoconfirmation}"></th>
-                <th th:text="#{label_org_esupportail_nfctag_domain_device_createdate}"></th>
-                <th th:text="#{label_org_esupportail_nfctag_domain_device_lastusedate}"></th>
+                <th><a class="sorting" sd:pagination-sort="numeroId" th:text="#{label_org_esupportail_nfctag_domain_device_numeroid}"/></th>
+                <th><a class="sorting" sd:pagination-sort="eppnInit" th:text="#{label_org_esupportail_nfctag_domain_device_eppninit}"/></th>
+                <th><a class="sorting" sd:pagination-sort="imei" th:text="#{label_org_esupportail_nfctag_domain_device_imei}"/></th>
+                <th><a class="sorting" sd:pagination-sort="macAddress" th:text="#{label_org_esupportail_nfctag_domain_device_macaddress}"/></th>
+                <th><a class="sorting" sd:pagination-sort="application.name" th:text="#{label_org_esupportail_nfctag_domain_device_application}"/></th>
+                <th><a class="sorting" sd:pagination-sort="location" th:text="#{label_org_esupportail_nfctag_domain_device_location}"/></th>
+                <th><a class="sorting" sd:pagination-sort="validateAuthWoConfirmation" th:text="#{label_org_esupportail_nfctag_domain_device_validateauthwoconfirmation}"/></th>
+                <th><a class="sorting" sd:pagination-sort="createDate" th:text="#{label_org_esupportail_nfctag_domain_device_createdate}"/></th>
+                <th><a class="sorting" sd:pagination-sort="lastUseDate" th:text="#{label_org_esupportail_nfctag_domain_device_lastusedate}"/></th>
                 <th></th>
             </tr>
         </thead>

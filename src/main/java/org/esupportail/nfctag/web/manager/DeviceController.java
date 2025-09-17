@@ -119,7 +119,7 @@ public class DeviceController {
     @RequestMapping(produces = "text/html")
     public String list(@RequestParam(required = false) Application applicationFilter,
                        @RequestParam(required = false) String searchText,
-                       @PageableDefault(size = 10) Pageable pageable,
+                       @PageableDefault(size = 10, sort = "lastUseDate", direction = Sort.Direction.DESC) Pageable pageable,
                        Model uiModel) {
     	Page<Device> devices = deviceDao.findDeviceEntries(applicationFilter, searchText, pageable);
         uiModel.addAttribute("applications", applicationDao.findAllApplications());
