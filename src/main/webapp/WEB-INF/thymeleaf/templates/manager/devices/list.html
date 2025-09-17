@@ -7,7 +7,7 @@
 
     <h1>
         <span th:text="#{label_org_esupportail_nfctag_domain_device_plural}"></span>
-        &nbsp;
+        (<span th:text="${devices.totalElements}"></span>)&nbsp;
         <div class="btn-group">
             <a class="btn btn-info pull-left" th:href="@{/manager/devices(form=true)}">
                 <span class="glyphicon glyphicon-plus"></span>

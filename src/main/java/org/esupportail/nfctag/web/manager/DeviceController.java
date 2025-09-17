@@ -96,7 +96,7 @@ public class DeviceController {
     public String create(@Valid Device device, BindingResult bindingResult, Model uiModel, HttpServletRequest httpServletRequest) {
         if (bindingResult.hasErrors()) {
             populateEditForm(uiModel, device);
-            return "templates/manager/devices/create";
+            return "templates/manager/devices/update";
         }
         uiModel.asMap().clear();
         device.setCreateDate(new Date());
@@ -137,7 +137,7 @@ public class DeviceController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		String eppn = auth.getName();
         uiModel.addAttribute("eppn", eppn);
-        return "templates/manager/devices/create";
+        return "templates/manager/devices/update";
     }
     
 	@RequestMapping(value="/locationsJson", headers = "Accept=application/json; charset=utf-8")
