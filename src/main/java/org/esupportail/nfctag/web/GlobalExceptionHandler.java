@@ -8,6 +8,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.InitBinder;
+import org.springframework.web.servlet.mvc.method.annotation.ExtendedServletRequestDataBinder;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -28,6 +30,13 @@ public class GlobalExceptionHandler {
         StringWriter sw = new StringWriter();
         ex.printStackTrace(new PrintWriter(sw));
         return sw.toString();
+    }
+    
+    @InitBinder
+    public void initBinder(ExtendedServletRequestDataBinder binder) {
+        // disable binding of all fields from request headers
+        // without this, headers form shibboleth authentication can be bound to model attributes
+        binder.setHeaderPredicate(header -> false);
     }
 
 }
