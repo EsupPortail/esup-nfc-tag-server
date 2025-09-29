@@ -1,8 +1,5 @@
 package org.esupportail.nfctag.web;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.ui.Model;
@@ -11,10 +8,21 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.servlet.mvc.method.annotation.ExtendedServletRequestDataBinder;
 
+import java.io.PrintWriter;
+import java.io.Serial;
+import java.io.Serializable;
+import java.io.StringWriter;
+
+/*
+    Global controller advice to
+    * handle uncaught exceptions
+    * and init binder settings (disable request headers injection in model attributes).
+ */
 @ControllerAdvice
-public class GlobalExceptionHandler {
+public class EsupNfcControllerAdvice implements Serializable {
 	
-	private static final long serialVersionUID = 1L;
+	@Serial
+    private static final long serialVersionUID = 1L;
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
 
@@ -31,7 +39,7 @@ public class GlobalExceptionHandler {
         ex.printStackTrace(new PrintWriter(sw));
         return sw.toString();
     }
-    
+
     @InitBinder
     public void initBinder(ExtendedServletRequestDataBinder binder) {
         // disable binding of all fields from request headers
