@@ -36,7 +36,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import org.springframework.transaction.annotation.Transactional;
 import java.io.IOException;
 import java.util.List;
@@ -105,7 +105,7 @@ public class NfcWsController {
 		return "{"+locationName+"}";
 	}
 	
-	@RequestMapping(value = "/deviceAuthConfig", method=RequestMethod.GET)
+	@RequestMapping(value = {"/deviceAuthConfig", "/deviceAuthConfig/"}, method=RequestMethod.GET)
 	@ResponseBody
 	public String nfcDeviceAuthMethod(@RequestParam String numeroId) throws IOException, EsupNfcTagException {
 		String deviceAuthConfig = null;

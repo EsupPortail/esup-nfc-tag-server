@@ -1,0 +1,102 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:sd="http://www.thymeleaf.org/spring-data"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{./layouts/user.html}"
+     layout:fragment="content">
+
+    <h1>
+        <span th:text="#{label_org_esupportail_nfctag_domain_taglog_plural}"></span>
+    </h1>
+
+    <form th:action="@{/manager/taglogs}" method="get" class="form-inline">
+        <input name="page" type="hidden" th:value="${page}" />
+        <input name="size" type="hidden" th:value="${size}" />
+        <div class="input-group">
+            <div class="input-group-addon" th:text="#{title_filter}"></div>
+            <div class="input-group-btn">
+                <select class="selectpicker" id="searchAttribut" name="applicationFilter" onchange="submit()">
+                    <option value="">-- Application --</option>
+                    <option th:each="app : ${applications}"
+                            th:value="${app}"
+                            th:text="${app}"
+                            th:selected="${applicationFilter != null and app == applicationFilter}"></option>
+                </select>
+            </div>
+            <div class="input-group-btn">
+                <select class="selectpicker" id="searchStatus" name="statusFilter" onchange="submit()">
+                    <option value="">-- Status --</option>
+                    <option th:each="state : ${status}"
+                            th:value="${state}"
+                            th:text="${state}"
+                            th:selected="${statusFilter != null and state == statusFilter}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="input-group">
+            <div class="input-group-addon" th:text="#{title_search}"></div>
+            <div class="input-group-btn">
+                <input class="form-control" id="multiSearch" name="searchString" type="text" th:value="${searchString}" placeholder="salle, csn, eppn, ..." />
+            </div>
+            <div class="input-group-btn">
+                <input class="btn btn-success" id="proceed" title="Search" type="submit" th:value="#{button_search}" />
+            </div>
+        </div>
+        <div class="input-group">
+            <input class="btn btn-danger" onclick="window.location.href='/manager/taglogs';" id="taglogCancelFilters" title="Cancel filters" type="button" th:value="#{button_cancel}" />
+        </div>
+    </form>
+
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th><a class="sorting" sd:pagination-sort="authDate" th:text="#{label_org_esupportail_nfctag_domain_taglog_authdate}"/></th>
+                <th><a class="sorting" sd:pagination-sort="applicationName" th:text="#{label_org_esupportail_nfctag_domain_taglog_applicationname}"/></th>
+                <th><a class="sorting" sd:pagination-sort="location" th:text="#{label_org_esupportail_nfctag_domain_taglog_location}"/></th>
+                <th><a class="sorting" sd:pagination-sort="eppnInit" th:text="#{label_org_esupportail_nfctag_domain_taglog_eppninit}"/></th>
+                <th><a class="sorting" sd:pagination-sort="numeroId" th:text="#{label_org_esupportail_nfctag_domain_taglog_numeroid}"/></th>
+                <th><a class="sorting" sd:pagination-sort="status" th:text="#{label_org_esupportail_nfctag_domain_taglog_status}"/></th>
+                <th><a class="sorting" sd:pagination-sort="csn" th:text="#{label_org_esupportail_nfctag_domain_taglog_csn}"/></th>
+                <th><a class="sorting" sd:pagination-sort="eppn" th:text="#{label_org_esupportail_nfctag_domain_taglog_eppn}"/></th>
+                <th><a class="sorting" sd:pagination-sort="firstname" th:text="#{label_org_esupportail_nfctag_domain_taglog_firstname}"/></th>
+                <th><a class="sorting" sd:pagination-sort="lastname" th:text="#{label_org_esupportail_nfctag_domain_taglog_lastname}"/></th>
+                <th><a class="sorting" sd:pagination-sort="liveStatus" th:text="#{label_org_esupportail_nfctag_domain_taglog_livestatus}"/></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="taglog : ${taglogs}">
+                <td th:text="${#dates.format(taglog.authDate, tagLog_authdate_date_format)}"></td>
+                <td th:text="${taglog.applicationName}"></td>
+                <td>
+                    <a th:href="@{/manager/taglogs(searchBySelected='location',searchString=${taglog.location})}" th:text="${taglog.location}"></a>
+                </td>
+                <td>
+                    <a th:href="@{/manager/taglogs(searchBySelected='eppnInit',searchString=${taglog.eppnInit})}" th:text="${taglog.eppnInit}"></a>
+                </td>
+                <td>
+                    <a th:href="@{/manager/devices/numeroid/{numeroId}(numeroId=${taglog.numeroId})}" th:text="${taglog.numeroId}"></a>
+                </td>
+                <td th:text="${taglog.status}"></td>
+                <td th:text="${taglog.csn}"></td>
+                <td th:text="${taglog.eppn}"></td>
+                <td th:text="${taglog.firstname}"></td>
+                <td th:text="${taglog.lastname}"></td>
+                <td th:text="${taglog.liveStatus}"></td>
+                <td>
+                    <a th:href="@{/manager/taglogs/{id}(id=${taglog.id})}" class="btn btn-info">
+                        <span class="glyphicon glyphicon-eye-open"></span>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="text-center">
+        <nav>
+            <div class="btn-group">
+                <div class="btn-group dropup" sd:page-size-selector="dropdown" style="margin-top: 20px"></div>
+                <ul class="btn-group pagination" sd:pagination="full"></ul>
+            </div>
+        </nav>
+    </div>
+</div>

@@ -1,0 +1,40 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{./layouts/user.html}">
+<head>
+    <meta charset="UTF-8"/>
+    <title th:text="#{error_uncaughtexception_title}">Exception non interceptée</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="panel">
+        <div class="panel-heading">
+            <h2 th:text="#{error_uncaughtexception_title}">Exception non interceptée</h2>
+        </div>
+        <div class="panel-body">
+            <p th:text="#{error_uncaughtexception_problemdescription}">
+                Une erreur inattendue s'est produite.
+            </p>
+            <div th:if="${exception != null}">
+                <h4 th:text="#{exception_details}">Détails de l'exception</h4>
+                <div class="panel panel-warning">
+                    <div class="panel-heading" th:text="#{exception_message}">Message</div>
+                    <div class="panel-body">
+                        <span th:text="${exception_message}"></span>
+                        <br/>
+                        (<i th:text="${exception.class.name}"></i>)
+                    </div>
+                </div>
+                <div class="panel panel-default">
+                    <div class="panel-heading">Stacktrace</div>
+                    <div class="panel-body">
+                        <pre th:utext="${exception_stacktrace}">
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

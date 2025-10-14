@@ -1,0 +1,14 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{./layouts/user.html}">
+<body>
+<div  layout:fragment="content">
+    <div id="col-lg-12" >
+        <div id="status" class="text-success"><!--  --></div>
+        <div id="lastleoauth"><!--  --></div>
+        <div id="debug" class="text-warning"><!--  --></div>
+    </div>
+    <h1 th:text="#{welcome_message}"></h1>
+</div>
+</body>
+</html>

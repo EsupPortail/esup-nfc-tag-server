@@ -1,15 +1,20 @@
 package org.esupportail.nfctag.dao;
 
+import jakarta.annotation.Resource;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
 import org.apache.commons.lang3.StringUtils;
 import org.esupportail.nfctag.domain.TagLog;
+import org.esupportail.nfctag.repositories.TagLogRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,6 +27,9 @@ public class TagLogDao {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Resource
+    TagLogRepository tagLogRepository;
 
     public final EntityManager entityManager() {
         EntityManager em = entityManager;
@@ -56,7 +64,7 @@ public class TagLogDao {
     public Long countFindTagLogsThisDay() {
         EntityManager em = entityManager;
         Query q = em.createNativeQuery("SELECT COUNT(*) FROM tag_log where date_trunc('day', auth_date) = date_trunc('day', now())");
-        return ((BigInteger) q.getSingleResult()).longValue();
+        return (Long) q.getSingleResult();
     }
 
     public TypedQuery<TagLog> findTagLogsByAuthDateGreaterThanAndNumeroIdEqualsAndApplicationNameEqualsAndLocationEquals(Date authDate, String numeroId, String applicationName, String location, String sortFieldName, String sortOrder) {
@@ -195,19 +203,12 @@ public class TagLogDao {
         return appNamesQuery.getResultList();
     }
 
-    public TypedQuery<TagLog> findTagLogs(String searchString, String statusFilter, String applicationFilter, String sortFieldName, String sortOrder) {
+    public Page<TagLog> findTagLogs(String searchString, String statusFilter, String applicationFilter, Pageable pageable) {
         EntityManager em = entityManager;
         CriteriaBuilder criteriaBuilder = em.getCriteriaBuilder();
         CriteriaQuery<TagLog> query = criteriaBuilder.createQuery(TagLog.class);
         Root<TagLog> c = query.from(TagLog.class);
         final List<Predicate> predicates = new ArrayList<Predicate>();
-        final List<Order> orders = new ArrayList<Order>();
-
-        if("DESC".equals(sortOrder.toUpperCase())){
-            orders.add(criteriaBuilder.desc(c.get(sortFieldName)));
-        }else{
-            orders.add(criteriaBuilder.asc(c.get(sortFieldName)));
-        }
 
         if(!StringUtils.isEmpty(applicationFilter)){
             predicates.add(criteriaBuilder.equal(c.get("applicationName"), applicationFilter));
@@ -220,15 +221,13 @@ public class TagLogDao {
             Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal("'"+searchString+"'"));
             Expression<Double> fullTestSearchRanking = criteriaBuilder.function("ts_rank", Double.class, criteriaBuilder.literal("'"+searchString+"'"));
             predicates.add(criteriaBuilder.isTrue(fullTestSearchExpression));
-            orders.add(criteriaBuilder.desc(fullTestSearchRanking));
         }
 
-        orders.add(criteriaBuilder.desc(c.get(sortFieldName)));
-        query.where(criteriaBuilder.and(predicates.toArray(new Predicate[predicates.size()])));
-        query.orderBy(orders);
-        query.select(c);
+        Specification<TagLog> spec = (root, q, cb) -> {
+            return cb.and(predicates.toArray(new Predicate[predicates.size()]));
+        };
 
-        return em.createQuery(query);
+        return tagLogRepository.findAll(spec, pageable);
     }
 
 

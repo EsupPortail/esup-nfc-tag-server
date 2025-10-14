@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 body {
-	background-color: rgba(0,0,0,1);
+	background-color: rgb(153, 178, 178);
 	padding-top: 10px;
 	padding-bottom: 30px;
 }
@@ -67,8 +67,16 @@ width: 30px;
   vertical-align: middle;
 }
 
-#menu{
+#menu .navbar-default {
 	background-color: rgba(255,255,255,0.8);
+}
+
+#menu .navbar-default .navbar-nav> li >a {
+    color: #337ab7;
+}
+
+#menu .navbar-default .navbar-nav>.active>a,.navbar-default .navbar-nav>.active>a:focus,.navbar-default .navbar-nav>.active>a:hover {
+    background-color: #ddd;
 }
 
 .navbar-collapse {
@@ -96,7 +104,7 @@ width: 30px;
 }
 
 .page-header {
-	background: url("../images/logo-xl.png") no-repeat 10px 5px;
+	background: url("/resources/images/logo-xl.png") no-repeat 10px 5px;
 	background-size: 74px;
 	margin: 0 0 5px;
 	border-bottom: 0px;

@@ -1,0 +1,49 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{./layouts/user.html}"
+     layout:fragment="content">
+
+    <h1>
+        <span th:text="#{label_org_esupportail_nfctag_domain_taglog}"></span> :
+        <span th:text="${taglog.csn}"></span>
+    </h1>
+
+    <dl class="dl-horizontal">
+        <dt th:text="#{label_org_esupportail_nfctag_domain_taglog_status}"></dt>
+        <dd th:text="${taglog.status}"></dd>
+
+        <dt th:text="#{label_org_esupportail_nfctag_domain_taglog_csn}"></dt>
+        <dd th:text="${taglog.csn}"></dd>
+
+        <dt th:text="#{label_org_esupportail_nfctag_domain_taglog_desfireid}"></dt>
+        <dd th:text="${taglog.desfireId}"></dd>
+
+        <dt th:text="#{label_org_esupportail_nfctag_domain_taglog_eppn}"></dt>
+        <dd th:text="${taglog.eppn}"></dd>
+
+        <dt th:text="#{label_org_esupportail_nfctag_domain_taglog_firstname}"></dt>
+        <dd th:text="${taglog.firstname}"></dd>
+
+        <dt th:text="#{label_org_esupportail_nfctag_domain_taglog_lastname}"></dt>
+        <dd th:text="${taglog.lastname}"></dd>
+
+        <dt th:text="#{label_org_esupportail_nfctag_domain_taglog_authdate}"></dt>
+        <dd th:text="${#dates.format(taglog.authDate, tagLog_authdate_date_format)}"></dd>
+
+        <dt th:text="#{label_org_esupportail_nfctag_domain_taglog_eppninit}"></dt>
+        <dd th:text="${taglog.eppnInit}"></dd>
+
+        <dt th:text="#{label_org_esupportail_nfctag_domain_taglog_numeroid}"></dt>
+        <dd th:text="${taglog.numeroId}"></dd>
+
+        <dt th:text="#{label_org_esupportail_nfctag_domain_taglog_applicationname}"></dt>
+        <dd th:text="${taglog.applicationName}"></dd>
+
+        <dt th:text="#{label_org_esupportail_nfctag_domain_taglog_location}"></dt>
+        <dd th:text="${taglog.location}"></dd>
+
+        <dt th:text="#{label_org_esupportail_nfctag_domain_taglog_livestatus}"></dt>
+        <dd th:text="${taglog.liveStatus}"></dd>
+    </dl>
+</div>

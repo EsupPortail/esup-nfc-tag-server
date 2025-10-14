@@ -11,21 +11,21 @@ Ce projet vise à permettre et faciliter le développement de services autour de
 
 Il propose une architecture standardisée et connectée autour du badgeage d'une carte présentant un identifiant (CSN ou identifiant codé en Desfire AES) correspondant à une carte valide d'un individu connu du système d'information.
 
-L'application EsupNfcTagServer, elle est développée en Spring et tourne sur Tomcat.
+L'application EsupNfcTagServer, elle est développée en Spring et tourne sur Tomcat (ou Jetty).
 
 
 ## Installation
 
 ### Pré-requis
-* Java - JDK : OpenJDK 8 ou 11 ou 17 : le mieux est de l'installer via le système de paquets de votre linux.
+* Java - JDK : OpenJDK 17-25 : le mieux est de l'installer via le système de paquets de votre linux.
 * Maven : le mieux est de l'installer via le système de paquets de votre linux.
 * Postgresql 9 ou > : le mieux est de l'installer via le système de paquets de votre linux.
-* Tomcat (Tomcat 9)
-* Apache + libapache2-mod-shib2 : https://services.renater.fr/federation/docs/installation/sp
+* Tomcat 10 ou Jetty (11 ou 12)
+* Apache + libapache2-mod-shib2 : https://services.renater.fr/federation/docs/installation/sp (ou équivalent)
 * Git
 
 ### Configuration Apache Shibboleth 
-L'authentification repose sur Shibboleth. Apache doit être configuré pour faire du mod_shib.
+L'authentification repose sur Shibboleth. Apache doit être configuré pour faire du mod_shib (ou équivalent si vous optez pour une authentification cas, oidc, ....).
 
 Une fois le SP Shibboleth et Apache configurés usuellement (voir : https://services.renater.fr/federation/docs/installation/sp), il faut sécuriser /manager et /nfc en ajoutant ceci à la conf apache (à adapter cependant en fonction des versions d'Apache et mod_shib) :
 

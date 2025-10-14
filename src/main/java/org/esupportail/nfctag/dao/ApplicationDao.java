@@ -1,12 +1,16 @@
 package org.esupportail.nfctag.dao;
 
 import org.esupportail.nfctag.domain.Application;
+import org.esupportail.nfctag.repositories.ApplicationRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import jakarta.annotation.Resource;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
 import java.util.List;
 
 @Repository
@@ -16,6 +20,9 @@ public class ApplicationDao {
 
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Resource
+    ApplicationRepository applicationRepository;
 
     public TypedQuery<Application> findApplicationsByNameEquals(String name) {
         if (name == null || name.length() == 0) throw new IllegalArgumentException("The name argument is required");
@@ -47,15 +54,8 @@ public class ApplicationDao {
         return entityManager().createQuery("SELECT COUNT(o) FROM Application o", Long.class).getSingleResult();
     }
 
-    public List<Application> findAllApplications(String sortFieldName, String sortOrder) {
-        String jpaQuery = "SELECT o FROM Application o";
-        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
-            jpaQuery = jpaQuery + " ORDER BY " + sortFieldName;
-            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
-                jpaQuery = jpaQuery + " " + sortOrder;
-            }
-        }
-        return entityManager().createQuery(jpaQuery, Application.class).getResultList();
+    public Page<Application> findAllApplications(Pageable pageable) {
+       return applicationRepository.findAll(pageable);
     }
 
     public Application findApplication(Long id) {

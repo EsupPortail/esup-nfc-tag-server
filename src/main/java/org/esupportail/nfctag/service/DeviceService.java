@@ -3,7 +3,7 @@ package org.esupportail.nfctag.service;
 import org.esupportail.nfctag.dao.DeviceDao;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.util.UUID;
 
 @Service

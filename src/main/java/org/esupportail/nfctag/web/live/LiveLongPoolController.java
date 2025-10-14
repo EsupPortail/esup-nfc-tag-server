@@ -37,13 +37,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.async.DeferredResult;
 
-import javax.annotation.Resource;
-import javax.persistence.NoResultException;
+import jakarta.annotation.Resource;
+import jakarta.persistence.NoResultException;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.Map.Entry;
@@ -75,9 +76,13 @@ public class LiveLongPoolController {
 	private Map<DeferredResult<List<TagLog>>, LiveQuery> suspendedLeoAuthsRequests = new ConcurrentHashMap<DeferredResult<List<TagLog>>, LiveQuery>();
 
 	private Queue<TagLog> tagLogs = new PriorityBlockingQueue<TagLog>(100, new TagLogComparator());
-	
 
     private List<String> ipsStart4LiveFullAnonymousList;
+
+    @ModelAttribute("active")
+    public String getActiveMenu() {
+        return "index";
+    }
 
     @Value("${ipsStart4LiveFullAnonymous}")
     public void setipsStart4LiveFullAnonymous(String ipsStart4LiveFullAnonymous) {
@@ -86,7 +91,7 @@ public class LiveLongPoolController {
     }
 	
 	@RequestMapping
-	public String index(@RequestParam(required=false) String numeroId, @RequestParam(required=false) String apkVersion, @RequestParam(required=false) String jarVersion, Model uiModel){
+	public String index(@RequestParam(required=false) String numeroId, Model uiModel){
 		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
 		if(!auth.isAuthenticated()) {
 			return "redirect:/manager";
@@ -94,7 +99,7 @@ public class LiveLongPoolController {
 
 		if(numeroId!=null) {
 			if(deviceDao.countFindDevicesByNumeroIdEquals(numeroId)<1 || deviceDao.findDevicesByNumeroIdEquals(numeroId).getSingleResult().getApplication() == null) {
-				return "redirect:/nfc-index/locations?jarVersion=" + jarVersion + "&apkVersion=" + apkVersion + "&numeroId=" + numeroId;		
+				return "redirect:/nfc-index/locations?numeroId=" + numeroId;
 			}else{
 				Device device = deviceDao.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
 				Application app = device.getApplication();
@@ -104,7 +109,7 @@ public class LiveLongPoolController {
 
 				uiModel.addAttribute("pageHeader", appliExtApi.getHeader());
 				uiModel.addAttribute("backgroundColor", appliExtApi.getBackgroundColor());
-				uiModel.addAttribute("application", app);
+				uiModel.addAttribute("app", app);
 				uiModel.addAttribute("isActiv", app.isActive());
 				uiModel.addAttribute("isDisplay", appliExtApi.isDisplay());
 				uiModel.addAttribute("imei", device.getImei());
@@ -114,14 +119,12 @@ public class LiveLongPoolController {
 				uiModel.addAttribute("validateAuthWoConfirmation", device.isValidateAuthWoConfirmation());
 				uiModel.addAttribute("numeroId", numeroId);
 				uiModel.addAttribute("eppnInit", device.getEppnInit());
-				uiModel.addAttribute("jarVersion", jarVersion);
-				uiModel.addAttribute("apkVersion", apkVersion);
 				if(esupSgcAuthTokenService != null) {
 		                        String sgcAuthToken = esupSgcAuthTokenService.getAuthToken(device.getEppnInit());
 		                        uiModel.addAttribute("sgcAuthToken", sgcAuthToken);
 		                }
 
-				return "live/mobil";
+				return "templates/live/mobil";
 			}
 		} else {		
 			if(!isLiveLongPoolAuthorized(auth)) {
@@ -131,7 +134,7 @@ public class LiveLongPoolController {
 			}
 		}
 		
-		return "live/index";		
+		return "templates/live/index";
 	}
 
 	@RequestMapping(value = "/taglogs")

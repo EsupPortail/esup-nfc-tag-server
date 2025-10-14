@@ -1,0 +1,22 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <th:block th:replace="~{fragments/head :: head}"/>
+    <title th:text="#{application_name} + ' - ' + ${active}"></title>
+</head>
+<body>
+<div>
+        <th:block th:replace="~{fragments/navbar :: navbar}"/>
+        <th:block th:replace="~{fragments/header :: header}"/>
+        <th:block th:replace="~{fragments/menu :: menu}"/>
+        <div id="main" class="containerfull">
+            <th:block th:replace="~{fragments/message :: message}"/>
+            <main layout:fragment="content"></main>
+        </div>
+        <th:block th:replace="~{fragments/footer :: footer}"/>
+</div>
+</body>
+</html>

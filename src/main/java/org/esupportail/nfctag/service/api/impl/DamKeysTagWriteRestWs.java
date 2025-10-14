@@ -23,11 +23,12 @@ import org.esupportail.nfctag.service.api.DamKeysTagWriteApi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 import java.net.URI;
 import java.text.MessageFormat;
 
@@ -108,7 +109,7 @@ public class DamKeysTagWriteRestWs implements DamKeysTagWriteApi {
 			id = restTemplate.getForObject(targetUrl, String.class);
 		} catch(HttpStatusCodeException e){
 			log.warn("tagIdCheck error : " + targetUrl);
-			HttpStatus status = e.getStatusCode();
+			HttpStatusCode status = e.getStatusCode();
 			if (!HttpStatus.NOT_FOUND.equals(status)) {
 				throw new EsupNfcTagException(EsupNfcTagErrorMessage.error_esupnfctagexception_serviceunavailable);
 			} else {

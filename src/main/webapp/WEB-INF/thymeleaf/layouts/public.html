@@ -1,0 +1,55 @@
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+    <meta charset="UTF-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <th:block th:replace="~{fragments/head :: head}"/>
+    <title th:text="#{application_name} + ' - ' + ${active}"></title>
+</head>
+<body data-target=".bs-docs-sidebar" data-spy="scroll" data-twttr-rendered="true">
+<div class="background">
+    <div class="background-filter">
+        <th:block th:replace="~{fragments/navbar :: navbar}"/>
+        <th:block th:replace="~{fragments/header :: header}"/>
+        <div id="main" class="containerfull">
+            <th:block th:replace="~{fragments/message :: message}"/>
+            <main layout:fragment="content"></main>
+        </div>
+        <th:block th:replace="~{fragments/footer :: footer}"/>
+    </div>
+</div>
+
+<!-- Modale dialog -->
+<div id="dialog" class="modal fade" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header"></div>
+            <div class="modal-body">
+                <span th:text="#{message_location_disconnect_location}"></span>
+            </div>
+            <div class="modal-footer">
+                <button id="dialogConfirmButton" type="button" class="btn btn-primary" data-dismiss="modal">Confirm</button>
+                <button id="dialogCancelButton" type="button" class="btn btn-default">cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modale dialogFull -->
+<div id="dialogFull" class="modal fade" role="dialog">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header"></div>
+            <div class="modal-body">
+                <span th:text="#{message_location_disconnect}"></span>
+            </div>
+            <div class="modal-footer">
+                <button id="dialogFullConfirmButton" type="button" class="btn btn-primary" data-dismiss="modal">Confirm</button>
+                <button id="dialogFullCancelButton" type="button" class="btn btn-default">cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+</body>
+</html>

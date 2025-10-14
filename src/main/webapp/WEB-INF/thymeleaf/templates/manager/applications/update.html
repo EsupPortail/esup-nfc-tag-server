@@ -1,0 +1,110 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{./layouts/user.html}"
+     layout:fragment="content">
+
+    <h1>
+        <span th:text="#{title_add_application}" th:if="${app.id == null}"></span>
+        <span th:text="${app.name}" th:if="${app.id != null}"></span>
+    </h1>
+
+    <form id="application" th:action="@{/manager/applications}" th:object="${app}" th:method="${app.id == null} ? POST : PUT" class="form-horizontal">
+        <input type="hidden" th:field="*{id}"/>
+        <input type="hidden" th:field="*{version}"/>
+
+        <div class="form-group">
+            <label th:for="*{name}" th:text="#{label_org_esupportail_nfctag_domain_application_name}" class="col-lg-4 control-label"></label>
+            <div class="col-lg-6">
+                <input type="text" class="form-control" th:field="*{name}"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label th:for="*{nfcConfig}" th:text="#{label_org_esupportail_nfctag_domain_application_nfcconfig}" class="col-lg-4 control-label"></label>
+            <div class="col-lg-6">
+                <select class="form-control" th:field="*{nfcConfig}">
+                    <option th:each="config : ${nfcAuthConfigs}"
+                            th:value="${config.id}"
+                            th:text="${config.description}"></option>
+                </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label th:for="*{appliExt}" th:text="#{label_org_esupportail_nfctag_domain_application_appliext}" class="col-lg-4 control-label"></label>
+            <div class="col-lg-6">
+            <select class="form-control" th:field="*{appliExt}">
+                <option th:each="ext : ${extApis}"
+                        th:value="${ext.appliExtKey}"
+                        th:text="${ext.appliExtDescription}"></option>
+            </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label th:for="*{tagIdCheck}" th:text="#{label_org_esupportail_nfctag_domain_application_tagidcheck}" class="col-lg-4 control-label"></label>
+            <div class="col-lg-6">
+            <select class="form-control" th:field="*{tagIdCheck}">
+                <option th:each="tag : ${tagIdChecks}"
+                        th:value="${tag.tagIdCheckKey}"
+                        th:text="${tag.tagIdCheckDescription}"></option>
+            </select>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label th:for="*{validateAuthWoConfirmationDefault}" th:text="#{label_org_esupportail_nfctag_domain_application_validateauthwoconfirmationdefault}" class="col-lg-4 control-label"></label>
+            <div class="col-lg-6">
+            <input type="checkbox" th:field="*{validateAuthWoConfirmationDefault}" id="validateAuthWoConfirmationDefault"/>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label th:for="*{active}" th:text="#{label_org_esupportail_nfctag_domain_application_active}" class="col-lg-4 control-label"></label>
+            <div class="col-lg-6">
+            <input type="checkbox" th:field="*{active}" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label th:for="*{description}" th:text="#{label_org_esupportail_nfctag_domain_application_description}" class="col-lg-4 control-label"></label>
+            <div class="col-lg-6">
+            <textarea class="form-control" th:field="*{description}"></textarea>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label th:for="*{sgcClientApp}" th:text="#{label_org_esupportail_nfctag_domain_application_sgcclientapp}" class="col-lg-4 control-label"></label>
+            <div class="col-lg-6">
+            <input type="checkbox" th:field="*{sgcClientApp}" />
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label th:for="*{displayAppNameBlock}" th:text="#{label_org_esupportail_nfctag_domain_application_displayappnameblock}" class="col-lg-4 control-label"></label>
+            <div class="col-lg-6">
+            <input type="checkbox" th:field="*{displayAppNameBlock}" />
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary" th:text="#{button_save}"></button>
+    </form>
+
+    <div th:unless="${#lists.isEmpty(devices)}">
+        <i>
+            Cette application est utilisée par
+            <a th:href="@{/manager/devices(applicationFilter=${app.name})}">
+                <span th:text="${devices.size()}"></span> périphérique(s)
+            </a>, vous ne pouvez pas la supprimer.
+        </i>
+        <br/>
+    </div>
+
+    <div th:if="${#lists.isEmpty(devices) and app.id != null}">
+        <form th:action="@{/manager/applications/{id}(id=${app.id})}" th:method="DELETE" class="form-horizontal">
+            <button type="submit" class="btn btn-danger" th:text="#{entity_delete(${app.name})}"></button>
+        </form>
+    </div>
+
+</div>

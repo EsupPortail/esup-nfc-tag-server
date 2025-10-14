@@ -63,9 +63,13 @@ public abstract class DesfireActionService {
 			
 			result = overrideResultIfNeeded(result);
 			
-			if(result != ""){
-				String msg = result.substring(result.length() - 2);
-				response = DESFireEV1Service.Response.getResponse(Integer.parseInt(msg, 16));
+			if(!result.isEmpty() ){
+                if(result.length() >= 2) {
+                    String msg = result.substring(result.length() - 2);
+                    response = DESFireEV1Service.Response.getResponse(Integer.parseInt(msg, 16));
+                } else {
+                    throw new EsupNfcTagException(String.format("APDU Desfire de longueur < 2 innatendue : %s", result), numeroId);
+                }
 			}
 			if(result.isEmpty() || DESFireEV1Service.Response.OPERATION_OK.equals(response)) {
 				TagType tagType = getTagType();

@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<beans xmlns:webflow="http://www.springframework.org/schema/webflow-config"
-		xmlns="http://www.springframework.org/schema/beans" 
+<beans  xmlns="http://www.springframework.org/schema/beans"
 		xmlns:context="http://www.springframework.org/schema/context" 
-		xmlns:mvc="http://www.springframework.org/schema/mvc" 
-		xmlns:p="http://www.springframework.org/schema/p" 
-		xmlns:util="http://www.springframework.org/schema/util"
+		xmlns:mvc="http://www.springframework.org/schema/mvc"
 		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-		xsi:schemaLocation="http://www.springframework.org/schema/webflow-config http://www.springframework.org/schema/webflow-config/spring-webflow-config-2.3.xsd
+		xsi:schemaLocation="
 			http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
 			http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
-			http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util.xsd
 			http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-3.1.xsd">
                 
                 
@@ -22,7 +18,11 @@
     
     <!-- Turns on support for mapping requests to Spring MVC @Controller methods
          Also registers default Formatters and Validators for use across all @Controllers -->
-    <mvc:annotation-driven conversion-service="applicationConversionService"/>
+    <mvc:annotation-driven conversion-service="applicationConversionService">
+        <mvc:argument-resolvers>
+            <bean class="org.esupportail.nfctag.web.SessionAwarePageableResolver"/>
+        </mvc:argument-resolvers>
+    </mvc:annotation-driven>
     
 
     <!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources -->
@@ -42,43 +42,43 @@
     requests to the container's default Servlet -->
     <mvc:default-servlet-handler/>
 
-
-    <!-- Selects a static view for rendering without the need for an explicit controller -->
-    <mvc:view-controller path="/" view-name="index"/>
-    <mvc:view-controller path="/resourceNotFound"/>
-    <mvc:view-controller path="/dataAccessFailure"/>
-
-    <!-- Enable this for integration of file upload functionality -->
-    <bean class="org.springframework.web.multipart.commons.CommonsMultipartResolver" id="multipartResolver"/>
-
-	<bean class="org.springframework.web.servlet.view.UrlBasedViewResolver" id="tilesViewResolver">
-    	<property name="viewClass" value="org.springframework.web.servlet.view.tiles3.TilesView"/>
-  	</bean>
-  
-    <bean class="org.springframework.web.servlet.view.tiles3.TilesConfigurer" id="tilesConfigurer">
-	    <property name="definitions">
-	      <list>
-	        <value>/WEB-INF/layouts/layouts.xml</value>
-	        <!-- Scan views directory for Tiles configurations -->
-	        <value>/WEB-INF/views/**/views.xml</value>
-	      </list>
-	    </property>
-  	</bean>
+    <bean name="multipartResolver" class="org.springframework.web.multipart.support.StandardServletMultipartResolver"/>
 
 	<bean class="org.esupportail.nfctag.web.ApplicationConversionServiceFactoryBean" id="applicationConversionService"/>
 
- <bean id="expressionParser" class="org.springframework.webflow.expression.spel.WebFlowSpringELExpressionParser">
-	<constructor-arg>
-            <bean class="org.springframework.expression.spel.standard.SpelExpressionParser"/>
-	</constructor-arg>
+
+    <!-- Template Resolver -->
+    <bean id="templateResolver" class="org.thymeleaf.spring6.templateresolver.SpringResourceTemplateResolver">
+        <property name="prefix" value="/WEB-INF/thymeleaf/" />
+        <property name="suffix" value=".html" />
+        <property name="templateMode" value="HTML" />
+        <property name="characterEncoding" value="UTF-8" />
+        <property name="cacheable" value="false" />
     </bean>
 
-    <bean id="viewFactoryCreator" class="org.springframework.webflow.mvc.builder.MvcViewFactoryCreator">
-	<property name="viewResolvers">
-       <util:list>
-			<ref bean="tilesViewResolver"/>
-       </util:list>
-	</property>
+    <!-- Template Engine -->
+    <bean id="templateEngine" class="org.thymeleaf.spring6.SpringTemplateEngine">
+        <property name="templateResolver" ref="templateResolver" />
+        <property name="enableSpringELCompiler" value="true"/>
+        <property name="additionalDialects">
+            <set>
+                <bean class="nz.net.ultraq.thymeleaf.layoutdialect.LayoutDialect"/>
+                <bean class="org.thymeleaf.extras.springsecurity6.dialect.SpringSecurityDialect"/>
+                <bean class="org.thymeleaf.dialect.springdata.SpringDataDialect"/>
+            </set>
+        </property>
+    </bean>
+
+    <!-- Thymeleaf ViewResolver -->
+    <bean class="org.thymeleaf.spring6.view.ThymeleafViewResolver">
+        <property name="templateEngine" ref="templateEngine" />
+        <property name="order" value="1" />
+        <property name="viewNames">
+            <list>
+                <value>templates/*</value>
+            </list>
+        </property>
+        <property name="characterEncoding" value="UTF-8" />
     </bean>
 
 </beans>

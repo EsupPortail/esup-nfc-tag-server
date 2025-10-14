@@ -17,15 +17,12 @@
  */
 package org.esupportail.nfctag.domain;
 
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import org.esupportail.nfctag.service.api.AppliExtApi;
-import org.esupportail.nfctag.service.api.NfcAuthConfig;
-import org.esupportail.nfctag.service.api.TagIdCheckApi;
 import org.springframework.beans.factory.annotation.Configurable;
 
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,7 +60,12 @@ public class Application {
     @Transient
     private Boolean available = true;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_seq")
+@SequenceGenerator(
+        name = "my_seq",
+        sequenceName = "hibernate_sequence",
+        allocationSize = 1
+)
     @Column(name = "id")
     private Long id;
     @Version

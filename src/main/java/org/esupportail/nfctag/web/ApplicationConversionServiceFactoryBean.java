@@ -28,7 +28,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.format.FormatterRegistry;
 import org.springframework.format.support.FormattingConversionServiceFactoryBean;
 
-import javax.annotation.Resource;
+import jakarta.annotation.Resource;
 
 /**
  * A central place to register application converters and formatters. 

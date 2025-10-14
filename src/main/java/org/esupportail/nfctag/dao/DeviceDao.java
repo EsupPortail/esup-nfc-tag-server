@@ -1,13 +1,21 @@
 package org.esupportail.nfctag.dao;
 
+import jakarta.annotation.Resource;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
+import org.apache.commons.lang3.StringUtils;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
+import org.esupportail.nfctag.repositories.DeviceRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.TypedQuery;
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -17,6 +25,9 @@ public class DeviceDao {
     
     @PersistenceContext
     private EntityManager entityManager;
+
+    @Resource
+    DeviceRepository deviceRepository;
 
     public TypedQuery<Device> findDevicesByLocationAndEppnInit(String location, String eppnInit) {
         if (location == null || location.length() == 0) throw new IllegalArgumentException("The location argument is required");
@@ -107,15 +118,26 @@ public class DeviceDao {
         return entityManager().find(Device.class, id);
     }
 
-    public List<Device> findDeviceEntries(int firstResult, int maxResults, String sortFieldName, String sortOrder) {
-        String jpaQuery = "SELECT o FROM Device o";
-        if (fieldNames4OrderClauseFilter.contains(sortFieldName)) {
-            jpaQuery = jpaQuery + " ORDER BY " + sortFieldName;
-            if ("ASC".equalsIgnoreCase(sortOrder) || "DESC".equalsIgnoreCase(sortOrder)) {
-                jpaQuery = jpaQuery + " " + sortOrder;
-            }
+    public Page<Device> findDeviceEntries(Application application, String searchText, Pageable pageable) {
+        CriteriaBuilder criteriaBuilder = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Device> query = criteriaBuilder.createQuery(Device.class);
+        Root<Device> c = query.from(Device.class);
+        final List<Predicate> predicates = new ArrayList<>();
+        if(application != null && application.getId() != null) {
+            predicates.add(criteriaBuilder.equal(c.get("application"), application));
         }
-        return entityManager().createQuery(jpaQuery, Device.class).setFirstResult(firstResult).setMaxResults(maxResults).getResultList();
+
+        if(!StringUtils.isEmpty(searchText)) {
+            Expression<Boolean> fullTestSearchExpression = criteriaBuilder.function("fts", Boolean.class, criteriaBuilder.literal("'" + searchText + "'"));
+            Expression<Double> fullTestSearchRanking = criteriaBuilder.function("ts_rank", Double.class, criteriaBuilder.literal("'" + searchText + "'"));
+            predicates.add(criteriaBuilder.isTrue(fullTestSearchExpression));
+        }
+
+        Specification<Device> spec = (root, q, cb) -> {
+            return cb.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return deviceRepository.findAll(spec, pageable);
     }
 
 

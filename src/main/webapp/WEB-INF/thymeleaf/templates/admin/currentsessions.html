@@ -1,0 +1,45 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{./layouts/user.html}"
+     layout:fragment="content">
+
+    <div class="jumbotron well">
+        <p th:text="${sessions.size() + ' session(s) shib active(s)'}"></p>
+        <ul>
+            <li th:each="s : ${sessions}" th:text="${s}"></li>
+        </ul>
+    </div>
+
+    <div class="jumbotron well">
+        <p th:text="${devices.size() + ' périphérique(s) actif(s)'}"></p>
+        <ul>
+            <li th:each="device : ${devices}">
+                <span th:text="${device.location}"></span> -
+                <span th:text="${device.eppnInit}"></span> -
+                <span th:text="${device.numeroId}"></span> -
+                <span th:text="${#dates.format(device.lastPollDate, 'yyyy-MM-dd HH:mm')}"></span>
+            </li>
+        </ul>
+    </div>
+
+    <div class="jumbotron well">
+        <p>Ensemble des Sessions HTTP</p>
+        <div>
+            <span th:text="${allSessions.size() + ' session(s) active(s)'}"></span>
+            [ sessionId - createdDate - remoteIp - originRequestUri - eppn ]
+        </div>
+        <div class="well">
+            <ul class="list">
+                <li th:each="s : ${allSessions}">
+                    <span th:text="${s.sessionId}"></span>
+                    - <span th:text="${s.createdDate}"></span>
+                    - <span th:text="${s.remoteIp}"></span>
+                    - <span th:text="${s.originRequestUri}"></span>
+                    - <span th:text="${s.userEppn}"></span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+</div>

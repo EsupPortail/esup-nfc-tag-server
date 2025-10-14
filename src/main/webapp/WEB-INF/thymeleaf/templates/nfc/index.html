@@ -1,0 +1,50 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{layouts/public.html}"
+     layout:fragment="content">
+
+    <div class="row nfc">
+        <div class="col-lg-12 text-center">
+            <h1 th:text="#{message_location_choice}"></h1>
+            <div th:each="app : ${applications}">
+                <div th:if="${app.available} and ${app.displayAppNameBlock}">
+                    <div class="panel panel-success">
+                        <div class="panel-heading">
+                            <h2 class="panel-title" th:text="${app.name}"></h2>
+                        </div>
+                        <div class="panel-body">
+                            <pre th:if="${app.description}" th:text="${app.description}"></pre>
+                            <div th:each="location, status : ${app.locations}">
+                                <a th:href="@{/nfc-index/register(location=${location},applicationId=${app.id},imei=${imei},macAddress=${macAddress},numeroId=${numeroId})}"
+                                   class="btn btn-success" th:text="${location}"></a>
+                                <br/><br th:if="${!status.last}" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div th:if="${app.available} and !${app.displayAppNameBlock}">
+                    <div th:each="location, status : ${app.locations}">
+                        <a th:href="@{/nfc-index/register(location=${location},applicationId=${app.id},imei=${imei},macAddress=${macAddress},numeroId=${numeroId})}"
+                           class="btn btn-success" th:text="${location}"></a>
+                        <hr />
+                    </div>
+                </div>
+                <div th:if="!${app.available}">
+                    <div class="panel panel-danger">
+                        <div class="panel-heading">
+                            <h2 class="panel-title" th:text="${app.name}"></h2>
+                        </div>
+                        <div class="panel-body">
+                            <span class="glyphicon glyphicon-warning-sign" aria-hidden="true"></span>
+                            <span th:text="${app.name}"></span>
+                            <span th:text="#{message_unavailable}"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr/>
+            <div id="debug"><!--  --></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,66 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+     class="navbar-default navbar-inverse navbar-fixed-top" th:fragment="navbar">
+    <div class="container-fluid">
+        <th:block th:if="${#strings.isEmpty(param.numeroId) and #strings.isEmpty(numeroId)}">
+
+            <button class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+      <span class="icon-bar">
+        <!--  -->
+      </span> <span class="icon-bar">
+        <!--  -->
+      </span> <span class="icon-bar">
+        <!--  -->
+      </span>
+            </button>
+            <a th:href="@{/}" class="navbar-brand" th:text="#{application_name}"></a>
+            <div class="navbar-collapse collapse">
+                <ul class="nav navbar-nav" id="_navbar">
+                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${active == 'sessions'} ? 'active'">
+                        <a th:href="@{/admin/currentsessions}">Sessions</a>
+                    </li>
+                    <li sec:authorize="hasRole('ROLE_ADMIN')" th:classappend="${active == 'javaperf'} ? 'active'">
+                        <a th:href="@{/admin/javaperf}">JavaPerf</a>
+                    </li>
+                </ul>
+            </div>
+            <ul class="list-inline navbar-right supervisor-nav visible-xs-block visible-lg-block visible-md-block visible-sm-block">
+                <li sec:authorize="isAuthenticated()">
+                    <h4 style="color:white;" sec:authentication="name"></h4>
+                </li>
+                <li sec:authorize="isAuthenticated()">
+                    <form th:action="@{/logout}" method="post">
+                        <button type="submit" class="btn btn-default navbar-btn">
+                            <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                        </button>
+                    </form>
+                </li>
+                <li sec:authorize="!isAuthenticated()">
+                    <a th:href="@{/manager}" class="btn btn-success" th:text="#{button_authentication}"></a>
+                </li>
+            </ul>
+        </th:block>
+        <th:block th:unless="${#strings.isEmpty(param.numeroId) and #strings.isEmpty(numeroId)}">
+            <th:block th:with="nfc_unregister_url=@{/nfc-index/unregister(jarVersion=${jarVersion},numeroId=${numeroId},imei=${imei},macAddress=${macAddress},full=false)},
+                               nfc_unregister_url_full=@{/nfc-index/unregister(jarVersion=${jarVersion},numeroId=${numeroId},imei=${imei},macAddress=${macAddress},full=true)}">
+                <ul class="list-inline navbar-right visible-xs-block visible-lg-block visible-md-block visible-sm-block text-right">
+                    <li>
+                        <h4 style="color:white;" th:text="${eppnInit}"></h4>
+                    </li>
+                    <li th:unless="${#strings.isEmpty(location)}">
+                        <a id="unregister" th:href="${nfc_unregister_url}" class="btn btn-default navbar-btn btn-success">
+                            <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                        </a>
+                    </li>
+                    <li th:if="${#strings.isEmpty(location)}">
+                        <a id="unregisterfull" th:href="${nfc_unregister_url_full}" class="btn btn-default navbar-btn btn-danger">
+                            <span class="glyphicon glyphicon-off" aria-hidden="true"></span>
+                        </a>
+                    </li>
+                </ul>
+            </th:block>
+        </th:block>
+    </div>
+</div>

@@ -1,0 +1,92 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{./layouts/user.html}">
+
+    <div layout:fragment="content">
+        <h2>Performance / Java</h2>
+
+        <div>
+            <h3>Memory</h3>
+            <ul class="list">
+                <li th:text="'max Memory : ' + ${maxMemoryInMB} + ' MB'"></li>
+                <li th:text="'total Memory : ' + ${totalMemoryInMB} + ' MB'"></li>
+                <li th:text="'free Memory : ' + ${freeMemoryInMB} + ' MB'"></li>
+                <li th:text="'used Memory : ' + ${usedMemoryInMB} + ' MB'"></li>
+            </ul>
+        </div>
+
+        <div>
+            <h3>Databases - pools de connexions</h3>
+            <ul class="list">
+                <li th:each="basicDataSource : ${basicDataSources}">
+                    <span th:text="${basicDataSource.url}"></span> :
+                    <ul>
+                        <li th:text="'active : ' + ${basicDataSource.numActive}"></li>
+                        <li th:text="'idle : ' + ${basicDataSource.numIdle}"></li>
+                        <li th:text="'max idle : ' + ${basicDataSource.maxIdle}"></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <h3>Ldap - pools de connexions</h3>
+            <ul class="list">
+                <li th:each="ldapContextSource : ${ldapContextSources}">
+                    <span th:text="${ldapContextSource.value}"></span> /
+                    <span th:text="${ldapContextSource.key.baseLdapPathAsString}"></span> :
+                    <ul>
+                        <li th:text="'active : ' + ${ldapContextSource.key.numActive}"></li>
+                        <li th:text="'idle : ' + ${ldapContextSource.key.numIdle}"></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div>
+            <h3>Threads</h3>
+            <ul class="list">
+                <li>
+                    <span th:text="${javaPerfWrapper.threadCount}"></span> threads en cours
+                    <ul>
+                        <li th:each="threadState : ${threadStateCount}"
+                            th:classappend="${threadState.key == 'RUNNABLE'} ? 'alert-warning' : (${threadState.key == 'BLOCKED'} ? 'alert-danger' : '')"
+                            th:text="${threadState.key} + ' : ' + ${threadState.value}"></li>
+                    </ul>
+                </li>
+                <li th:text="'avec un pic de ' + ${javaPerfWrapper.peakThreadCount} + ' threads'"></li>
+                <li th:text="'(num. thread courant : ' + ${currentThreadId} + ')'"></li>
+            </ul>
+
+            <table class="table table-striped">
+                <tr>
+                    <th>Thread Id</th>
+                    <th>Thread Name</th>
+                    <th>Thread State</th>
+                    <th>Blocked Count</th>
+                    <th>Blocked Time</th>
+                    <th>Waited Count</th>
+                    <th>Waited Time</th>
+                    <th>Stack Trace</th>
+                </tr>
+
+                <tr th:each="threadInfo : ${javaPerfWrapper.threadInfoWrappers}"
+                    th:classappend="${currentThreadId eq threadInfo.threadId ? 'success' : (threadInfo.threadState eq 'RUNNABLE' ? 'warning' : (threadInfo.threadState eq 'BLOCKED' ? 'danger' : ''))}">
+                    <td th:text="${threadInfo.threadId}"></td>
+                    <td th:text="${threadInfo.threadName}"></td>
+                    <td th:text="${threadInfo.threadState}"></td>
+                    <td th:text="${threadInfo.blockedCount}"></td>
+                    <td th:text="${threadInfo.blockedTime}"></td>
+                    <td th:text="${threadInfo.waitedCount}"></td>
+                    <td th:text="${threadInfo.waitedTime}"></td>
+                    <td>
+                    <span th:each="stackTrace : ${threadInfo.stackTrace}">
+                        <span th:text="${stackTrace.className} + '.' + ${stackTrace.methodName} + '(' + ${stackTrace.fileName} + ':' + ${stackTrace.lineNumber} + ')'"></span><br/>
+                    </span>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+</div>

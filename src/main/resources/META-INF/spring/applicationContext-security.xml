@@ -49,7 +49,18 @@
 	    	<csrf disabled="true"/>
     </http>
 
-	<beans:bean id="resourceUrlEncodingFilter" class="org.springframework.web.servlet.resource.ResourceUrlEncodingFilter"/>
+    <beans:bean id="webSecurityExpressionHandler"
+                class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler"/>
+
+    <beans:bean id="methodSecurityExpressionHandler" class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler"/>
+
+    <!-- enable support for Expression-based annotations in Spring Security -->
+    <global-method-security pre-post-annotations="enabled">
+        <expression-handler ref="methodSecurityExpressionHandler" />
+    </global-method-security>
+
+
+    <beans:bean id="resourceUrlEncodingFilter" class="org.springframework.web.servlet.resource.ResourceUrlEncodingFilter"/>
 	
     <beans:bean id="http403EntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>
     
@@ -94,17 +105,21 @@
 	</beans:bean>
     
      	
-    <beans:bean id="ldapContextSourcePool" class="org.springframework.ldap.pool.factory.PoolingContextSource">
-      <beans:property name="contextSource" ref="ldapContextSource" />
+    <beans:bean id="ldapContextSourcePool" class="org.springframework.ldap.pool2.factory.PooledContextSource">
+        <beans:constructor-arg>
+            <beans:bean class="org.springframework.ldap.pool2.factory.PoolConfig">
+                <beans:property name="testWhileIdle" value="true"/>
+                <beans:property name="testOnBorrow" value="true"/>
+                <beans:property name="timeBetweenEvictionRunsMillis" value="30000"/>
+                <beans:property name="minEvictableIdleTimeMillis" value="60000"/>
+            </beans:bean>
+        </beans:constructor-arg>
+        <beans:property name="contextSource" ref="ldapContextSource" />
       <beans:property name="dirContextValidator" ref="dirContextValidator"/>
-      <beans:property name="testWhileIdle" value="true"/>
-      <beans:property name="testOnBorrow" value="true"/>
-      <beans:property name="timeBetweenEvictionRunsMillis" value="30000"/>
-      <beans:property name="minEvictableIdleTimeMillis" value="60000"/>
    </beans:bean>
    
    <beans:bean id="dirContextValidator"
-            class="org.springframework.ldap.pool.validation.DefaultDirContextValidator"/>
+            class="org.springframework.ldap.pool2.validation.DefaultDirContextValidator"/>
 	
     <beans:bean id="ldapContextSource"
 		class="org.springframework.ldap.core.support.LdapContextSource">

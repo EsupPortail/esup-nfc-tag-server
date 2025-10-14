@@ -79,7 +79,7 @@ $(document).ready(function() {
 	  
 	/* MUSTACHE TEMPLATES */
 	if(typeof numeroId != 'undefined'){
-		if(numeroId!=""){
+		if(numeroId!==""){
 			$.Mustache.add('leoauth-template', '{{#leoauths}} \
 					<tr id="row_{{id}}"> \
 						<td class="td-live-text">{{firstname}} {{lastname}} <br/> {{authDateString}}<br/></td> \
@@ -171,128 +171,160 @@ $(document).ready(function() {
 
 
 	/* LIVE LONG POLL */
-	
-	var liveLongPoll = Object.create(esupLongPoll);
-	
-	liveLongPoll.load = function() {
-		if(this.debug) {
-			$('#status').text("Getting Taglogs...")
-		}
-		if (this.run) {
-			$.ajax({
-				url : "/live/taglogs?authDateTimestamp=" + this.lastAuthDate + "&numeroId=" + numeroId,
-				context: this,
-				success : function(message) {
-					
-					if (this.debug) {
-						$('#debug').text(JSON.stringify(message));
-					}
-					if (message && message.length) {
-						var newLastleoauth = $('#lastleoauth').mustache('leoauth-template', {'leoauths' : message}, { method: 'prepend' });
-						var newleoauth = newLastleoauth.children('#newLog').fadeIn('slow').slice();	
-						if(this.lastAuthDate==0) {
-							newleoauth.attr("class", "oldLog");
-							if(message[0].liveStatus == "none" && message.length > 1){message[0].liveStatus = "cancel"}
-							if(message[0].status == "none" && message.length > 1){message[0].status = "cancel"}
-						}
-						var newValidateModal = $('#validate').mustache('validate-template', {'leoauths' : message}, { method: 'prepend' });
-						
-						if(message[0].liveStatus == "none" || message[0].status == "none") {
-							window.readyToScan = "ko";
-							if(validateAuthWoConfirmation == "true") {
-								if(isDisplay == "true"){
-									$("#displayModal").remove();
-									$.get( "/nfc-ws/display?id=" + message[0].id + "&numeroId=" + numeroId, function( display ) {
-										if(display != "" && display != "null"){
-											$(".modal-backdrop.in").hide();
-											var newDisplayModal = $('#display').mustache('display-template', {'display' : display}, { method: 'prepend' });
-											var displayModal = $('#displayModal').appendTo('body').modal({backdrop: 'static', keyboard: false, show: true});
-											getEsupNfcStorage().setItem("readyToScan", "ok");
-											window.readyToScan = "ok";
-											displayModal.on('hidden.bs.modal', function () {
-												$.get( "/nfc-ws/dismiss?id=" + message[0].id + "&numeroId=" + numeroId, function( display ) {});
-											});
-										}
-									});
-								}
-							} else {
-								$("#displayModal").remove();
-								var validateModal = $('#validateModal').appendTo('body').modal({backdrop: 'static', keyboard: false, show: true});						
+	if(typeof numeroId != 'undefined') {
 
-								validateModal.on('hidden.bs.modal', function () {
-									getEsupNfcStorage().setItem("readyToScan", "ok");
-									window.readyToScan = "ok";
-								});
-								$('#validateButton_' + message[0].id).on('click', function(event) {
-									$.get( "/nfc-ws/validate?id=" + message[0].id  + "&numeroId=" + numeroId, function( data ) {
-										if(data==true){
-											$('#status_'+message[0].id).html('<span class="icon-tag glyphicon glyphicon-ok-circle text-success"><!-- --></span>');
-											$('#row_'+message[0].id).toggleClass("success");
-											$.get( "/nfc-ws/dismiss?id=" + message[0].id + "&numeroId=" + numeroId, function( display ) {});
-											if(isDisplay == "true"){
-												$.get( "/nfc-ws/display?id=" + message[0].id + "&numeroId=" + numeroId, function( display ) {
-													if(display != "" && display != "null"){
-														$(".modal-backdrop.in").hide();
-														var newDisplayModal = $('#display').mustache('display-template', {'display' : display}, { method: 'prepend' });
-														var displayModal = $('#displayModal').appendTo('body').modal({backdrop: 'static', keyboard: false, show: true});
-														getEsupNfcStorage().setItem("readyToScan", "ok");
-														window.readyToScan = "ok";
-													}
-												});
-											}
-										}
-									});
-								});
-								$('#cancelButton_'+message[0].id).on('click', function(event) {
-									$(".modal-backdrop.in").hide();
-									$.get( "/nfc-ws/cancel?id=" + message[0].id + "&numeroId=" + numeroId, function( data ) {
-										if(data==true){
-											$('#status_'+message[0].id).html('<span class="icon-tag glyphicon glyphicon-remove-circle text-danger"><!-- --></span>');
-											$('#row_'+message[0].id).toggleClass("danger");
-											$.get( "/nfc-ws/dismiss?id=" + message[0].id + "&numeroId=" + numeroId, function( display ) {});
-										}
-									});
-								});
-							}
-						}
-						this.lastAuthDate = message[0].authDate;
-						setTimeout(function(){
-							newleoauth.attr("class", "oldLog");
-						}, 2000);
-						var oldleoauth = $('#lastleoauth tr:gt(9)').slice();
-						setTimeout(function(){
-							oldleoauth.hide('slow', function(){ oldleoauth.remove(); });
-						}, 5000);
-						try{
-							if(validateAuthWoConfirmation=="true"){
-								getEsupNfcStorage().setItem("readyToScan", "ok");
-								window.readyToScan = "ok";
-							}
-						}catch(e){
-							if(this.debug) $('#status').text(e);
-						}
-					}
-					$("div[id^=status]").each(function(){
-						if($(this).text()=="valid"){$(this).html('<span class="icon-tag glyphicon glyphicon-ok-circle text-success"><!-- --></span>')}
-						if($(this).text()=="cancel"){$(this).html('<span class="icon-tag glyphicon glyphicon-remove-circle text-danger"><!-- --></span>')}					
-						if($(this).text()=="none"){$(this).html('<span class="icon-tag glyphicon glyphicon-ban-circle text-warning"><!-- --></span>')}
-					});
-					this.timer = this.poll();
-				},
-				error : function() {
-					if(this.debug) $('#status').text("Failed to get tagLogs");
-					setTimeout(function(){
-						liveLongPoll.timer = liveLongPoll.poll();
-					}, 2000);
-				},
-				cache : false
-			})
-			$('#status').text("");
-		} else {
-			if(this.debug) $('#status').text("Stopped");
-		}
-	}
-	
+        var liveLongPoll = Object.create(esupLongPoll);
+
+
+        liveLongPoll.load = function () {
+            if (this.debug) {
+                $('#status').text("Getting Taglogs...")
+            }
+            if (this.run) {
+                $.ajax({
+                    url: "/live/taglogs?authDateTimestamp=" + this.lastAuthDate + "&numeroId=" + numeroId,
+                    context: this,
+                    success: function (message) {
+
+                        if (this.debug) {
+                            $('#debug').text(JSON.stringify(message));
+                        }
+                        if (message && message.length) {
+                            var newLastleoauth = $('#lastleoauth').mustache('leoauth-template', {'leoauths': message}, {method: 'prepend'});
+                            var newleoauth = newLastleoauth.children('#newLog').fadeIn('slow').slice();
+                            if (this.lastAuthDate == 0) {
+                                newleoauth.attr("class", "oldLog");
+                                if (message[0].liveStatus == "none" && message.length > 1) {
+                                    message[0].liveStatus = "cancel"
+                                }
+                                if (message[0].status == "none" && message.length > 1) {
+                                    message[0].status = "cancel"
+                                }
+                            }
+                            var newValidateModal = $('#validate').mustache('validate-template', {'leoauths': message}, {method: 'prepend'});
+
+                            if (message[0].liveStatus == "none" || message[0].status == "none") {
+                                window.readyToScan = "ko";
+                                if (validateAuthWoConfirmation == "true") {
+                                    if (isDisplay == "true") {
+                                        $("#displayModal").remove();
+                                        $.get("/nfc-ws/display?id=" + message[0].id + "&numeroId=" + numeroId, function (display) {
+                                            if (display != "" && display != "null") {
+                                                $(".modal-backdrop.in").hide();
+                                                var newDisplayModal = $('#display').mustache('display-template', {'display': display}, {method: 'prepend'});
+                                                var displayModal = $('#displayModal').appendTo('body').modal({
+                                                    backdrop: 'static',
+                                                    keyboard: false,
+                                                    show: true
+                                                });
+                                                getEsupNfcStorage().setItem("readyToScan", "ok");
+                                                window.readyToScan = "ok";
+                                                displayModal.on('hidden.bs.modal', function () {
+                                                    $.get("/nfc-ws/dismiss?id=" + message[0].id + "&numeroId=" + numeroId, function (display) {
+                                                    });
+                                                });
+                                            }
+                                        });
+                                    }
+                                } else {
+                                    $("#displayModal").remove();
+                                    var validateModal = $('#validateModal').appendTo('body').modal({
+                                        backdrop: 'static',
+                                        keyboard: false,
+                                        show: true
+                                    });
+
+                                    validateModal.on('hidden.bs.modal', function () {
+                                        getEsupNfcStorage().setItem("readyToScan", "ok");
+                                        window.readyToScan = "ok";
+                                    });
+                                    $('#validateButton_' + message[0].id).on('click', function (event) {
+                                        $.get("/nfc-ws/validate?id=" + message[0].id + "&numeroId=" + numeroId, function (data) {
+                                            if (data == true) {
+                                                $('#status_' + message[0].id).html('<span class="icon-tag glyphicon glyphicon-ok-circle text-success"><!-- --></span>');
+                                                $('#row_' + message[0].id).toggleClass("success");
+                                                $.get("/nfc-ws/dismiss?id=" + message[0].id + "&numeroId=" + numeroId, function (display) {
+                                                });
+                                                if (isDisplay == "true") {
+                                                    $.get("/nfc-ws/display?id=" + message[0].id + "&numeroId=" + numeroId, function (display) {
+                                                        if (display != "" && display != "null") {
+                                                            $(".modal-backdrop.in").hide();
+                                                            var newDisplayModal = $('#display').mustache('display-template', {'display': display}, {method: 'prepend'});
+                                                            var displayModal = $('#displayModal').appendTo('body').modal({
+                                                                backdrop: 'static',
+                                                                keyboard: false,
+                                                                show: true
+                                                            });
+                                                            getEsupNfcStorage().setItem("readyToScan", "ok");
+                                                            window.readyToScan = "ok";
+                                                        }
+                                                    });
+                                                }
+                                            }
+                                        });
+                                    });
+                                    $('#cancelButton_' + message[0].id).on('click', function (event) {
+                                        $(".modal-backdrop.in").hide();
+                                        $.get("/nfc-ws/cancel?id=" + message[0].id + "&numeroId=" + numeroId, function (data) {
+                                            if (data == true) {
+                                                $('#status_' + message[0].id).html('<span class="icon-tag glyphicon glyphicon-remove-circle text-danger"><!-- --></span>');
+                                                $('#row_' + message[0].id).toggleClass("danger");
+                                                $.get("/nfc-ws/dismiss?id=" + message[0].id + "&numeroId=" + numeroId, function (display) {
+                                                });
+                                            }
+                                        });
+                                    });
+                                }
+                            }
+                            this.lastAuthDate = message[0].authDate;
+                            setTimeout(function () {
+                                newleoauth.attr("class", "oldLog");
+                            }, 2000);
+                            var oldleoauth = $('#lastleoauth tr:gt(9)').slice();
+                            setTimeout(function () {
+                                oldleoauth.hide('slow', function () {
+                                    oldleoauth.remove();
+                                });
+                            }, 5000);
+                            try {
+                                if (validateAuthWoConfirmation == "true") {
+                                    getEsupNfcStorage().setItem("readyToScan", "ok");
+                                    window.readyToScan = "ok";
+                                }
+                            } catch (e) {
+                                if (this.debug) $('#status').text(e);
+                            }
+                        }
+                        $("div[id^=status]").each(function () {
+                            if ($(this).text() == "valid") {
+                                $(this).html('<span class="icon-tag glyphicon glyphicon-ok-circle text-success"><!-- --></span>')
+                            }
+                            if ($(this).text() == "cancel") {
+                                $(this).html('<span class="icon-tag glyphicon glyphicon-remove-circle text-danger"><!-- --></span>')
+                            }
+                            if ($(this).text() == "none") {
+                                $(this).html('<span class="icon-tag glyphicon glyphicon-ban-circle text-warning"><!-- --></span>')
+                            }
+                        });
+                        this.timer = this.poll();
+                    },
+                    error: function () {
+                        if (this.debug) $('#status').text("Failed to get tagLogs");
+                        setTimeout(function () {
+                                if(typeof liveLongPoll != 'undefined') {
+                                    liveLongPoll.timer = liveLongPoll.poll();
+                                }
+                        }, 2000);
+                    },
+                    cache: false
+                })
+                $('#status').text("");
+            } else {
+                if (this.debug) $('#status').text("Stopped");
+            }
+        }
+
+    }
 	
 	$(function() {
 		$.ajaxSetup({cache:false});
@@ -305,53 +337,64 @@ $(document).ready(function() {
 	        }catch(e){
 	        	if(this.debug) document.getElementById("debug").innerHTML = e;
 	        }
-			liveLongPoll.start();
+            if(typeof liveLongPoll != 'undefined') {
+                liveLongPoll.start();
+            }
 		}
 	});
 	
 	
 	/* ERRORS LONG POLL */
-	
-	var errorsLongPool = Object.create(esupLongPoll);
-	
-	errorsLongPool.load = function() {
+	if(typeof numeroId != 'undefined') {
+        var errorsLongPool = Object.create(esupLongPoll);
 
-		if(this.run) {
-			
-			$.ajax({
-				url : "/live/tagerror?errorDateTimestamp=" + this.lastAuthDate +"&numeroId=" + numeroId,
-				context: this,
-				success : function(message) {
-					if (this.debug) {
-						$('#debug').text(JSON.stringify(message))
-					}
-					if (message && message.length) {
-						window.readyToScan = "ko";
-						var newErrorModal = $('#error').mustache('error-template', {'tagerrors' : message[0]}, { method: 'prepend' });
-						var errorModal = $('#errorModal').appendTo('body').modal({backdrop: 'static', keyboard: false, show: true});
-						errorModal.on('hidden.bs.modal', function () {
-							getEsupNfcStorage().setItem("readyToScan", "ok");
-							window.readyToScan = "ok";
-						});
-						this.lastAuthDate = message[0].errorDate;
-					}
-					this.timer = this.poll();			
-				},
-				error : function() {
-					if(this.debug) $('#status').text("Failed to get errors");
-					setTimeout(function(){
-						errorsLongPool.timer = errorsLongPool.poll();
-					}, 2000);
-				},
-				cache : false
-			});
-		}
-	}
-	
+        errorsLongPool.load = function () {
+
+            if (this.run) {
+
+                $.ajax({
+                    url: "/live/tagerror?errorDateTimestamp=" + this.lastAuthDate + "&numeroId=" + numeroId,
+                    context: this,
+                    success: function (message) {
+                        if (this.debug) {
+                            $('#debug').text(JSON.stringify(message))
+                        }
+                        if (message && message.length) {
+                            window.readyToScan = "ko";
+                            var newErrorModal = $('#error').mustache('error-template', {'tagerrors': message[0]}, {method: 'prepend'});
+                            var errorModal = $('#errorModal').appendTo('body').modal({
+                                backdrop: 'static',
+                                keyboard: false,
+                                show: true
+                            });
+                            errorModal.on('hidden.bs.modal', function () {
+                                getEsupNfcStorage().setItem("readyToScan", "ok");
+                                window.readyToScan = "ok";
+                            });
+                            this.lastAuthDate = message[0].errorDate;
+                        }
+                        this.timer = this.poll();
+                    },
+                    error: function () {
+                        if (this.debug) $('#status').text("Failed to get errors");
+                        setTimeout(function () {
+                                if(typeof errorsLongPool != 'undefined') {
+                                    errorsLongPool.timer = errorsLongPool.poll();
+                                }
+                        }, 2000);
+                    },
+                    cache: false
+                });
+            }
+        }
+    }
+
 	$(function() {
 		$.ajaxSetup({cache:false});
 		if($('#lastleoauth').length) {
-			errorsLongPool.start();
+            if(typeof errorsLongPool != 'undefined') {
+                errorsLongPool.start();
+            }
 		}
 	});
 	
@@ -374,7 +417,7 @@ $(document).ready(function(){
 	Chart.defaults.global.elements.line.tension=0.2;
 
 		$.ajax({
-			url: "chartJson?model=numberTagByApplication&annee="+annee,
+			url: statsUrl + "/chartJson?model=numberTagByApplication&annee="+annee,
 			type: 'GET',
 			dataType : 'json',
 			success : function(data) {
@@ -417,7 +460,7 @@ $(document).ready(function(){
 		});
 
 		$.ajax({
-			url: "chartJson?model=numberTagByYear",
+			url: statsUrl + "/chartJson?model=numberTagByYear",
 			type: 'GET',
 			dataType : 'json',
 			success : function(data) {
@@ -439,7 +482,7 @@ $(document).ready(function(){
 		});
 
 	$.ajax({
-        url: "chartJson?model=numberDeviceByUserAgent&annee="+annee,
+        url: statsUrl + "/chartJson?model=numberDeviceByUserAgent&annee="+annee,
         type: 'GET',
         dataType : 'json',
         success : function(data) {
@@ -482,7 +525,7 @@ $(document).ready(function(){
 	});
 
 	$.ajax({
-        url: "chartJson?model=numberTagByLocation&annee="+annee+"&application="+application,
+        url: statsUrl + "/chartJson?model=numberTagByLocation&annee="+annee+"&application="+application,
         type: 'GET',
         dataType : 'json',
         success : function(data) {
@@ -525,7 +568,7 @@ $(document).ready(function(){
 	
 	
 	$.ajax({
-        url: "chartJson?model=nbTagThisDay&annee="+annee,
+        url: statsUrl + "/chartJson?model=nbTagThisDay&annee="+annee,
         type: 'GET',
         dataType : 'json',
         success : function(data) {
@@ -562,7 +605,7 @@ $(document).ready(function(){
 	});
 	
 	$.ajax({
-		url: "chartJson?model=numberTagByWeek&annee="+annee,
+		url: statsUrl + "/chartJson?model=numberTagByWeek&annee="+annee,
         type: 'GET',
         dataType : 'json',
         success : function(data) {
@@ -630,30 +673,20 @@ $(document).ready(function() {
 	});
 	
 	$(function(){
-		
-		$('[id^=_application_id]').each(function() {
-			$(this).click(function(){
-				checkLocations();
-			})
+
+		$("#application").focusout(function(){
+			checkLocations();
 		});
 		$("#eppnInit").focusout(function(){
 			checkLocations();
 		});
-		/*
-		$("#location").focusin(function(){
-			checkLocations();
-		});	
-*/
 		
 		function checkLocations(){
 			$('#location').val('');
 			$('#location').find('option').remove().end();
-			var eppn = $('#eppnInit').val();			
-			var idApp;
-			$("input[id^=_application_id]:checked").each(function() {
-		        idApp = $(this).val();
-		    });
-    		$('#_validateAuthWoConfirmation_id').prop('checked', false);
+			var eppn = $('#eppnInit').val();
+			var idApp = $('#application').val();
+    		$('#validateAuthWoConfirmation').prop('checked', false);
 			var url = '/manager/devices/getValidateWo?applicationId='+idApp;
 			$.ajax({
 			    url: url,
@@ -661,7 +694,7 @@ $(document).ready(function() {
 			    dataType: 'json',
 			    success: function( json ) {
 			    	if(json == true){
-			    		$('#_validateAuthWoConfirmation_id').prop('checked', true);
+			    		$('#validateAuthWoConfirmation').prop('checked', true);
 			    	}
 			    }
 			});

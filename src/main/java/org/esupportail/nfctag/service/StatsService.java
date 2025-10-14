@@ -3,20 +3,22 @@ package org.esupportail.nfctag.service;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import jakarta.annotation.Resource;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
 import org.apache.commons.lang3.StringUtils;
 import org.esupportail.nfctag.dao.DeviceDao;
 import org.esupportail.nfctag.dao.TagLogDao;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Resource;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
-import java.math.BigInteger;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Service
 public class StatsService {
@@ -79,11 +81,11 @@ public class StatsService {
 		Query q = em.createNativeQuery(
 				"SELECT count(id) as value, date_trunc('day', auth_date) FROM tag_log WHERE date_part('year', auth_date) = " + annee + " GROUP By date_trunc('day', auth_date) ORDER BY value DESC LIMIT 1;");
 		Long max = Long.valueOf(0);
-		Date maxDay = null;
+        LocalDateTime maxDay = null;
 		if(q.getResultList().size()>0){
 			Object[] nbAndDay = (Object[])q.getResultList().get(0);
-			max = ((BigInteger)nbAndDay[0]).longValue();
-			maxDay = ((Date)nbAndDay[1]);
+			max = (Long)nbAndDay[0];
+			maxDay = ((LocalDateTime )nbAndDay[1]);
 		}
 		if (nbTagThisDay.doubleValue() > max.doubleValue()) max = nbTagThisDay.longValue();
 		Double percentNow = (nbTagThisDay.doubleValue() / max.doubleValue()) * 100;
@@ -185,26 +187,27 @@ public class StatsService {
 		String sql = "SELECT trim(to_char(date_part('month', auth_date), '99')) as labels, t.application_name as label, count(id) as data FROM tag_log as t RIGHT JOIN (SELECT date_part('month', auth_date) as date FROM tag_log  GROUP BY date) AS m ON m.date = date_part('month', t.auth_date) WHERE date_part('year', auth_date) = " + annee + " GROUP BY labels, label ORDER BY label, labels;";
 		
 		Query q = em.createNativeQuery(sql);
-		
-		List<Object[]> qResult = q.getResultList();
-		String app = appList.get(0);
-		for (String appName : appList){
-			if(!app.equals(appName)){
-				Object[] saut = {null, null, null};
-				result.add(saut);
-				app = appName;
-			}
-			for (int i = 0; i< month.size(); i++){
-				Object[] objectToApp = {month.get(i), appName, 0};
-				for (Object[] object : qResult) {
-					if(object[0].toString().equals(month.get(i)) && object[1].toString().equals(appName)){
-						objectToApp = object;
-					}
-				}
-				result.add(objectToApp);
-			}
-			
-		}
+
+        List<Object[]> qResult = q.getResultList();
+        if(!qResult.isEmpty()){
+            String app = appList.get(0);
+            for (String appName : appList) {
+                if (!app.equals(appName)) {
+                    Object[] saut = {null, null, null};
+                    result.add(saut);
+                    app = appName;
+                }
+                for (int i = 0; i < month.size(); i++) {
+                    Object[] objectToApp = {month.get(i), appName, 0};
+                    for (Object[] object : qResult) {
+                        if (object[0].toString().equals(month.get(i)) && object[1].toString().equals(appName)) {
+                            objectToApp = object;
+                        }
+                    }
+                    result.add(objectToApp);
+                }
+            }
+        }
 
 		return result;
 	}	

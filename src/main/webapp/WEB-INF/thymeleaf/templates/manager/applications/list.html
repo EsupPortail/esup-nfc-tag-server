@@ -1,0 +1,55 @@
+
+<div xmlns:th="http://www.thymeleaf.org"
+     xmlns:sd="http://www.thymeleaf.org/spring-data"
+     xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+     layout:decorate="~{./layouts/user.html}"
+     layout:fragment="content">
+    <h1>
+        <span th:text="#{label_org_esupportail_nfctag_domain_application_plural}"></span>
+        &nbsp;
+        <div class="btn-group">
+            <a class="btn btn-info pull-left" th:href="@{/manager/applications(form=true)}">
+                <span class="glyphicon glyphicon-plus"></span>
+                <span th:text="#{button_add_application}"></span>
+            </a>
+        </div>
+    </h1>
+    <br/>
+
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th><a class="sorting" sd:pagination-sort="name" th:text="#{label_org_esupportail_nfctag_domain_application_name}"/></th>
+                <th><a class="sorting" sd:pagination-sort="nfcConfigDesc" th:text="#{label_org_esupportail_nfctag_domain_application_nfcconfig}"/></th>
+                <th><a class="sorting" sd:pagination-sort="appliExtDesc" th:text="#{label_org_esupportail_nfctag_domain_application_appliext}"/></th>
+                <th><a class="sorting" sd:pagination-sort="tagIdCheckDesc" th:text="#{label_org_esupportail_nfctag_domain_application_tagidcheck}"/></th>
+                <th><a class="sorting" sd:pagination-sort="validateAuthWoConfirmationDefault" th:text="#{label_org_esupportail_nfctag_domain_application_validateauthwoconfirmationdefault}"/></th>
+                <th><a class="sorting" sd:pagination-sort="active" th:text="#{label_org_esupportail_nfctag_domain_application_active}"/></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="app : ${applications}">
+                <td th:text="${app.name}"></td>
+                <td th:text="${app.nfcConfigDesc}"></td>
+                <td th:text="${app.appliExtDesc}"></td>
+                <td th:text="${app.tagIdCheckDesc}"></td>
+                <td th:text="${app.validateAuthWoConfirmationDefault}"></td>
+                <td th:text="${app.active}"></td>
+                <td>
+                    <a th:href="@{/manager/applications/{id}(id=${app.id})}" class="btn btn-info">
+                        <span class="glyphicon glyphicon-pencil"></span>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <div class="text-center">
+        <nav>
+            <div class="btn-group">
+                <div class="btn-group dropup" sd:page-size-selector="dropdown" style="margin-top: 20px"></div>
+                <ul class="btn-group pagination" sd:pagination="full"></ul>
+            </div>
+        </nav>
+    </div>
+</div>

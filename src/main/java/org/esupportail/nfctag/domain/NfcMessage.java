@@ -21,7 +21,7 @@ import org.apache.commons.lang3.builder.ReflectionToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
 import org.springframework.beans.factory.annotation.Configurable;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Configurable
@@ -31,7 +31,12 @@ public class NfcMessage {
     private String csn;
 	private String numeroId;
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "my_seq")
+@SequenceGenerator(
+        name = "my_seq",
+        sequenceName = "hibernate_sequence",
+        allocationSize = 1
+)
     @Column(name = "id")
     private Long id;
     @Version
