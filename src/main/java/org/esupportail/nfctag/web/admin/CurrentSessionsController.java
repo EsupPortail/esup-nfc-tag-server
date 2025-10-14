@@ -17,9 +17,12 @@
  */
 package org.esupportail.nfctag.web.admin;
 
+import jakarta.servlet.ServletContext;
+import jakarta.servlet.ServletContextEvent;
 import org.esupportail.nfctag.domain.NfcHttpSession;
 import org.esupportail.nfctag.security.NfcHttpSessionsListenerService;
 import org.esupportail.nfctag.web.live.LiveLongPoolController;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.session.SessionInformation;
 import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -44,8 +47,9 @@ public class CurrentSessionsController {
 	@Resource
 	private LiveLongPoolController liveLongPoolController;
 
-	@Resource
-	NfcHttpSessionsListenerService nfcHttpSessionsListenerService;
+	@Autowired
+    private ServletContext servletContext;
+
 		
 	@ModelAttribute("active")
 	String getCurrentMenu() {
@@ -53,8 +57,8 @@ public class CurrentSessionsController {
 	}
 	
 	@RequestMapping
-	public String getCurrentSessions(Model uiModel) throws IOException {
-
+	public String getCurrentSessions(Model uiModel) {
+		NfcHttpSessionsListenerService nfcHttpSessionsListenerService = (NfcHttpSessionsListenerService) servletContext.getAttribute("nfcHttpSessionsListenerService");
 		Map<String, NfcHttpSession> allSessions = nfcHttpSessionsListenerService.getSessions();
 		List<String> sessions = new Vector<String>();
 		List<Object> principals = sessionRegistry.getAllPrincipals();

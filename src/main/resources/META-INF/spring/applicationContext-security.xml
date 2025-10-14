@@ -52,14 +52,6 @@
     <beans:bean id="webSecurityExpressionHandler"
                 class="org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler"/>
 
-    <beans:bean id="methodSecurityExpressionHandler" class="org.springframework.security.access.expression.method.DefaultMethodSecurityExpressionHandler"/>
-
-    <!-- enable support for Expression-based annotations in Spring Security -->
-    <global-method-security pre-post-annotations="enabled">
-        <expression-handler ref="methodSecurityExpressionHandler" />
-    </global-method-security>
-
-
     <beans:bean id="resourceUrlEncodingFilter" class="org.springframework.web.servlet.resource.ResourceUrlEncodingFilter"/>
 	
     <beans:bean id="http403EntryPoint" class="org.springframework.security.web.authentication.Http403ForbiddenEntryPoint"/>

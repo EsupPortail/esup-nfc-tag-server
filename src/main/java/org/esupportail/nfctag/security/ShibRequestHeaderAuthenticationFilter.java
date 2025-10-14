@@ -1,16 +1,26 @@
 package org.esupportail.nfctag.security;
 
+import jakarta.annotation.Resource;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.session.SessionRegistry;
 import org.springframework.security.web.authentication.preauth.RequestHeaderAuthenticationFilter;
 
 import jakarta.servlet.http.HttpServletRequest;
+
+import java.io.IOException;
 
 public class ShibRequestHeaderAuthenticationFilter extends RequestHeaderAuthenticationFilter {
 	
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
 	private String credentialsRequestHeader4thisClass;
+
+	@Resource
+	SessionRegistry sessionRegistry;
 	
 	/* 
 	 * Surcharge de la méthode initiale : si pas d'attributs correspondant à credentialsRequestHeader (shib) ; on continue  :
@@ -36,4 +46,11 @@ public class ShibRequestHeaderAuthenticationFilter extends RequestHeaderAuthenti
         this.credentialsRequestHeader4thisClass = credentialsRequestHeader;
     }
 
+	@Override
+	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authResult) throws IOException, ServletException {
+		super.successfulAuthentication(request, response, authResult);
+		// appelé normalement au travers de org.springframework.security.web.session.SessionManagementFilter
+		// incompatible avec le fonctionnement de ShibRequestHeaderAuthenticationFilter ici
+		this.sessionRegistry.registerNewSession(request.getSession().getId(), authResult.getPrincipal());
+	}
 }
