@@ -51,38 +51,38 @@
         <thead>
             <tr>
                 <th><a class="sorting" sd:pagination-sort="authDate" th:text="#{label_org_esupportail_nfctag_domain_taglog_authdate}"/></th>
-                <th><a class="sorting" sd:pagination-sort="applicationName" th:text="#{label_org_esupportail_nfctag_domain_taglog_applicationname}"/></th>
-                <th><a class="sorting" sd:pagination-sort="location" th:text="#{label_org_esupportail_nfctag_domain_taglog_location}"/></th>
-                <th><a class="sorting" sd:pagination-sort="eppnInit" th:text="#{label_org_esupportail_nfctag_domain_taglog_eppninit}"/></th>
-                <th><a class="sorting" sd:pagination-sort="numeroId" th:text="#{label_org_esupportail_nfctag_domain_taglog_numeroid}"/></th>
-                <th><a class="sorting" sd:pagination-sort="status" th:text="#{label_org_esupportail_nfctag_domain_taglog_status}"/></th>
-                <th><a class="sorting" sd:pagination-sort="csn" th:text="#{label_org_esupportail_nfctag_domain_taglog_csn}"/></th>
+                <th class="hidden-xs hidden-sm"><a class="sorting" sd:pagination-sort="applicationName" th:text="#{label_org_esupportail_nfctag_domain_taglog_applicationname}"/></th>
+                <th class="hidden-xs hidden-sm"><a class="sorting" sd:pagination-sort="location" th:text="#{label_org_esupportail_nfctag_domain_taglog_location}"/></th>
+                <th class="hidden-xs hidden-sm"><a class="sorting" sd:pagination-sort="eppnInit" th:text="#{label_org_esupportail_nfctag_domain_taglog_eppninit}"/></th>
+                <th class="hidden-xs hidden-sm hidden-md"><a class="sorting" sd:pagination-sort="numeroId" th:text="#{label_org_esupportail_nfctag_domain_taglog_numeroid}"/></th>
+                <th class="hidden-xs hidden-sm"><a class="sorting" sd:pagination-sort="status" th:text="#{label_org_esupportail_nfctag_domain_taglog_status}"/></th>
+                <th class="hidden-xs hidden-sm"><a class="sorting" sd:pagination-sort="csn" th:text="#{label_org_esupportail_nfctag_domain_taglog_csn}"/></th>
                 <th><a class="sorting" sd:pagination-sort="eppn" th:text="#{label_org_esupportail_nfctag_domain_taglog_eppn}"/></th>
-                <th><a class="sorting" sd:pagination-sort="firstname" th:text="#{label_org_esupportail_nfctag_domain_taglog_firstname}"/></th>
-                <th><a class="sorting" sd:pagination-sort="lastname" th:text="#{label_org_esupportail_nfctag_domain_taglog_lastname}"/></th>
-                <th><a class="sorting" sd:pagination-sort="liveStatus" th:text="#{label_org_esupportail_nfctag_domain_taglog_livestatus}"/></th>
+                <th class="hidden-xs hidden-sm hidden-md"><a class="sorting" sd:pagination-sort="firstname" th:text="#{label_org_esupportail_nfctag_domain_taglog_firstname}"/></th>
+                <th class="hidden-xs hidden-sm"><a class="sorting" sd:pagination-sort="lastname" th:text="#{label_org_esupportail_nfctag_domain_taglog_lastname}"/></th>
+                <th class="hidden-xs hidden-sm hidden-md"><a class="sorting" sd:pagination-sort="liveStatus" th:text="#{label_org_esupportail_nfctag_domain_taglog_livestatus}"/></th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             <tr th:each="taglog : ${taglogs}">
                 <td th:text="${#dates.format(taglog.authDate, tagLog_authdate_date_format)}"></td>
-                <td th:text="${taglog.applicationName}"></td>
-                <td>
+                <td class="hidden-xs hidden-sm" th:text="${taglog.applicationName}"></td>
+                <td class="hidden-xs hidden-sm">
                     <a th:href="@{/manager/taglogs(searchBySelected='location',searchString=${taglog.location})}" th:text="${taglog.location}"></a>
                 </td>
-                <td>
+                <td class="hidden-xs hidden-sm">
                     <a th:href="@{/manager/taglogs(searchBySelected='eppnInit',searchString=${taglog.eppnInit})}" th:text="${taglog.eppnInit}"></a>
                 </td>
-                <td>
+                <td class="hidden-xs hidden-sm hidden-md">
                     <a th:href="@{/manager/devices/numeroid/{numeroId}(numeroId=${taglog.numeroId})}" th:text="${taglog.numeroId}"></a>
                 </td>
-                <td th:text="${taglog.status}"></td>
-                <td th:text="${taglog.csn}"></td>
+                <td class="hidden-xs hidden-sm" th:text="${taglog.status}"></td>
+                <td class="hidden-xs hidden-sm" th:text="${taglog.csn}"></td>
                 <td th:text="${taglog.eppn}"></td>
-                <td th:text="${taglog.firstname}"></td>
-                <td th:text="${taglog.lastname}"></td>
-                <td th:text="${taglog.liveStatus}"></td>
+                <td class="hidden-xs hidden-sm hidden-md" th:text="${taglog.firstname}"></td>
+                <td class="hidden-xs hidden-sm" th:text="${taglog.lastname}"></td>
+                <td class="hidden-xs hidden-sm hidden-md" th:text="${taglog.liveStatus}"></td>
                 <td>
                     <a th:href="@{/manager/taglogs/{id}(id=${taglog.id})}" class="btn btn-info">
                         <span class="glyphicon glyphicon-eye-open"></span>

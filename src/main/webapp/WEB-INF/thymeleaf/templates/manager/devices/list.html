@@ -46,29 +46,29 @@
     <table class="table table-bordered table-hover">
         <thead>
             <tr>
-                <th><a class="sorting" sd:pagination-sort="numeroId" th:text="#{label_org_esupportail_nfctag_domain_device_numeroid}"/></th>
+                <th class="hidden-xs hidden-sm hidden-md"><a class="sorting" sd:pagination-sort="numeroId" th:text="#{label_org_esupportail_nfctag_domain_device_numeroid}"/></th>
                 <th><a class="sorting" sd:pagination-sort="eppnInit" th:text="#{label_org_esupportail_nfctag_domain_device_eppninit}"/></th>
-                <th><a class="sorting" sd:pagination-sort="imei" th:text="#{label_org_esupportail_nfctag_domain_device_imei}"/></th>
-                <th><a class="sorting" sd:pagination-sort="macAddress" th:text="#{label_org_esupportail_nfctag_domain_device_macaddress}"/></th>
-                <th><a class="sorting" sd:pagination-sort="application.name" th:text="#{label_org_esupportail_nfctag_domain_device_application}"/></th>
-                <th><a class="sorting" sd:pagination-sort="location" th:text="#{label_org_esupportail_nfctag_domain_device_location}"/></th>
-                <th><a class="sorting" sd:pagination-sort="validateAuthWoConfirmation" th:text="#{label_org_esupportail_nfctag_domain_device_validateauthwoconfirmation}"/></th>
-                <th><a class="sorting" sd:pagination-sort="createDate" th:text="#{label_org_esupportail_nfctag_domain_device_createdate}"/></th>
-                <th><a class="sorting" sd:pagination-sort="lastUseDate" th:text="#{label_org_esupportail_nfctag_domain_device_lastusedate}"/></th>
+                <th class="hidden-xs hidden-sm"><a class="sorting" sd:pagination-sort="imei" th:text="#{label_org_esupportail_nfctag_domain_device_imei}"/></th>
+                <th class="hidden-xs hidden-sm"><a class="sorting" sd:pagination-sort="macAddress" th:text="#{label_org_esupportail_nfctag_domain_device_macaddress}"/></th>
+                <th class="hidden-xs"><a class="sorting" sd:pagination-sort="application.name" th:text="#{label_org_esupportail_nfctag_domain_device_application}"/></th>
+                <th class="hidden-xs hidden-sm"><a class="sorting" sd:pagination-sort="location" th:text="#{label_org_esupportail_nfctag_domain_device_location}"/></th>
+                <th class="hidden-xs hidden-sm hidden-md"><a class="sorting" sd:pagination-sort="validateAuthWoConfirmation" th:text="#{label_org_esupportail_nfctag_domain_device_validateauthwoconfirmation}"/></th>
+                <th class="hidden-xs hidden-sm hidden-md"><a class="sorting" sd:pagination-sort="createDate" th:text="#{label_org_esupportail_nfctag_domain_device_createdate}"/></th>
+                <th class="hidden-xs hidden-sms"><a class="sorting" sd:pagination-sort="lastUseDate" th:text="#{label_org_esupportail_nfctag_domain_device_lastusedate}"/></th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             <tr th:each="device : ${devices}">
-                <td th:text="${device.numeroId}"></td>
+                <td class="hidden-xs hidden-sm hidden-md" th:text="${device.numeroId}"></td>
                 <td th:text="${device.eppnInit}"></td>
-                <td th:text="${device.imei}"></td>
-                <td th:text="${device.macAddress}"></td>
-                <td th:text="${device.applicationName}"></td>
-                <td th:text="${device.location}"></td>
-                <td th:text="${device.validateAuthWoConfirmation}"></td>
-                <td th:text="${#dates.format(device.createDate, device_createdate_date_format)}"></td>
-                <td th:text="${#dates.format(device.lastUseDate, device_lastusedate_date_format)}"></td>
+                <td class="hidden-xs hidden-sm" th:text="${device.imei}"></td>
+                <td class="hidden-xs hidden-sm" th:text="${device.macAddress}"></td>
+                <td class="hidden-xs" th:text="${device.applicationName}"></td>
+                <td class="hidden-xs hidden-sm" th:text="${device.location}"></td>
+                <td class="hidden-xs hidden-sm hidden-md" th:text="${device.validateAuthWoConfirmation}"></td>
+                <td class="hidden-xs hidden-sm hidden-md" th:text="${#dates.format(device.createDate, device_createdate_date_format)}"></td>
+                <td class="hidden-xs hidden-sm" th:text="${#dates.format(device.lastUseDate, device_lastusedate_date_format)}"></td>
                 <td>
                     <a th:href="@{/manager/devices/{id}(id=${device.id})}" class="btn btn-info">
                         <span class="glyphicon glyphicon-pencil"></span>

@@ -20,22 +20,22 @@
         <thead>
             <tr>
                 <th><a class="sorting" sd:pagination-sort="name" th:text="#{label_org_esupportail_nfctag_domain_application_name}"/></th>
-                <th><a class="sorting" sd:pagination-sort="nfcConfigDesc" th:text="#{label_org_esupportail_nfctag_domain_application_nfcconfig}"/></th>
-                <th><a class="sorting" sd:pagination-sort="appliExtDesc" th:text="#{label_org_esupportail_nfctag_domain_application_appliext}"/></th>
-                <th><a class="sorting" sd:pagination-sort="tagIdCheckDesc" th:text="#{label_org_esupportail_nfctag_domain_application_tagidcheck}"/></th>
-                <th><a class="sorting" sd:pagination-sort="validateAuthWoConfirmationDefault" th:text="#{label_org_esupportail_nfctag_domain_application_validateauthwoconfirmationdefault}"/></th>
-                <th><a class="sorting" sd:pagination-sort="active" th:text="#{label_org_esupportail_nfctag_domain_application_active}"/></th>
+                <th class="hidden-xs hidden-sm"><a class="sorting" sd:pagination-sort="nfcConfigDesc" th:text="#{label_org_esupportail_nfctag_domain_application_nfcconfig}"/></th>
+                <th class="hidden-xs hidden-sm"><a class="sorting" sd:pagination-sort="appliExtDesc" th:text="#{label_org_esupportail_nfctag_domain_application_appliext}"/></th>
+                <th class="hidden-xs hidden-sm hidden-md"><a class="sorting" sd:pagination-sort="tagIdCheckDesc" th:text="#{label_org_esupportail_nfctag_domain_application_tagidcheck}"/></th>
+                <th class="hidden-xs"><a class="sorting" sd:pagination-sort="validateAuthWoConfirmationDefault" th:text="#{label_org_esupportail_nfctag_domain_application_validateauthwoconfirmationdefault}"/></th>
+                <th class="hidden-xs"><a class="sorting" sd:pagination-sort="active" th:text="#{label_org_esupportail_nfctag_domain_application_active}"/></th>
                 <th></th>
             </tr>
         </thead>
         <tbody>
             <tr th:each="app : ${applications}">
                 <td th:text="${app.name}"></td>
-                <td th:text="${app.nfcConfigDesc}"></td>
-                <td th:text="${app.appliExtDesc}"></td>
-                <td th:text="${app.tagIdCheckDesc}"></td>
-                <td th:text="${app.validateAuthWoConfirmationDefault}"></td>
-                <td th:text="${app.active}"></td>
+                <td class="hidden-xs hidden-sm" th:text="${app.nfcConfigDesc}"></td>
+                <td class="hidden-xs hidden-sm" th:text="${app.appliExtDesc}"></td>
+                <td class="hidden-xs hidden-sm hidden-md" th:text="${app.tagIdCheckDesc}"></td>
+                <td class="hidden-xs" th:text="${app.validateAuthWoConfirmationDefault}"></td>
+                <td class="hidden-xs" th:text="${app.active}"></td>
                 <td>
                     <a th:href="@{/manager/applications/{id}(id=${app.id})}" class="btn btn-info">
                         <span class="glyphicon glyphicon-pencil"></span>
