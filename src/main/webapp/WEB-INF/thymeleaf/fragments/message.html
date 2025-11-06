@@ -54,9 +54,11 @@
         </div>
         <script th:inline="javascript">
             /*<![CDATA[*/
-            $('#messageModal').modal({
-                resizable: false,
-                modal: true
+            $(function() {
+                $('#messageModal').modal({
+                    resizable: false,
+                    modal: true
+                });
             });
             /*]]>*/
         </script>
