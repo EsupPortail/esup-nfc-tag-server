@@ -29,6 +29,8 @@
 
 	<http security="none" pattern="/resources/**" />
 
+	<http security="none" pattern="/webjars/**" />
+
     <!-- HTTP security configurations -->
     <http disable-url-rewriting="true" use-expressions="true" entry-point-ref="http403EntryPoint">
 		<intercept-url pattern="/wsrest/**" access="hasIpAddress('127.0.0.1')" /> <!-- Esup-SGC IP Address -->

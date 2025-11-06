@@ -13,7 +13,7 @@
     <form th:action="@{/manager/stats}" method="get">
         <h1>
             Stats :
-            <select name="annee" onchange="this.form.submit()" class="selectpicker">
+            <select name="annee" onchange="this.form.submit()" class="form-control">
                 <option th:each="year : ${years}"
                         th:value="${year}"
                         th:text="${year}"
@@ -35,7 +35,7 @@
                 <div class="panel panel-primary">
                     <div class="panel-heading"><h5>Tags by location</h5></div>
                     <div class="panel-body">
-                        <select name="application" onchange="this.form.submit()" class="selectpicker" data-none-selected-text="">
+                        <select name="application" onchange="this.form.submit()" class="form-control" data-none-selected-text="">
                             <option th:each="a : ${apps}"
                                     th:value="${a}"
                                     th:text="${a}"

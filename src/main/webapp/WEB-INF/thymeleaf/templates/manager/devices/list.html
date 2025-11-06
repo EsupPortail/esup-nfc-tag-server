@@ -20,7 +20,7 @@
         <div class="input-group">
             <div class="input-group-addon" th:text="#{title_filter}"></div>
             <div class="input-group-btn">
-                <select class="selectpicker" id="searchAttribut" onchange="submit()" name="applicationFilter">
+                <select class="form-control" id="searchAttribut" onchange="submit()" name="applicationFilter">
                     <option value="">-- Application --</option>
                     <option th:each="app : ${applications}"
                             th:value="${app.id}"

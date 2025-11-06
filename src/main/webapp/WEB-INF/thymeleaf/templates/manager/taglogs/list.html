@@ -15,7 +15,7 @@
         <div class="input-group">
             <div class="input-group-addon" th:text="#{title_filter}"></div>
             <div class="input-group-btn">
-                <select class="selectpicker" id="searchAttribut" name="applicationFilter" onchange="submit()">
+                <select class="form-control" id="searchAttribut" name="applicationFilter" onchange="submit()">
                     <option value="">-- Application --</option>
                     <option th:each="app : ${applications}"
                             th:value="${app}"
@@ -24,7 +24,7 @@
                 </select>
             </div>
             <div class="input-group-btn">
-                <select class="selectpicker" id="searchStatus" name="statusFilter" onchange="submit()">
+                <select class="form-control" id="searchStatus" name="statusFilter" onchange="submit()">
                     <option value="">-- Status --</option>
                     <option th:each="state : ${status}"
                             th:value="${state}"

@@ -38,6 +38,11 @@
 		</mvc:resource-chain>
 	</mvc:resources>
 
+    <mvc:resources location="/webjars/" mapping="/webjars/**"  order="2">
+        <mvc:cache-control cache-public="true" max-age="86400"/>
+        <mvc:resource-chain resource-cache="true"/>
+    </mvc:resources>
+
     <!-- Allows for mapping the DispatcherServlet to "/" by forwarding static resource 
     requests to the container's default Servlet -->
     <mvc:default-servlet-handler/>
