@@ -91,6 +91,11 @@
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
 
+    <!-- used by HttpSessionDestroyedEvent for destroy session : session creation is handled by ShibRequestHeaderAuthenticationFilter.successfulAuthentication -->
+    <listener>
+        <listener-class>org.springframework.security.web.session.HttpSessionEventPublisher</listener-class>
+    </listener>
+
     <!-- Handles Spring requests -->
     <servlet>
         <servlet-name>esup-nfc-tag-server</servlet-name>
