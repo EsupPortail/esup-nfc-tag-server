@@ -24,7 +24,7 @@ public class DbToolService {
 
 	private final Logger log = LoggerFactory.getLogger(getClass());
 	
-	final static String currentEsupSgcVersion = "2.4.x";
+	final static String currentEsupSgcVersion = "3.0.x";
 		
 	@Resource
 	DataSource dataSource;
@@ -98,6 +98,16 @@ public class DbToolService {
 					app.setSgcClientApp(false);
 				}
 				log.warn("Mise à jour de numero de version : 2.4.x");
+			}
+
+			if ("2.4.x".equals(esupSgcVersion)) {
+				esupSgcVersion = "2.5.x";
+				log.warn("Mise à jour de numero de version : 2.5.x");
+			}
+
+			if ("2.5.x".equals(esupSgcVersion)) {
+				esupSgcVersion = "3.0.x";
+				log.warn("Mise à jour de numero de version : 3.0.x");
 			}
 				
 			log.warn("\n\n#####\n\t" +
