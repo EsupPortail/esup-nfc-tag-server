@@ -411,8 +411,24 @@
             <groupId>org.webjars</groupId>
             <artifactId>jquery-validation</artifactId>
             <version>1.21.0</version>
-        </dependency>
 
+        </dependency>
+        <dependency>
+            <groupId>jakarta.xml.bind</groupId>
+            <artifactId>jakarta.xml.bind-api</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jaxb</groupId>
+            <artifactId>jaxb-runtime</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+        <dependency>
+            <groupId>net.bytebuddy</groupId>
+            <artifactId>byte-buddy</artifactId>
+            <version>1.14.7</version>
+        </dependency>
+        
 	</dependencies>
 	<build>
 		<plugins>
