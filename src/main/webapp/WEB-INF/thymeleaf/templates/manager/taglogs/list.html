@@ -67,12 +67,14 @@
         <tbody>
             <tr th:each="taglog : ${taglogs}">
                 <td th:text="${#dates.format(taglog.authDate, tagLog_authdate_date_format)}"></td>
-                <td class="hidden-xs hidden-sm" th:text="${taglog.applicationName}"></td>
                 <td class="hidden-xs hidden-sm">
-                    <a th:href="@{/manager/taglogs(searchBySelected='location',searchString=${taglog.location})}" th:text="${taglog.location}"></a>
+                    <a th:href="@{/manager/taglogs(searchString=${taglog.applicationName})}" th:text="${taglog.applicationName}"></a>
                 </td>
                 <td class="hidden-xs hidden-sm">
-                    <a th:href="@{/manager/taglogs(searchBySelected='eppnInit',searchString=${taglog.eppnInit})}" th:text="${taglog.eppnInit}"></a>
+                    <a th:href="@{/manager/taglogs(searchString=${taglog.location})}" th:text="${taglog.location}"></a>
+                </td>
+                <td class="hidden-xs hidden-sm">
+                    <a th:href="@{/manager/taglogs(searchString=${taglog.eppnInit})}" th:text="${taglog.eppnInit}"></a>
                 </td>
                 <td class="hidden-xs hidden-sm hidden-md">
                     <a th:href="@{/manager/devices/numeroid/{numeroId}(numeroId=${taglog.numeroId})}" th:text="${taglog.numeroId}"></a>

@@ -15,11 +15,11 @@ public class PgFullTextDialect extends PostgreSQLDialect {
         var functionRegistry = functionContributions.getFunctionRegistry();
         functionRegistry.registerPattern(
                 "fts",
-                FTS_VECTOR_FIELD + " @@ to_tsquery('french',?1)"
+                FTS_VECTOR_FIELD + " @@ to_tsquery('simple',?1)"
         );
         functionRegistry.registerPattern(
                 "ts_rank",
-                "ts_rank(" + FTS_VECTOR_FIELD  + ", to_tsquery('french', ?1))"
+                "ts_rank(" + FTS_VECTOR_FIELD  + ", to_tsquery('simple', ?1))"
         );
     }
 

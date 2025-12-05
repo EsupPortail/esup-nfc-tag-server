@@ -61,11 +61,17 @@
         <tbody>
             <tr th:each="device : ${devices}">
                 <td class="hidden-xs hidden-sm hidden-md" th:text="${device.numeroId}"></td>
-                <td th:text="${device.eppnInit}"></td>
+                <td>
+                    <a th:href="@{/manager/devices(searchText=${device.eppnInit})}" th:text="${device.eppnInit}"></a>
+                </td>
                 <td class="hidden-xs hidden-sm" th:text="${device.imei}"></td>
                 <td class="hidden-xs hidden-sm" th:text="${device.macAddress}"></td>
-                <td class="hidden-xs" th:text="${device.applicationName}"></td>
-                <td class="hidden-xs hidden-sm" th:text="${device.location}"></td>
+                <td class="hidden-xs">
+                    <a th:href="@{/manager/devices(searchText=${device.applicationName})}" th:text="${device.applicationName}"></a>
+                </td>
+                <td class="hidden-xs hidden-sm">
+                    <a th:href="@{/manager/devices(searchText=${device.location})}" th:text="${device.location}"></a>
+                </td>
                 <td class="hidden-xs hidden-sm hidden-md" th:text="${device.validateAuthWoConfirmation}"></td>
                 <td class="hidden-xs hidden-sm hidden-md" th:text="${#dates.format(device.createDate, device_createdate_date_format)}"></td>
                 <td class="hidden-xs hidden-sm" th:text="${#dates.format(device.lastUseDate, device_lastusedate_date_format)}"></td>
