@@ -108,12 +108,11 @@ public class DeviceController {
     public String numeroId(@PathVariable("numeroId") String numeroId, Model uiModel) {
     	try{
     		Device device = deviceDao.findDevicesByNumeroIdEquals(numeroId).getSingleResult();
-            uiModel.addAttribute("device", device);
-            uiModel.addAttribute("itemId", device.getId());
+            return "redirect:/manager/devices/" + device.getId();
     	}catch(EmptyResultDataAccessException e){
     		log.debug("No device with id " + numeroId);
+            throw new EsupNfcTagException("No device with id " + numeroId, e);
     	}
-        return "templates/manager/devices/update";
     }
  
     @RequestMapping(produces = "text/html")
@@ -210,12 +209,4 @@ public class DeviceController {
         uiModel.addAttribute("applications", applicationDao.findAllApplications());
     }
 
-    String encodeUrlPathSegment(String pathSegment, HttpServletRequest httpServletRequest) {
-        String enc = httpServletRequest.getCharacterEncoding();
-        if (enc == null) {
-            enc = WebUtils.DEFAULT_CHARACTER_ENCODING;
-        }
-        pathSegment = UriUtils.encodePathSegment(pathSegment, enc);
-        return pathSegment;
-    }
 }
