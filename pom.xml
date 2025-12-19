@@ -11,10 +11,10 @@
 		<java.version>17</java.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<slf4j.version>2.0.17</slf4j.version>
-		<spring.version>6.2.14</spring.version>
+		<spring.version>6.2.15</spring.version>
 		<spring-security.version>6.5.7</spring-security.version>
-        <hibernate.version>7.1.0.Final</hibernate.version>
-        <jackson.version>2.19.2</jackson.version>
+        <hibernate.version>7.1.12.Final</hibernate.version>
+        <jackson.version>2.20.1</jackson.version>
         <thymeleaf.version>3.1.3.RELEASE</thymeleaf.version>
 		<skipTests>true</skipTests>
 	</properties>
@@ -37,7 +37,7 @@
        <dependency>
 		  <groupId>ch.qos.logback</groupId>
 		  <artifactId>logback-classic</artifactId>
-		  <version>1.5.18</version>
+		  <version>1.5.22</version>
 		   <exclusions>
 			   <exclusion>
 				   <artifactId>slf4j-api</artifactId>
