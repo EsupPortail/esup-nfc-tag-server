@@ -1,12 +1,9 @@
 package org.esupportail.nfctag.pcsc;
 
-import jnasmartcardio.Smartcardio;
-import jnasmartcardio.Smartcardio.JnaPCSCException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.smartcardio.*;
-import java.security.Security;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -21,9 +18,8 @@ public class PcscUsbService {
 	public CardTerminals terminals;
 	
 	public PcscUsbService() {
-		Security.addProvider(new Smartcardio());
 		try {
-			context = TerminalFactory.getInstance("PC/SC", null, Smartcardio.PROVIDER_NAME);
+			context = TerminalFactory.getInstance("PC/SC", null);
 			terminals = context.terminals();
 		} catch (Exception e) {
 			log.error("Exception retrieving context", e);
@@ -41,7 +37,7 @@ public class PcscUsbService {
 				try{
 					card = cardTerminal.connect("*");
 					return cardTerminal.getName();
-				}catch(JnaPCSCException e){
+				}catch(Exception e){
 					log.error("pcsc connection error", e);
 				}
 			}
