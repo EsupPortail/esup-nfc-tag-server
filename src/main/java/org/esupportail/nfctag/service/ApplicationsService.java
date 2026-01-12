@@ -84,6 +84,10 @@ public class ApplicationsService {
 					() -> {
 						log.trace(String.format("get locations for %s for %s ...", appli.getName(), eppn));
 						AppliExtApi appliExtApi = applisExtService.get(appli.getAppliExt());
+						if(appliExtApi == null) {
+							log.error("AppliExtApi " + appli.getAppliExt() + " introuvable pour l'application " + appli.getName() + " référencée en base de données !");
+							return null;
+						}
 						try {
 							List<String> locations = appliExtApi.getLocations4Eppn(eppn);
 							if (locations.size() > 0 && (appli.isActive() || !checkActive)) {

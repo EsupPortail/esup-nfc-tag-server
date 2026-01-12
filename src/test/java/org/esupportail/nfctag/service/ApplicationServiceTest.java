@@ -13,6 +13,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import static org.junit.jupiter.api.Assertions.fail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.context.web.WebAppConfiguration;
@@ -33,6 +34,9 @@ public class ApplicationServiceTest {
 
 	@Resource
 	private DeviceDao deviceDao;
+
+	@Value("${test.ldap.eppn:dummy@example.org}")
+	String testLdapEppn;
 
 	@Test
 	public void testApplications() throws Exception {
@@ -65,6 +69,16 @@ public class ApplicationServiceTest {
 		}
 		if(nbDeviceOK < devices.size()){
 			fail("error on testDevices");
+		}
+	}
+
+	@Test
+	public void getApplications4EppnTest() {
+		try {
+			List<Application> locations = applicationService.getApplications4Eppn(testLdapEppn, false);
+			log.info("locations for " + testLdapEppn + " : " + locations);
+		} catch (Exception e) {
+			fail("error on getApplications4EppnTest : " + e.getMessage());
 		}
 	}
 	
