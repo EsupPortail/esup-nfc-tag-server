@@ -21,11 +21,10 @@ import org.esupportail.nfctag.domain.TagLog;
 import org.esupportail.nfctag.service.api.TagIdCheckApi.TagType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ldap.NamingException;
 import org.springframework.ldap.core.AttributesMapper;
-import org.springframework.ldap.core.ContextMapper;
-import org.springframework.ldap.core.DirContextAdapter;
+import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.AbstractContextMapper;
 import org.springframework.ldap.core.support.LdapContextSource;
 
 import javax.naming.directory.Attributes;
@@ -46,11 +45,10 @@ public class LdapService {
 	public boolean isTagable(String eppn, String isTagableFilter) {
 		String ldapFilter = "(&(eduPersonPrincipalName=" + eppn + ")("+isTagableFilter+"))";
 		try{
-			List<String> result = ldapTemplate.search("", ldapFilter, new ContextMapper<String>() {
-					@Override
-					public String mapFromContext(Object ctx) throws NamingException {
-						DirContextAdapter searchResultContext = (DirContextAdapter)ctx;
-				        String eppn = searchResultContext.getStringAttribute("eduPersonPrincipalName");
+			List<String> result = ldapTemplate.search("", ldapFilter, new AbstractContextMapper<String>() {
+				@Override
+				protected String doMapFromContext(DirContextOperations ctx) {
+				        String eppn = ctx.getStringAttribute("eduPersonPrincipalName");
 						return eppn;
 					}
 				});
@@ -69,11 +67,10 @@ public class LdapService {
 	
 	public boolean locationRightCheck(String eppnInit, String locationFilter) {
 		try{
-			List<String> result = ldapTemplate.search("", "(&(eduPersonPrincipalName=" + eppnInit + ")("+locationFilter+"))", new ContextMapper<String>() {
-					@Override
-					public String mapFromContext(Object ctx) throws NamingException {
-						DirContextAdapter searchResultContext = (DirContextAdapter)ctx;
-				        String eppn = searchResultContext.getStringAttribute("eduPersonPrincipalName");
+			List<String> result = ldapTemplate.search("", "(&(eduPersonPrincipalName=" + eppnInit + ")("+locationFilter+"))", new AbstractContextMapper<String>() {
+				@Override
+				protected String doMapFromContext(DirContextOperations ctx) {
+				        String eppn = ctx.getStringAttribute("eduPersonPrincipalName");
 						return eppn;
 					}
 				});
@@ -92,11 +89,10 @@ public class LdapService {
 	
 	public String getDisplay(String eppn, String displayAttribut) {
 		try {
-			List<String> result = ldapTemplate.search("", "(&(eduPersonPrincipalName=" + eppn + "))", new ContextMapper<String>() {
-					@Override
-					public String mapFromContext(Object ctx) throws NamingException {
-						DirContextAdapter searchResultContext = (DirContextAdapter)ctx;
-				        String result = searchResultContext.getStringAttribute(displayAttribut);
+			List<String> result = ldapTemplate.search("", "(&(eduPersonPrincipalName=" + eppn + "))", new AbstractContextMapper<String>() {
+				@Override
+				protected String doMapFromContext(DirContextOperations ctx) {
+				        String result = ctx.getStringAttribute(displayAttribut);
 						return result;
 					}
 				});

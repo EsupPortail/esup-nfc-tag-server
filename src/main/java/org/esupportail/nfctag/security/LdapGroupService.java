@@ -3,12 +3,11 @@ package org.esupportail.nfctag.security;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.ldap.core.ContextMapper;
-import org.springframework.ldap.core.DirContextAdapter;
+import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.ldap.core.LdapTemplate;
+import org.springframework.ldap.core.support.AbstractContextMapper;
 import org.springframework.ldap.query.LdapQueryBuilder;
 
-import javax.naming.NamingException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -56,12 +55,10 @@ public class LdapGroupService implements GroupService {
 		String username = eppn.replaceAll("@.*", "");	
 		
 		List<String> dns = ldapTemplate.search(LdapQueryBuilder.query().where("eduPersonPrincipalName").is(eppn),
-				new ContextMapper<String>() {
-
+				new AbstractContextMapper<String>() {
 					@Override
-					public String mapFromContext(Object ctx) throws NamingException {
-						DirContextAdapter searchResultContext = (DirContextAdapter)ctx;
-				        String dn = searchResultContext.getNameInNamespace();
+					protected String doMapFromContext(DirContextOperations ctx) {
+				        String dn = ctx.getNameInNamespace();
 						return dn;
 					}
 			
@@ -74,12 +71,10 @@ public class LdapGroupService implements GroupService {
 			String formattedFilter = MessageFormat.format(groupSearchFilter, userDn, username);
 			
 			groups = ldapTemplate.search(
-					groupSearchBase, formattedFilter,new ContextMapper<String>() {
-	
+					groupSearchBase, formattedFilter, new AbstractContextMapper<String>() {
 						@Override
-						public String mapFromContext(Object ctx) throws NamingException {
-							DirContextAdapter searchResultContext = (DirContextAdapter)ctx;
-					        String dn = searchResultContext.getNameInNamespace();
+						protected String doMapFromContext(DirContextOperations ctx) {
+					        String dn = ctx.getNameInNamespace();
 							return dn;
 						}
 					});
