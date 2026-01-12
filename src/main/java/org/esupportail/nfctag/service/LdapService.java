@@ -44,8 +44,9 @@ public class LdapService {
 	}
 
 	public boolean isTagable(String eppn, String isTagableFilter) {
+		String ldapFilter = "(&(eduPersonPrincipalName=" + eppn + ")("+isTagableFilter+"))";
 		try{
-			List<String> result = ldapTemplate.search("", "(&(eduPersonPrincipalName=" + eppn + ")("+isTagableFilter+"))", new ContextMapper<String>() {
+			List<String> result = ldapTemplate.search("", ldapFilter, new ContextMapper<String>() {
 					@Override
 					public String mapFromContext(Object ctx) throws NamingException {
 						DirContextAdapter searchResultContext = (DirContextAdapter)ctx;
@@ -54,14 +55,14 @@ public class LdapService {
 					}
 				});
 			if(!result.isEmpty()) {
-				log.info("Ldap entry for " + eppn + " this filter : " + isTagableFilter + "isTagable = true");
+				log.info(ldapFilter + " -> ldap entry -> isTagable = true");
 				return true;
 			} else {
-				log.warn("NO ldap entry for " + eppn + " this filter : " + isTagableFilter + " isTagable = false");
+				log.warn(ldapFilter + " -> NO ldap entry -> isTagable = false");
 				return false;
 			}
 		} catch (Exception e){
-			log.warn("ldap request error for " + eppn + " with istagable filter" + isTagableFilter, e);
+			log.warn("ldap request error for " + eppn + " with istagable filter " + isTagableFilter, e);
 			return false;
 		}
 	}
