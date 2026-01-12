@@ -82,6 +82,9 @@ public class ApplicationsService {
 		for(Application appli: applicationDao.findAllApplications()) {
 			CompletableFuture<Void> appliGetLocationsAsync = CompletableFuture.supplyAsync(
 					() -> {
+						// Hack : set context classloader to avoid issues with some AppliExtApi implementations (like LDAP one)
+						// See https://stackoverflow.com/questions/45742638/classcastexception-while-searching-for-ldap-user
+						Thread.currentThread().setContextClassLoader(this.getClass().getClassLoader());
 						log.trace(String.format("get locations for %s for %s ...", appli.getName(), eppn));
 						AppliExtApi appliExtApi = applisExtService.get(appli.getAppliExt());
 						if(appliExtApi == null) {
