@@ -17,13 +17,11 @@
  */
 package org.esupportail.nfctag.web.live;
 
-import jakarta.annotation.Resource;
-import jakarta.persistence.NoResultException;
-import org.esupportail.nfctag.dao.DeviceDao;
-import org.esupportail.nfctag.dao.TagLogDao;
 import org.esupportail.nfctag.domain.Application;
 import org.esupportail.nfctag.domain.Device;
 import org.esupportail.nfctag.domain.TagLog;
+import org.esupportail.nfctag.dao.DeviceDao;
+import org.esupportail.nfctag.dao.TagLogDao;
 import org.esupportail.nfctag.service.ApplisExtService;
 import org.esupportail.nfctag.service.EsupSgcAuthTokenService;
 import org.esupportail.nfctag.service.NfcAuthConfigService;
@@ -38,7 +36,6 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -46,6 +43,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import jakarta.annotation.Resource;
+import jakarta.persistence.NoResultException;
+import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
@@ -120,7 +120,7 @@ public class LiveLongPoolController {
 				uiModel.addAttribute("numeroId", numeroId);
 				uiModel.addAttribute("eppnInit", device.getEppnInit());
 				if(esupSgcAuthTokenService.isPresent()) {
-		                        String sgcAuthToken = esupSgcAuthTokenService.get()X.getAuthToken(device.getEppnInit());
+		                        String sgcAuthToken = esupSgcAuthTokenService.get().getAuthToken(device.getEppnInit());
 		                        uiModel.addAttribute("sgcAuthToken", sgcAuthToken);
 		                }
 
