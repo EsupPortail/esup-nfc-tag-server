@@ -36,7 +36,7 @@
             <property name="hibernate.id.new_generator_mappings" value="false"/>
             <property name="hibernate.connection.charSet" value="UTF-8"/>
             <property name="hibernate.jdbc.use_streams_for_binary" value="true"/>
-            <property name="hibernate.hbm2ddl.import_files_sql_extractor" value="org.hibernate.tool.hbm2ddl.SingleLineSqlCommandExtractor"/>
+            <property name="hibernate.hbm2ddl.import_files_sql_extractor" value="org.hibernate.tool.schema.internal.script.SingleLineSqlScriptExtractor"/>
             <!-- Uncomment the following two properties for JBoss only -->
             <!-- property name="hibernate.validator.apply_to_ddl" value="false" /-->
             <!-- property name="hibernate.validator.autoregister_listeners" value="false" /-->
